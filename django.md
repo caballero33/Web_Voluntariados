@@ -159,6 +159,18 @@ INSTALLED_APPS = [
 ]
 ```
 
+# Framework (Bulma)
+
+Como no me gusta en lo más mínimo diseñar con CSS, usaré Bulma para eso. Lo usamos añadiendo lo siguiente en el `head` del HTML:
+```html
+<link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css"
+    />
+```
+
+Eso, junto a DeepSeek.
+
 # Base de datos 
 
 Por defecto, Django utiliza SQLite. Esta configuración está en los ajustes del sitio (`voluntarios/settings.py`). Ahí también está la `TIME_ZONE` que dejaremos en `UTC`.

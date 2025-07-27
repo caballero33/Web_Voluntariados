@@ -1,26 +1,194 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}Voluntariados{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Voluntariados - {% block title %}{% endblock %}</title>
+    
+    <!-- Bulma CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS personalizado optimizado -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
-<body>
-    <header>
-        <h1>Mi sitio</h1>
-        <nav>
-            <a href="/">Inicio</a>
-            <a href="/contacto/">Contacto</a>
-        </nav>
-    </header>
+<body class="has-text-white">
+    <!-- Navbar principal -->
+    <nav class="navbar has-background-dark" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item has-text-white has-text-weight-bold is-size-4">
+                <i class="fas fa-hands-helping mr-2"></i>Voluntariados
+            </a>
+            <a role="button" class="navbar-burger has-text-white" aria-label="menu" aria-expanded="false" data-target="navbarMenu">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+        </div>
 
-    <main>
-        {% block content %}
-        <!-- Aquí va el contenido de cada página -->
-        {% endblock %}
+        <div id="navbarMenu" class="navbar-menu has-background-dark">
+            <div class="navbar-start">
+                <a class="navbar-item has-text-white">
+                    <i class="fas fa-home mr-2"></i>Inicio
+                </a>
+                <a class="navbar-item has-text-white">
+                    <i class="fas fa-book mr-2"></i>Documentación
+                </a>
+
+                <div class="navbar-item has-dropdown is-hoverable">
+                    <a class="navbar-item has-text-white">
+                        <i class="fas fa-ellipsis-h mr-2"></i>Más
+                    </a>
+                    <div class="navbar-dropdown has-background-dark">
+                        <a class="navbar-item has-text-white">
+                            <i class="fas fa-users mr-2"></i>Sobre nosotros
+                        </a>
+                        <a class="navbar-item has-text-white">
+                            <i class="fas fa-hand-holding-heart mr-2"></i>Voluntariados
+                        </a>
+                        <a class="navbar-item has-text-white">
+                            <i class="fas fa-envelope mr-2"></i>Contacto
+                        </a>
+                        <hr class="navbar-divider">
+                        <a class="navbar-item has-text-white">
+                            <i class="fas fa-bug mr-2"></i>Reportar un problema
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="navbar-end">
+                <!-- Botón para alternar modo oscuro/claro -->
+                <div class="navbar-item">
+                    <button class="theme-toggle" id="theme-toggle" title="Cambiar tema">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+                
+                <div class="navbar-item">
+                    <div class="buttons">
+                        <a class="button is-primary">
+                            <strong>Registrarse</strong>
+                        </a>
+                        <a class="button is-light">
+                            Iniciar sesión
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido principal -->
+    <main class="section">
+        <div class="container">
+            {% block content %}
+                <div class="box-content">
+                    <p>
+                        Este contenido no debería ser accesible.
+                    </p>
+                    <p>
+                        Si usted lo está viendo, es por un error, por favor, respórtelo.
+                    </p>
+                    <p>
+                        Muchas gracias.
+                    </p>
+                </div>
+            {% endblock %}
+        </div>
     </main>
 
-    <footer>
-        <p>&copy; 2025 Mi sitio</p>
-    </footer>
+<!-- Footer reorganizado -->
+<footer class="footer has-background-dark">
+    <div class="container">
+        <div class="columns is-vcentered is-multiline">
+            <!-- Columna 1: Logo y descripción -->
+            <div class="column is-4">
+                <div class="footer-brand">
+                    <div class="logo-container has-text-centered event-image">
+                        <img src="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741579925/ckeskhupgmw0tlfyvgmj.png" 
+                                alt="Voluntariados Logo"
+                                class="footer-logo">
+                    </div>
+                    <p class="has-text-grey-light mt-4 has-text-centered-mobile">
+                        Una red universitaria comprometida con el desarrollo social y ambiental a través de la acción voluntaria organizada.
+                    </p>
+                    <div class="social-links mt-4 is-flex is-justify-content-center">
+                        <a class="social-icon" href="#">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a class="social-icon" href="#">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a class="social-icon" href="#">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a class="social-icon" href="#">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a class="social-icon" href="#">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Columna 2: Enlaces rápidos -->
+            <div class="column is-3">
+                <div class="footer-section">
+                    <h4 class="title is-5 has-text-white mb-4 has-text-centered-mobile">Enlaces Rápidos</h4>
+                    <ul class="footer-links">
+                        <li><a href="#"><i class="fas fa-chevron-right mr-2 has-text-primary"></i>Inicio</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right mr-2 has-text-primary"></i>Documentación</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right mr-2 has-text-primary"></i>Voluntariados</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right mr-2 has-text-primary"></i>Eventos</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right mr-2 has-text-primary"></i>Galeria</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Columna 3: Contacto -->
+            <div class="column is-5">
+                <div class="footer-section">
+                    <h4 class="title is-5 has-text-white mb-4 has-text-centered-mobile">Contacto</h4>
+                    <ul class="contact-info">
+                        <li class="mb-3">
+                            <i class="fas fa-map-marker-alt mr-3 has-text-primary"></i>
+                            <span class="has-text-white">UNAH Campus Cortés, San Pedro Sula, Honduras</span>
+                        </li>
+                        <li class="mb-3">
+                            <i class="fas fa-envelope mr-3 has-text-primary"></i>
+                            <span><a class="has-text-white" href="mailto:contacto@ejemplo.com">contacto@ejemplo.com</a></span>
+                        </li>
+                        <li class="mb-3">
+                            <i class="fas fa-phone mr-3 has-text-primary"></i>
+                            <span> <a class="has-text-white" href="tel:+50412345678">+504 1234-5678</a></span>
+                        </li>
+                        <li>
+                            <i class="fas fa-clock mr-3 has-text-primary"></i>
+                            <span class="has-text-white">Lun-Vie: 8:00 AM - 5:00 PM</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Divider -->
+        <hr class="footer-divider">
+        
+        <!-- Copyright -->
+        <div class="footer-copyright has-text-centered mt-5">
+            <p class="has-text-grey-light">
+                &copy; 2025 Voluntariados - UNAH - Cortés. Todos los derechos reservados.
+            </p>
+        </div>
+    </div>
+</footer>
+
+    <!-- Cargar JavaScript al final del body -->
+    <script src="{% static 'js/main.js' %}"></script>
 </body>
 </html>
