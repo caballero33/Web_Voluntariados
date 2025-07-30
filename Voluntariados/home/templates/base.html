@@ -19,8 +19,8 @@
     <!-- Navbar principal -->
     <nav class="navbar has-background-dark" role="navigation" aria-label="main navigation">
         <div class="navbar-brand">
-            <a class="navbar-item has-text-white has-text-weight-bold is-size-4">
-                <i class="fas fa-hands-helping mr-2"></i>Voluntariados
+            <a href="{% url "home" %}" class="navbar-item has-text-white has-text-weight-bold is-size-4">
+                <img src="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741579925/ckeskhupgmw0tlfyvgmj.png" alt='Logo de los Voluntariados'>
             </a>
             <a role="button" class="navbar-burger has-text-white" aria-label="menu" aria-expanded="false" data-target="navbarMenu">
                 <span aria-hidden="true"></span>
@@ -31,11 +31,11 @@
 
         <div id="navbarMenu" class="navbar-menu has-background-dark">
             <div class="navbar-start">
-                <a class="navbar-item has-text-white">
+                <a href="{% url "home" %}" class="navbar-item has-text-white">
                     <i class="fas fa-home mr-2"></i>Inicio
                 </a>
-                <a class="navbar-item has-text-white">
-                    <i class="fas fa-book mr-2"></i>Documentación
+                <a href="{% url "reglamento" %}" class="navbar-item has-text-white">
+                    <i class="fas fa-book mr-2"></i>Reglamento
                 </a>
 
                 <div class="navbar-item has-dropdown is-hoverable">
@@ -46,11 +46,8 @@
                         <a class="navbar-item has-text-white">
                             <i class="fas fa-users mr-2"></i>Sobre nosotros
                         </a>
-                        <a class="navbar-item has-text-white">
+                        <a class="navbar-item has-text-white" href="{% url "voluntariados" %}">
                             <i class="fas fa-hand-holding-heart mr-2"></i>Voluntariados
-                        </a>
-                        <a class="navbar-item has-text-white">
-                            <i class="fas fa-envelope mr-2"></i>Contacto
                         </a>
                         <hr class="navbar-divider">
                         <a class="navbar-item has-text-white">
@@ -141,9 +138,9 @@
                 <div class="footer-section">
                     <h4 class="title is-5 has-text-white mb-4 has-text-centered-mobile">Enlaces Rápidos</h4>
                     <ul class="footer-links">
-                        <li><a href="#"><i class="fas fa-chevron-right mr-2 has-text-primary"></i>Inicio</a></li>
-                        <li><a href="#"><i class="fas fa-chevron-right mr-2 has-text-primary"></i>Documentación</a></li>
-                        <li><a href="#"><i class="fas fa-chevron-right mr-2 has-text-primary"></i>Voluntariados</a></li>
+                        <li><a href="{% url "home" %}"><i class="fas fa-chevron-right mr-2 has-text-primary"></i>Inicio</a></li>
+                        <li><a href="{% url "reglamento" %}"><i class="fas fa-chevron-right mr-2 has-text-primary"></i>Reglamento</a></li>
+                        <li><a href="{% url "voluntariados" %}"><i class="fas fa-chevron-right mr-2 has-text-primary"></i>Voluntariados</a></li>
                         <li><a href="#"><i class="fas fa-chevron-right mr-2 has-text-primary"></i>Eventos</a></li>
                         <li><a href="#"><i class="fas fa-chevron-right mr-2 has-text-primary"></i>Galeria</a></li>
                     </ul>
