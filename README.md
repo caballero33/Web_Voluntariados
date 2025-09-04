@@ -159,7 +159,7 @@ INSTALLED_APPS = [
 ]
 ```
 
-# Framework (Bulma)
+# Bulma
 
 Como no me gusta en lo más mínimo diseñar con CSS, usaré Bulma para eso. Lo usamos añadiendo lo siguiente en el `head` del HTML:
 ```html
