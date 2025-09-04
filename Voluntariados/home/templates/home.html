@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}Inicio{% endblock %}
+
+{% block content %}
+<!-- Esta es la parte de bienvenida -->
+    <div class="box-content">
+        <section class="hero is-medium is-primary">
+            <div class="hero-body">
+                <div class="container has-text-centered">
+                    <h1 class="title is-1">
+                        <i class="fas fa-hands-helping mr-3"></i>Juntos Transformando Comunidades
+                    </h1>
+                    <p class="subtitle is-3 mt-4">
+                        Una red universitaria comprometida con el desarrollo social y ambiental a través de la acción voluntaria organizada.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+<!-- Aquí están los eventos -->
+<div class="box-content mt-5">
+    <div class="columns">
+        <div class="column is-12">
+            <h2 class="title is-2 has-text-primary">
+                <i class="fas fa-history mr-2"></i>Eventos Recientes
+            </h2>
+        </div>
+    </div>
+    
+    <div class="columns is-multiline mt-4">
+
+        <!-- Evento 1 -->
+        <div class="column is-6">
+            <div class="event-card card">
+                <div class="card-content">
+                    <div class="columns is-vcentered">
+                        <div class="column is-2 has-text-centered">
+                            <span class="icon is-large has-text-primary">
+                                <i class="fa-solid fa-warehouse fa-2x"></i>
+                            </span>
+                        </div>
+                        <div class="column is-7">
+                            <h3 class="title is-4 has-text-white">Inauguración del Nuevo Espacio de Voluntariado</h3>
+                        </div>
+                        <div class="column is-3">
+                            <div class="event-image">
+                                <img src="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741583384/b7cffaf1-0995-42fb-b8e8-c306a6fee7d2_nfsdyo.jpg" 
+                                    alt="Inauguración espacio voluntariado">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="event-details has-text-white">
+                        <p class="mb-2"><i class="fas fa-calendar-day mr-2"></i>15 de Octubre, 2025</p>
+                        <p><i class="fas fa-map-marker-alt mr-2"></i>UNAH - Cortés</p>
+                    </div>
+                    <div class="content mt-4">
+                        <p class="has-text-white">
+                            Únete a nosotros en este hito histórico para nuestra organización universitaria.
+                        </p>
+                        <!--<a class="button is-primary mt-3">Más información</a>-->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+
+    </div>
+    
+    <!--
+    <div class="has-text-centered mt-5">
+        <a class="button is-primary is-medium">
+            <span>Ver todos los eventos</span>
+            <span class="icon">
+                <i class="fas fa-arrow-right"></i>
+            </span>
+        </a>
+    </div>
+    -->
+</div>
+    
+<!-- Voluntariados -->
+    <div class="box-content mt-5">
+        <h2 class="title is-2 has-text-centered has-text-primary">Nuestros Voluntariados</h2>
+        <p class="subtitle has-text-centered has-text-white">Descubre cómo puedes contribuir según tus intereses</p>
+        
+        <div class="columns mt-5 is-variable is-4">
+            <!-- Pumas Verdes -->
+            <div class="column">
+                <div class="volunteer-card box has-text-centered notification is-primary">
+                    <div class="logo-container mb-4">
+                        <div class="event-image">
+                            <img src="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741580608/Logo_PV_UNAH_VS-removebg-preview_jadsip.png" 
+                                    alt="Pumas Verdes Logo"
+                                    width="200" height="100">
+                        </div>
+                    </div>
+                    <h3 class="title is-4">Pumas Verdes</h3>
+                    <div class="volunteer-description">
+                        <p>Comprometidos con la sostenibilidad ambiental y la educación ecológica en nuestro campus y comunidades.</p>
+                        <a class="button is-light mt-3">Unirse al cambio</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Sonriendo Juntos -->
+            <div class="column">
+                <div class="volunteer-card box has-text-centered notification is-primary">
+                    <div class="logo-container mb-4">
+                        <div class="event-image">
+                            <img src="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741580995/c31eebe3-8666-4c25-ba58-c81ae0da5ab6-removebg-preview_b1an3v.png" 
+                                    alt="Sonriendo Juntos Logo"
+                                    width="150" height="100">
+                        </div>
+                    </div>
+                    <h3 class="title is-4">Sonriendo Juntos</h3>
+                    <div class="volunteer-description">
+                        <p>Transformando vidas a través de la salud y bienestar, colaborando con Operación Sonrisa Honduras.</p>
+                        <a class="button is-light mt-3">Unirse al cambio</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Patitas UNAH -->
+            <div class="column">
+                <div class="volunteer-card box has-text-centered notification is-primary">
+                    <div class="logo-container mb-4">
+                        <div class="event-image">
+                            <img src="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741580981/273c01b6-b5ce-4abb-af34-c5046222a2d6-removebg-preview_ycw82u.png" 
+                                    alt="Sonriendo Juntos Logo"
+                                    width="100" height="100">
+                        </div>
+                    </div>
+                    <h3 class="title is-4">Patitas UNAH</h3>
+                    <div class="volunteer-description">
+                        <p>Protectores de la vida animal: Rescate, rehabilitación y concienciación sobre tenencia responsable.</p>
+                        <a class="button is-light mt-3">Unirse al cambio</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Pumas Unidos -->
+            <div class="column">
+                <div class="volunteer-card box has-text-centered notification is-primary">
+                    <div class="logo-container mb-4">
+                        <div class="event-image">
+                            <img src="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741581160/27022b04-71eb-4808-95e2-fbc2c4e43738-removebg-preview_hewtfm.png" 
+                                    alt="Sonriendo Juntos Logo"
+                                    width="100" height="100">
+                        </div>
+                    </div>
+                    <h3 class="title is-4">Pumas Unidos</h3>
+                    <div class="volunteer-description">
+                        <p>Acciones solidarias que fortalecen comunidades vulnerables mediante ayuda humanitaria y educación.</p>
+                        <a class="button is-light mt-3">Unirse al cambio</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+{% endblock %}
