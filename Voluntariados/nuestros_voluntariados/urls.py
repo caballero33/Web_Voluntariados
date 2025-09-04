@@ -5,5 +5,6 @@ from . import views
 app_name = "nuestros_voluntariados"  # <-- Add this line
 
 urlpatterns = [
-    path("home/", views.index, name="home"),
+    path("home/", views.home, name="home"),
+    path("pumas_verdes/", views.pumas_verdes, name="pumas_verdes"),
 ]

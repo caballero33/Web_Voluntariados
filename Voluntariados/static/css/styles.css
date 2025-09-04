@@ -14,6 +14,11 @@
   --shadow: 0 4px 15px rgba(0,0,0,0.1);
   --transition: 0.3s;
   --spacing: 1.5rem;
+
+  --color-light-mode-bg-dark: #a7c0fd;
+  --color-light-mode-primary: #c2e9fb;
+
+  --color-primary-dark: #1e5799;
 }
 
 /* Estilos generales */
@@ -28,8 +33,8 @@ body {
   transition: background var(--transition), color var(--transition);
 }
 body.light-mode {
-  background: linear-gradient(to bottom, #a7c0fd, #c2e9fb);
-  color: var(--color-text-dark);
+  background: linear-gradient(to bottom, var(--color-light-mode-bg-dark), var(--color-light-mode-primary));
+  color: var(--color-light-mode-text);
 }
 main { flex: 1; padding: var(--spacing) 0; }
 
@@ -63,7 +68,7 @@ body.light-mode .footer { background: var(--color-bg-light); color: var(--color-
     left: 0;
     width: 100%;
     height: 4px;
-    background: linear-gradient(90deg, #2989d8, #1e5799);
+    background: linear-gradient(90deg, var(--color-primary), var(--color-primary-dark));
 }
 
 .footer-brand .logo-container {
@@ -86,7 +91,7 @@ body.light-mode .footer { background: var(--color-bg-light); color: var(--color-
 }
 
 .social-icon:hover {
-    background-color: #2989d8;
+    background-color: var(--color-primary);
     transform: translateY(-3px);
 }
 
@@ -107,7 +112,7 @@ body.light-mode .footer { background: var(--color-bg-light); color: var(--color-
 }
 
 .footer-links a:hover {
-    color: #2989d8;
+    color: var(--color-primary);
     transform: translateX(5px);
 }
 
@@ -160,7 +165,7 @@ body.light-mode .footer { background: var(--color-bg-light); color: var(--color-
 }
 
 .legal-links a:hover {
-    color: #2989d8;
+    color: var(--color-primary);
 }
 
 .divider {
@@ -232,11 +237,7 @@ body.light-mode .card, body.light-mode .volunteer-card, body.light-mode .event-c
     color: #00d1b2;
 }
 
-/* Modo claro */
-body.light-mode {
-    background: linear-gradient(to bottom, #a7c0fd, #c2e9fb);
-    color: var(--color-text-dark);
-}
+
 
 body.light-mode .has-text-white,
 body.light-mode .navbar-item.has-text-white,
@@ -316,31 +317,31 @@ body.light-mode .theme-toggle:hover { background: rgba(0,0,0,0.15); }
 
 /* Estilos adicionales para mejor UX */
 .hero.is-primary {
-    background-color: #2989d8;
+    background-color: var(--color-primary);
     color: #fff;
 }
 
 .has-text-primary {
-    color: #2989d8 !important;
+    color: var(--color-primary) !important;
 }
 
 .button.is-primary {
-    background-color: #2989d8;
+    background-color: var(--color-primary);
     border-color: transparent;
     color: #fff;
 }
 
 .button.is-primary:hover {
-    background-color: #1e5799;
+    background-color: var(--color-primary-dark);
 }
 
 .notification.is-primary {
-    background-color: #2989d8;
+    background-color: var(--color-primary);
     color: #fff;
 }
 
 .notification.is-primary-light {
-    background-color: #e6f2ff;
+    background-color: var(--color-primary-light);
     color: #333;
 }
 
@@ -364,7 +365,7 @@ body.light-mode .theme-toggle:hover { background: rgba(0,0,0,0.15); }
 
 /* Efecto de hover para imágenes de eventos */
 .event-image {
-    background-color: #e6f2ff;
+    background-color: var(--color-bg-light);
     transition: transform 0.5s ease, box-shadow 0.3s ease;
     border-radius: 8px;
     overflow: hidden;
@@ -526,7 +527,7 @@ body.light-mode .event-details {
     left: 0;
     width: 100%;
     height: 4px;
-    background: linear-gradient(90deg, #2989d8, #1e5799);
+    background: linear-gradient(90deg, var(--color-primary), var(--color-primary-dark));
 }
 
 .footer-brand .logo-container {
@@ -549,7 +550,7 @@ body.light-mode .event-details {
 }
 
 .social-icon:hover {
-    background-color: #2989d8;
+    background-color: var(--color-primary);
     transform: translateY(-3px);
 }
 
@@ -570,7 +571,7 @@ body.light-mode .event-details {
 }
 
 .footer-links a:hover {
-    color: #2989d8;
+    color: var(--color-primary);
     transform: translateX(5px);
 }
 
@@ -623,7 +624,7 @@ body.light-mode .event-details {
 }
 
 .legal-links a:hover {
-    color: #2989d8;
+    color: var(--color-primary);
 }
 
 .divider {
@@ -637,7 +638,7 @@ body.light-mode .footer {
 }
 
 body.light-mode .footer::before {
-    background: linear-gradient(90deg, #64b5f6, #1e88e5);
+    background: linear-gradient(90deg, var(--color-bg-dark), var(--color-primary-dark));
 }
 
 body.light-mode .footer-links a,
@@ -729,4 +730,96 @@ body:not(.light-mode) .accordion-content {
 /* Transiciones suaves para mostrar/ocultar voluntariados */
 .column {
     transition: all 0.4s ease;
+}
+
+/* Fondo de color claro/blanco */
+
+div.set-bg-light {
+    background-color: var(--color-bg-light) !important;
+    color: #333 !important;
+}
+
+/* Hero logo style for Pumas Verdes */
+.hero-logo-container {
+    background: #fff;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.hero-logo-container img {
+    max-width: 220px;
+    height: auto;
+    display: block;
+    transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.hero-logo-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.hero-logo-mobile {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .hero-logo-mobile {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+    }
+    .hero-logo-desktop-row {
+        display: none !important;
+    }
+}
+
+.hero-header-content {
+    max-width: 600px;
+    margin: 0 auto;
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+.hero-logo-container.hero-logo-responsive {
+    max-width: 260px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.hero-logo-container img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+@media (max-width: 1024px) {
+    .hero-header-content {
+        max-width: 100%;
+        padding: 0 1rem;
+    }
+    .hero-logo-container.hero-logo-responsive {
+        max-width: 180px;
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-logo-container.hero-logo-responsive {
+        margin-bottom: 1.5rem;
+        max-width: 160px;
+        padding: 0.5rem;
+    }
+    .hero-header-content {
+        padding: 0 0.5rem;
+    }
+    .columns {
+        flex-direction: column !important;
+    }
 }
