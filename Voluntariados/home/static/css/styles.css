@@ -423,7 +423,7 @@ body.light-mode .event-details {
     background-color: rgba(255, 255, 255, 0.1);
     color: white;
     margin-right: 10px;
-    transition: all 0.3s ease;
+    transition: all 1s cubic-bezier(.68,-0.55,.27,1.55);
 }
 
 .social-icon:hover {
