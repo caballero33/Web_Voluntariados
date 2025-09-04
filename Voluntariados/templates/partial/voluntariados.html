@@ -1,0 +1,41 @@
+<div class="column is-3" data-categorias="{{ categorias }}">
+  <div class="volunteer-card box has-text-centered notification {{ color_class }}">
+    <div class="logo-container mb-4">
+      <div class="event-image">
+        <img src="{{ logo_url }}" 
+             alt="{{ alt }}"
+             width="200" height="100">
+      </div>
+    </div>
+
+    <h3 class="title is-4 has-text-white">{{ nombre }}</h3>
+
+    <div class="tags is-centered mb-3">
+      {% for tag in tags %}
+        <span class="tag {{ tag.class }}">{{ tag.text }}</span>
+      {% endfor %}
+    </div>
+
+    <div class="volunteer-description has-text-white">
+      <p>{{ descripcion }}</p>
+      <div class="volunteer-stats mt-4">
+        <span class="icon-text">
+          <span class="icon has-text">
+            <i class="fas fa-users"></i>
+          </span>
+          <span>{{ voluntarios }} voluntarios</span>
+        </span>
+        <span class="icon-text ml-4">
+          <span class="icon has-text">
+            <i class="fas fa-calendar-check"></i>
+          </span>
+          <span>{{ proyectos }} proyectos</span>
+        </span>
+      </div>
+
+      <a class="button is-light is-fullwidth mt-4" href="{{ url }}">
+        <i class="fas fa-plus-circle mr-2"></i>{{ boton_texto }}
+      </a>
+    </div>
+  </div>
+</div>

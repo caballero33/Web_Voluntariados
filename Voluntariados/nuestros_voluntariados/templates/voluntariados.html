@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% block title %}Voluntariados{% endblock %}
+{% block content %}
+<section class="hero is-medium is-primary">
+  <div class="hero-body">
+    <div class="container has-text-centered">
+      <h1 class="title is-1"><i class="fas fa-hands-helping mr-3"></i>Únete a Nuestros Voluntariados</h1>
+      <p class="subtitle is-3 mt-4">Transforma vidas, transforma comunidades, transforma el mundo</p>
+      <div class="mt-5">
+        <div class="buttons is-centered">
+          <a href="#voluntariados" class="button is-light is-large"><strong>Ver Voluntariados</strong></a>
+          <a href="#beneficios" class="button is-link is-large has-text-white"><i class="fas fa-gift mr-2"></i>Beneficios</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="section" id="beneficios">
+  <div class="container">
+    <div class="box-content">
+      <div class="has-text-centered mb-6">
+        <h2 class="title is-2 has-text-primary"><i class="fas fa-star mr-2"></i>Beneficios de Ser Voluntario</h2>
+        <p class="subtitle has-text-white">Lo que ganarás al unirte a nuestra comunidad</p>
+      </div>
+      <div class="columns is-multiline is-centered">
+        <div class="column is-3">
+          <div class="card volunteer-benefit">
+            <div class="card-content has-text-centered has-text-white">
+              <div class="icon-circle has-background-primary"><i class="fas fa-graduation-cap fa-2x has-text-white"></i></div>
+              <h3 class="title is-4 mt-4 has-text-white">Créditos Académicos</h3>
+              <p class="mt-3">Reconocimiento oficial en tu expediente académico por tu labor social</p>
+            </div>
+          </div>
+        </div>
+        <div class="column is-3">
+          <div class="card volunteer-benefit">
+            <div class="card-content has-text-centered has-text-white">
+              <div class="icon-circle has-background-info"><i class="fas fa-network-wired fa-2x has-text-white"></i></div>
+              <h3 class="title is-4 mt-4 has-text-white">Red de Contactos</h3>
+              <p class="mt-3">Conecta con profesionales y organizaciones de impacto social</p>
+            </div>
+          </div>
+        </div>
+        <div class="column is-3">
+          <div class="card volunteer-benefit">
+            <div class="card-content has-text-centered has-text-white">
+              <div class="icon-circle has-background-warning"><i class="fas fa-medal fa-2x has-text-white"></i></div>
+              <h3 class="title is-4 mt-4 has-text-white">Desarrollo Personal</h3>
+              <p class="mt-3">Fortalece liderazgo, empatía y habilidades de resolución de problemas</p>
+            </div>
+          </div>
+        </div>
+        <div class="column is-3">
+          <div class="card volunteer-benefit">
+            <div class="card-content has-text-centered has-text-white">
+              <div class="icon-circle has-background-success"><i class="fas fa-globe-americas fa-2x has-text-white"></i></div>
+              <h3 class="title is-4 mt-4 has-text-white">Impacto Social</h3>
+              <p class="mt-3">Contribuye directamente a mejorar la vida en tu comunidad</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="section has-background-primary-light" id="voluntariados">
+  <div class="container">
+    <div class="has-text-centered mb-6">
+      <h2 class="title is-2 has-text-primary"><i class="fas fa-hands-helping mr-2"></i>Nuestros Voluntariados</h2>
+      <p class="subtitle">Descubre cómo puedes contribuir según tus intereses</p>
+      <div class="tabs is-centered is-boxed mt-5" id="filtros-voluntariados">
+        <ul>
+          <li class="is-active" data-categoria="todos"><a>Todos</a></li>
+          <li data-categoria="ambiental"><a>Medio Ambiente</a></li>
+          <li data-categoria="social"><a>Social</a></li>
+          <li data-categoria="educacion"><a>Educación</a></li>
+          <li data-categoria="animal"><a>Animales</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="columns is-multiline is-variable is-4" id="contenedor-voluntariados">
+        <!-- Pumas Verdes -->
+        {% include "partial/voluntariados.html" with color_class="is-success" categorias="ambiental social" logo_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741580608/Logo_PV_UNAH_VS-removebg-preview_jadsip.png" alt="Pumas Verdes Logo" tags=tags_pumas_verdes nombre="Pumas Verdes" descripcion="Comprometidos con la sostenibilidad ambiental y la educación ecológica en nuestro campus y comunidades." voluntarios=85 proyectos=12 url=url_pumas_verdes boton_texto="Unirse al cambio" %}
+
+        <!-- Sonriendo Juntos -->
+        {% include "partial/voluntariados.html" with color_class="is-warning" categorias="social" logo_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741580995/c31eebe3-8666-4c25-ba58-c81ae0da5ab6-removebg-preview_b1an3v.png" alt="Sonriendo Juntos Logo" tags=tags_sonriendo_juntos nombre="Sonriendo Juntos" descripcion="Transformando vidas a través de la salud y bienestar, colaborando con Operación Sonrisa Honduras." voluntarios=120 proyectos=8 url="#" boton_texto="Unirse al cambio" %}
+
+        <!-- Patitas UNAH -->
+        {% include "partial/voluntariados.html" with color_class="is-danger" categorias="animal social" logo_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741580981/273c01b6-b5ce-4abb-af34-c5046222a2d6-removebg-preview_ycw82u.png" alt="Patitas UNAH Logo" tags=tags_patitas_unah nombre="Patitas UNAH" descripcion="Protectores de la vida animal: Rescate, rehabilitación y concienciación sobre tenencia responsable." voluntarios=65 proyectos=15 url="#" boton_texto="Unirse al cambio" %}
+    
+        <!-- Pumas Unidos -->
+        {% include "partial/voluntariados.html" with color_class="is-info" categorias="social" logo_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741581160/27022b04-71eb-4808-95e2-fbc2c4e43738-removebg-preview_hewtfm.png" alt="Pumas Unidos Logo" tags=tags_pumas_unidos nombre="Pumas Unidos" descripcion="Acciones solidarias que fortalecen comunidades vulnerables mediante ayuda humanitaria y educación." voluntarios=110 proyectos=20 url="#" boton_texto="Unirse al cambio" %}
+    
+        <!-- Pumas en Acción -->
+        {% include "partial/voluntariados.html" with color_class="is-info" categorias="social educacion" logo_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741580608/Logo_PV_UNAH_VS-removebg-preview_jadsip.png" alt="Educación para Todos Logo" tags=tags_pumas_en_accion nombre="Pumas en Acción" descripcion="Programas de alfabetización y refuerzo educativo en comunidades con bajos recursos educativos." voluntarios=95 proyectos=10 url="#" boton_texto="Unirse al cambio" %}
+
+    </div>
+  </div>
+</section>
+<section class="section">
+  <div class="container">
+    <div class="box-content">
+      <div class="has-text-centered mb-6">
+        <h2 class="title is-2 has-text-primary"><i class="fas fa-question-circle mr-2"></i>Preguntas Frecuentes</h2>
+        <p class="subtitle has-text-white">Todo lo que necesitas saber sobre nuestro programa de voluntariado</p>
+      </div>
+      <div class="accordions">
+        <div class="accordion">
+          <div class="accordion-header">
+            <h3 class="title is-5 has-text-white">
+                ¿Quién puede participar en los voluntariados?
+                <span class="icon"><i class="fas fa-chevron-down"></i></span>
+            </h3>
+          </div>
+          <div class="accordion-content has-text-white">
+            <p>Todos los estudiantes activos de UNAH-CORTÉS pueden participar en nuestros programas de voluntariado. Algunos proyectos pueden tener requisitos específicos según la naturaleza de la actividad.</p>
+          </div>
+        </div>
+        <br>
+        <div class="accordion">
+          <div class="accordion-header">
+            <h3 class="title is-5 has-text-white">¿Cómo afecta el voluntariado a mi carga académica?
+                <span class="icon"><i class="fas fa-chevron-down"></i></span>
+            </h3>
+            
+          </div>
+          <div class="accordion-content has-text-white">
+            <p>Las actividades de voluntariado están diseñadas para complementar tu formación académica. Ofrecemos horarios flexibles y reconocimiento académico por tu participación.</p>
+          </div>
+        </div>
+        <br>
+        <div class="accordion">
+          <div class="accordion-header">
+            <h3 class="title is-5 has-text-white">¿Necesito experiencia previa para unirme?
+                <span class="icon"><i class="fas fa-chevron-down"></i></span>
+            </h3>
+            
+          </div>
+          <div class="accordion-content has-text-white">
+            <p>¡No! Todos los voluntarios reciben capacitación inicial y continua. Lo más importante es tu compromiso y ganas de ayudar.</p>
+          </div>
+        </div>
+        <br>
+        <div class="accordion">
+          <div class="accordion-header">
+            <h3 class="title is-5 has-text-white">¿Puedo participar en más de un voluntariado?
+            <span class="icon"><i class="fas fa-chevron-down"></i></span>
+            </h3>
+          </div>
+          <div class="accordion-content has-text-white">
+            <p>Sí, puedes participar en múltiples voluntariados siempre que puedas comprometerte adecuadamente con cada uno. Recomendamos comenzar con uno y luego expandir tu participación.</p>
+          </div>
+        </div>
+      </div>
+      <br>
+      <div class="has-text-centered mt-6">
+        <a href="#" class="button is-primary is-large">
+          <i class="fas fa-comments mr-2"></i>¿Preguntas?
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
