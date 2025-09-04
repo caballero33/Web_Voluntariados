@@ -1,4 +1,6 @@
-# Crear un projecto
+# Aspectos generales del proyecto
+
+## Crear un projecto
 
 Revisar la instalación:
 ```shell
@@ -31,7 +33,7 @@ Según la documentación:
 - `voluntariados/urls.py` para las rutas de las URLs.
 - `voluntariados/asgi.py` y `voluntariados/msgi.py` son para servicios correspondientes.
 
-# El servidor
+## El servidor
 
 Para correr el servidor:
 ```shell
@@ -41,7 +43,7 @@ Ejecutará el servidor en: http://127.0.0.1:8000/.
 
 Podemos detener el servidor con `Ctrl + C`.
 
-# Apps
+## Apps
 
 Para crear una app:
 ```shell
@@ -63,7 +65,7 @@ home/
 
 Este servirá para la aplicación.
 
-# Vistas
+## Vistas
 
 Estas son la páginas. Para crear una primero nos vamos a la aplicación, en vistas (`home/views.py`), donde estará el siguiente código:
 ```python
@@ -119,7 +121,7 @@ urlpatterns = [
 
 Ahora, si corremos el servidor y abrimos: http://127.0.0.1:8000/home, veremos la página.
 
-## Rederizar vistas
+### Rederizar vistas
 
 También, en lugar de escribir el código `html` directamente, podemos renderizar la página. Primero, creamos una carpeta en la aplicación, llamada `home/templates`, en ella podemos poner las páginas.
 
@@ -159,7 +161,7 @@ INSTALLED_APPS = [
 ]
 ```
 
-# Bulma
+## Bulma
 
 Como no me gusta en lo más mínimo diseñar con CSS, usaré Bulma para eso. Lo usamos añadiendo lo siguiente en el `head` del HTML:
 ```html
@@ -171,7 +173,7 @@ Como no me gusta en lo más mínimo diseñar con CSS, usaré Bulma para eso. Lo 
 
 Eso, junto a DeepSeek.
 
-# Base de datos 
+## Base de datos 
 
 Por defecto, Django utiliza SQLite. Esta configuración está en los ajustes del sitio (`voluntarios/settings.py`). Ahí también está la `TIME_ZONE` que dejaremos en `UTC`.
 
@@ -180,7 +182,7 @@ Ahora, en la parte de `INSTALLED_APPS`, ya vienen incluidas algunas. Todas estas
 python manage.py migrate
 ```
 
-# Modelos
+## Modelos
 
 Básicamente, diseños de bases de datos, con metadatos adicionales.
 
