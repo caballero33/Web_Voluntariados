@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
-  <nav class="navbar has-background-dark" role="navigation" aria-label="main navigation">
+  <nav class="navbar has-background-dark fijo" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
       <a href="{% url "home" %}" class="navbar-item has-text-white has-text-weight-bold is-size-4">
         <img src="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741579925/ckeskhupgmw0tlfyvgmj.png" alt='Logo de los Voluntariados'>
@@ -50,6 +50,7 @@
   </nav>
   <main class="section">
     <div class="container">
+      <br><br>
       {% block content %}
         <div class="box-content">
           <p>Este contenido no debería ser accesible.</p>
@@ -57,6 +58,7 @@
           <p>Muchas gracias.</p>
         </div>
       {% endblock %}
+      <br><br>
     </div>
   </main>
   <footer class="footer has-background-dark">
