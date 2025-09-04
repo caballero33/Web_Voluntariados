@@ -1,3 +1,14 @@
+# Web del Voluntariado
+
+Este proyecto es para el desarrollo de la página web de los voluntariados de UNAH-CORTÉS.
+
+# ¿Cómo está organizado el proyecto?
+Todo está dentro de la carpeta `Voluntariados`, lo que significa que si intenta correrlo sin cambiar a dicho directorio le dará error. Asegúrese que su terminal está en `./Voluntariados/` y no en `./`.
+
+Si tiene errores al ejecutar el proyecto, cierre la terminal, vuelvala a abrir, cambie de directorio con `cd Voluntariados` y corra el servidor de nuevo.
+
+Puede ver a detalle cómo están organizados los directorios del proyecto en [este archivo](./Diagrama.md).
+
 # Aspectos generales del proyecto
 
 ## Crear un projecto
