@@ -423,9 +423,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Actualizar clase activa en los filtros
             filtros.forEach(f => f.classList.remove('is-active'));
             filtro.classList.add('is-active');
-            
             const categoria = filtro.getAttribute('data-categoria');
-            
             // Filtrar voluntariados
             voluntariados.forEach(voluntariado => {
                 if (categoria === 'todos') {
@@ -441,23 +439,27 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     });
-    
-    // Funcionalidad del acordeón
+
+    /**
+     * * Funcionalidad del acordeón
+     * Se ha reparado la funcionalidad del acordeón
+     * Ahora, en teoría, funciona correctamente
+     * muestra el contenido (respuesta a la pregunta) al hacer clic en el encabezado
+     * y oculta el contenido si se vuelve a hacer clic en el mismo encabezado
+     */
     const acordeones = document.querySelectorAll('.accordion');
-    
     acordeones.forEach(acordeon => {
         const header = acordeon.querySelector('.accordion-header');
         const content = acordeon.querySelector('.accordion-content');
         const icon = header.querySelector('.icon i');
-        
         header.addEventListener('click', () => {
             // Alternar visibilidad del contenido
-            if (content.style.maxHeight) {
-                content.style.maxHeight = null;
+            if (content.classList.contains('is-open')) {
+                content.classList.remove('is-open');
                 icon.classList.remove('fa-chevron-up');
                 icon.classList.add('fa-chevron-down');
             } else {
-                content.style.maxHeight = content.scrollHeight + "px";
+                content.classList.add('is-open');
                 icon.classList.remove('fa-chevron-down');
                 icon.classList.add('fa-chevron-up');
             }
@@ -499,6 +501,11 @@ document.addEventListener('DOMContentLoaded', () => {
     padding: 0 1rem;
     background-color: white;
     border-radius: 0 0 4px 4px;
+}
+
+.accordion-content.is-open {
+    max-height: 500px; /* Suficiente para mostrar el contenido */
+    transition: max-height 0.3s ease;
 }
 
 .accordion-content p {
