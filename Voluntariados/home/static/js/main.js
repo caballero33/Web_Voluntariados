@@ -4,7 +4,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Menú móvil
     const navbarBurgers = document.querySelectorAll('.navbar-burger');
-    
     if (navbarBurgers.length > 0) {
         navbarBurgers.forEach(el => {
             el.addEventListener('click', () => {
@@ -16,18 +15,14 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
-    
     // Toggle de tema oscuro/claro
     const themeToggle = document.getElementById('theme-toggle');
-    
     // Verificar tema almacenado
     const currentTheme = localStorage.getItem('theme');
-    
     if (currentTheme === 'light') {
         document.body.classList.add('light-mode');
         themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-    }
-    
+    }    
     // Alternar tema al hacer clic
     themeToggle.addEventListener('click', () => {
         document.body.classList.toggle('light-mode');
@@ -75,30 +70,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             });
         });
-    }
-    
-    // Funcionalidad del acordeón
+    };
+
+    // Funcionalidad del acordeón con animación
     const acordeones = document.querySelectorAll('.accordion');
-    if (acordeones.length > 0) {
-        acordeones.forEach(acordeon => {
-            const header = acordeon.querySelector('.accordion-header');
-            const content = acordeon.querySelector('.accordion-content');
-            const icon = header.querySelector('.icon i');
-            
-            header.addEventListener('click', () => {
-                // Alternar visibilidad del contenido
-                if (content.style.maxHeight) {
-                    content.style.maxHeight = null;
-                    icon.classList.remove('fa-chevron-up');
-                    icon.classList.add('fa-chevron-down');
-                } else {
-                    content.style.maxHeight = content.scrollHeight + "px";
-                    icon.classList.remove('fa-chevron-down');
-                    icon.classList.add('fa-chevron-up');
-                }
-            });
+    acordeones.forEach(acordeon => {
+        const header = acordeon.querySelector('.accordion-header');
+        const content = acordeon.querySelector('.accordion-content');
+        const icon = header.querySelector('.icon i');
+        content.style.transition = 'max-height 0.3s ease, opacity 0.3s';
+        content.style.overflow = 'hidden';
+        content.style.maxHeight = '0';
+        content.style.opacity = '0';
+        header.addEventListener('click', () => {
+            if (content.classList.contains('is-open')) {
+                content.classList.remove('is-open');
+                icon.classList.remove('fa-chevron-up');
+                icon.classList.add('fa-chevron-down');
+                content.style.maxHeight = '0';
+                content.style.opacity = '0';
+            } else {
+                content.classList.add('is-open');
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-up');
+                content.style.maxHeight = content.scrollHeight + 'px';
+                content.style.opacity = '1';
+            }
         });
-    }
-    
-    console.log('JavaScript cargado correctamente');
+    });
 });
