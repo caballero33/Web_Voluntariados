@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+
+{% block title %}Unirse a Voluntariado{% endblock %}
+
+{% block content %}
+<div class="columns is-centered">
+    <div class="column is-half">
+        <div class="box-content">
+            <div class="has-text-centered mb-6">
+                <h1 class="title is-2 has-text-primary">
+                    <i class="fas fa-users mr-3"></i>Unirse a Voluntariado
+                </h1>
+                <p class="subtitle">Ingresa el código único del voluntariado al que deseas unirte</p>
+            </div>
+
+            <form id="join-voluntariado-form" class="box">
+                <div class="field">
+                    <label class="label">Código del Voluntariado</label>
+                    <div class="control has-icons-left">
+                        <input class="input" type="text" id="voluntariado-code" 
+                               placeholder="Ej: PV2025" required maxlength="10" style="text-transform: uppercase;">
+                        <span class="icon is-small is-left">
+                            <i class="fas fa-key"></i>
+                        </span>
+                    </div>
+                    <p class="help">Pide el código al coordinador del voluntariado</p>
+                </div>
+
+                <div class="field">
+                    <div class="control">
+                        <button class="button is-primary is-fullwidth" type="submit">
+                            <span class="icon">
+                                <i class="fas fa-user-plus"></i>
+                            </span>
+                            <span>Unirse al Voluntariado</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Información de voluntariados disponibles -->
+            <div class="box mt-5">
+                <h3 class="title is-4 has-text-primary mb-4">
+                    <i class="fas fa-info-circle mr-2"></i>Voluntariados Disponibles
+                </h3>
+                
+                <div class="columns is-multiline" id="voluntariados-list">
+                    <!-- Se cargarán dinámicamente -->
+                </div>
+            </div>
+
+            <!-- Mis voluntariados actuales -->
+            <div class="box mt-5" id="my-voluntariados" style="display: none;">
+                <h3 class="title is-4 has-text-primary mb-4">
+                    <i class="fas fa-heart mr-2"></i>Mis Voluntariados
+                </h3>
+                
+                <div class="columns is-multiline" id="user-voluntariados-list">
+                    <!-- Se cargarán dinámicamente -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const joinForm = document.getElementById('join-voluntariado-form');
+    
+    // Auto-uppercase del código
+    document.getElementById('voluntariado-code').addEventListener('input', function() {
+        this.value = this.value.toUpperCase();
+    });
+    
+    joinForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const code = document.getElementById('voluntariado-code').value.trim();
+        const submitButton = joinForm.querySelector('button[type="submit"]');
+        
+        if (!code) {
+            window.authManager.showMessage('Por favor ingresa un código válido.', 'error');
+            return;
+        }
+        
+        // Deshabilitar botón durante la operación
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<span class="icon"><i class="fas fa-spinner fa-spin"></i></span><span>Procesando...</span>';
+        
+        try {
+            const result = await window.voluntariadosManager.joinVoluntariadoByCode(code);
+            
+            if (result.success) {
+                window.authManager.showMessage(result.message, 'success');
+                document.getElementById('voluntariado-code').value = '';
+                
+                // Recargar la lista de voluntariados del usuario
+                loadUserVoluntariados();
+            }
+            
+        } catch (error) {
+            window.authManager.showMessage(error.message, 'error');
+        } finally {
+            // Rehabilitar botón
+            submitButton.disabled = false;
+            submitButton.innerHTML = '<span class="icon"><i class="fas fa-user-plus"></i></span><span>Unirse al Voluntariado</span>';
+        }
+    });
+    
+    // Cargar voluntariados disponibles
+    loadAvailableVoluntariados();
+    loadUserVoluntariados();
+});
+
+async function loadAvailableVoluntariados() {
+    try {
+        const voluntariados = await window.voluntariadosManager.getAllVoluntariados();
+        const container = document.getElementById('voluntariados-list');
+        
+        if (voluntariados.length === 0) {
+            container.innerHTML = '<p class="has-text-grey">No hay voluntariados disponibles.</p>';
+            return;
+        }
+        
+        container.innerHTML = voluntariados.map(vol => `
+            <div class="column is-6">
+                <div class="card">
+                    <div class="card-content">
+                        <div class="media">
+                            <div class="media-left">
+                                <figure class="image is-48x48">
+                                    <img src="${vol.logo}" alt="${vol.name}">
+                                </figure>
+                            </div>
+                            <div class="media-content">
+                                <p class="title is-6">${vol.name}</p>
+                                <p class="subtitle is-7 has-text-grey">Código: <strong>${vol.code}</strong></p>
+                            </div>
+                        </div>
+                        <div class="content">
+                            <p class="is-small">${vol.description}</p>
+                            <div class="tags">
+                                <span class="tag is-${getCategoryColor(vol.category)}">${vol.category}</span>
+                                <span class="tag is-light">${vol.memberCount}/${vol.maxMembers} miembros</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+        
+    } catch (error) {
+        console.error('Error cargando voluntariados:', error);
+    }
+}
+
+async function loadUserVoluntariados() {
+    try {
+        const userVoluntariados = await window.voluntariadosManager.getUserVoluntariados();
+        const container = document.getElementById('user-voluntariados-list');
+        const section = document.getElementById('my-voluntariados');
+        
+        if (userVoluntariados.length === 0) {
+            section.style.display = 'none';
+            return;
+        }
+        
+        section.style.display = 'block';
+        container.innerHTML = userVoluntariados.map(vol => `
+            <div class="column is-6">
+                <div class="card volunteer-card">
+                    <div class="card-content">
+                        <div class="media">
+                            <div class="media-left">
+                                <figure class="image is-48x48">
+                                    <img src="${vol.logo}" alt="${vol.name}">
+                                </figure>
+                            </div>
+                            <div class="media-content">
+                                <p class="title is-6">${vol.name}</p>
+                                <p class="subtitle is-7 has-text-success">
+                                    <i class="fas fa-check-circle mr-1"></i>Miembro Activo
+                                </p>
+                            </div>
+                        </div>
+                        <div class="content">
+                            <div class="level">
+                                <div class="level-item has-text-centered">
+                                    <div>
+                                        <p class="heading">Eventos</p>
+                                        <p class="title is-6">${vol.userData.eventsCompleted || 0}</p>
+                                    </div>
+                                </div>
+                                <div class="level-item has-text-centered">
+                                    <div>
+                                        <p class="heading">Horas</p>
+                                        <p class="title is-6">${vol.userData.totalHours || 0}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="buttons is-centered">
+                                <button class="button is-small is-info" onclick="viewVoluntariadoDetails('${vol.id}')">
+                                    <span class="icon"><i class="fas fa-eye"></i></span>
+                                    <span>Ver Detalles</span>
+                                </button>
+                                <button class="button is-small is-danger is-outlined" onclick="leaveVoluntariado('${vol.id}')">
+                                    <span class="icon"><i class="fas fa-sign-out-alt"></i></span>
+                                    <span>Abandonar</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+        
+    } catch (error) {
+        console.error('Error cargando voluntariados del usuario:', error);
+    }
+}
+
+function getCategoryColor(category) {
+    const colors = {
+        'medio-ambiente': 'success',
+        'social': 'info',
+        'animales': 'warning',
+        'educacion': 'danger',
+        'salud': 'primary'
+    };
+    return colors[category] || 'light';
+}
+
+async function leaveVoluntariado(voluntariadoId) {
+    if (!confirm('¿Estás seguro de que quieres abandonar este voluntariado?')) {
+        return;
+    }
+    
+    try {
+        const result = await window.voluntariadosManager.leaveVoluntariado(voluntariadoId);
+        if (result.success) {
+            window.authManager.showMessage(result.message, 'info');
+            loadUserVoluntariados();
+        }
+    } catch (error) {
+        window.authManager.showMessage(error.message, 'error');
+    }
+}
+
+function viewVoluntariadoDetails(voluntariadoId) {
+    // Redirigir al dashboard del voluntariado
+    window.location.href = `/auth/dashboard/?voluntariado=${voluntariadoId}`;
+}
+</script>
+
+<style>
+.volunteer-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.volunteer-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+</style>
+{% endblock %}

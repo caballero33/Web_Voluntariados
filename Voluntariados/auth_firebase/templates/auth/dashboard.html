@@ -1,0 +1,559 @@
+{% extends "base.html" %}
+
+{% block title %}Mi Espacio{% endblock %}
+
+{% block content %}
+<div class="columns">
+    <!-- Sidebar -->
+    <div class="column is-3">
+        <div class="box-content">
+            <div class="has-text-centered mb-4">
+                <div class="is-size-1 has-text-primary">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <h3 class="title is-4" id="user-name-display">Usuario</h3>
+                <p class="subtitle is-6" id="user-email-display">email@ejemplo.com</p>
+            </div>
+            
+            <nav class="menu">
+                <p class="menu-label">Mi Espacio</p>
+                <ul class="menu-list">
+                    <li><a href="#profile" class="dashboard-nav active" data-section="profile">
+                        <span class="icon"><i class="fas fa-user"></i></span>
+                        Mi Perfil
+                    </a></li>
+                    <li><a href="#volunteerings" class="dashboard-nav" data-section="volunteerings">
+                        <span class="icon"><i class="fas fa-hands-helping"></i></span>
+                        Mis Voluntariados
+                    </a></li>
+                    <li><a href="#events" class="dashboard-nav" data-section="events">
+                        <span class="icon"><i class="fas fa-calendar"></i></span>
+                        Eventos
+                    </a></li>
+                    <li><a href="#achievements" class="dashboard-nav" data-section="achievements">
+                        <span class="icon"><i class="fas fa-trophy"></i></span>
+                        Logros
+                    </a></li>
+                    <li><a href="{% url 'auth:join_voluntariado' %}" class="dashboard-nav">
+                        <span class="icon"><i class="fas fa-user-plus"></i></span>
+                        Unirse a Voluntariado
+                    </a></li>
+                    <li><a href="{% url 'auth:admin_panel' %}" class="dashboard-nav" id="admin-link" style="display: none;">
+                        <span class="icon"><i class="fas fa-crown"></i></span>
+                        Panel Admin
+                    </a></li>
+                </ul>
+                
+                <p class="menu-label">Acciones</p>
+                <ul class="menu-list">
+                    <li><a href="#" onclick="window.authManager.signOut()">
+                        <span class="icon"><i class="fas fa-sign-out-alt"></i></span>
+                        Cerrar Sesión
+                    </a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="column is-9">
+        <!-- Profile Section -->
+        <div id="profile-section" class="dashboard-section">
+            <div class="box-content">
+                <h2 class="title is-3 has-text-primary">
+                    <i class="fas fa-user mr-3"></i>Mi Perfil
+                </h2>
+                
+                <div class="columns">
+                    <div class="column is-8">
+                        <form id="profile-form">
+                            <div class="columns">
+                                <div class="column">
+                                    <div class="field">
+                                        <label class="label">Nombre</label>
+                                        <div class="control">
+                                            <input class="input" type="text" id="profile-first-name" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="column">
+                                    <div class="field">
+                                        <label class="label">Apellido</label>
+                                        <div class="control">
+                                            <input class="input" type="text" id="profile-last-name" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="field">
+                                <label class="label">Correo Electrónico</label>
+                                <div class="control">
+                                    <input class="input" type="email" id="profile-email" readonly>
+                                </div>
+                            </div>
+                            
+                            <div class="field">
+                                <label class="label">Teléfono</label>
+                                <div class="control">
+                                    <input class="input" type="tel" id="profile-phone" readonly>
+                                </div>
+                            </div>
+                            
+                            <div class="field">
+                                <label class="label">Interés en Voluntariado</label>
+                                <div class="control">
+                                    <input class="input" type="text" id="profile-interest" readonly>
+                                </div>
+                            </div>
+                            
+                            <div class="field">
+                                <div class="control">
+                                    <button class="button is-primary" type="button" onclick="toggleEditProfile()">
+                                        <span class="icon"><i class="fas fa-edit"></i></span>
+                                        <span>Editar Perfil</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <div class="column is-4">
+                        <div class="has-text-centered">
+                            <div class="is-size-1 has-text-primary mb-4">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <h4 class="title is-5">Estadísticas</h4>
+                            <div class="stats">
+                                <div class="stat-item">
+                                    <span class="stat-number" id="volunteer-count">0</span>
+                                    <span class="stat-label">Voluntariados</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-number" id="event-count">0</span>
+                                    <span class="stat-label">Eventos</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-number" id="hours-count">0</span>
+                                    <span class="stat-label">Horas</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Volunteerings Section -->
+        <div id="volunteerings-section" class="dashboard-section" style="display: none;">
+            <div class="box-content">
+                <h2 class="title is-3 has-text-primary">
+                    <i class="fas fa-hands-helping mr-3"></i>Mis Voluntariados
+                </h2>
+                
+                <div class="columns is-multiline" id="user-voluntariados-container">
+                    <!-- Se cargarán dinámicamente -->
+                    <div class="column is-12 has-text-centered">
+                        <div class="spinner" id="voluntariados-spinner">
+                            <i class="fas fa-spinner fa-spin fa-2x"></i>
+                            <p class="mt-3">Cargando voluntariados...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Events Section -->
+        <div id="events-section" class="dashboard-section" style="display: none;">
+            <div class="box-content">
+                <h2 class="title is-3 has-text-primary">
+                    <i class="fas fa-calendar mr-3"></i>Próximos Eventos
+                </h2>
+                
+                <div class="columns is-multiline">
+                    <div class="column is-6">
+                        <div class="card event-card">
+                            <div class="card-content">
+                                <h4 class="title is-5">Inauguración del Nuevo Espacio</h4>
+                                <p class="subtitle is-6 has-text-grey">15 de Octubre, 2024</p>
+                                <div class="content">
+                                    <p>Únete a nosotros en este hito histórico para nuestra organización universitaria.</p>
+                                    <div class="buttons">
+                                        <button class="button is-primary is-small">Ver Detalles</button>
+                                        <button class="button is-success is-small">Participar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Achievements Section -->
+        <div id="achievements-section" class="dashboard-section" style="display: none;">
+            <div class="box-content">
+                <h2 class="title is-3 has-text-primary">
+                    <i class="fas fa-trophy mr-3"></i>Mis Logros
+                </h2>
+                
+                <div class="columns is-multiline">
+                    <div class="column is-4">
+                        <div class="card achievement-card">
+                            <div class="card-content has-text-centered">
+                                <div class="is-size-1 has-text-warning mb-3">
+                                    <i class="fas fa-medal"></i>
+                                </div>
+                                <h4 class="title is-6">Primer Voluntariado</h4>
+                                <p class="subtitle is-7">¡Bienvenido al equipo!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.dashboard-nav {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.dashboard-nav:hover {
+    background-color: rgba(41, 137, 216, 0.1);
+}
+
+.dashboard-nav.active {
+    background-color: var(--color-primary);
+    color: white;
+}
+
+.dashboard-nav .icon {
+    margin-right: 0.5rem;
+}
+
+.stats {
+    margin-top: 1rem;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--color-primary);
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: var(--color-text-light);
+}
+
+.volunteer-card, .event-card, .achievement-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.volunteer-card:hover, .event-card:hover, .achievement-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+/* Estilos específicos para cards de voluntariados */
+.volunteer-card .card-content {
+    padding: 1.5rem;
+}
+
+.volunteer-card .media {
+    margin-bottom: 1rem;
+}
+
+.volunteer-card .image.is-64x64 {
+    border: 2px solid var(--color-primary);
+    padding: 2px;
+}
+
+.volunteer-card .card-footer {
+    border-top: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.05);
+}
+
+.volunteer-card .card-footer-item {
+    color: var(--color-primary);
+    transition: background 0.3s ease;
+}
+
+.volunteer-card .card-footer-item:hover {
+    background: rgba(41, 137, 216, 0.1);
+}
+
+/* Estilos específicos para cards de logros */
+.achievement-card {
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.achievement-card .card-content {
+    padding: 2rem 1.5rem;
+}
+
+.has-opacity-50 {
+    opacity: 0.5;
+}
+
+/* Estilos para spinner */
+.spinner {
+    padding: 3rem;
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Estilos para modo claro */
+body.light-mode .volunteer-card,
+body.light-mode .event-card,
+body.light-mode .achievement-card {
+    border: 1px solid #e0e0e0;
+    background: rgba(255,255,255,0.98);
+}
+
+body.light-mode .volunteer-card .image.is-64x64 {
+    border: 2px solid var(--color-primary);
+}
+
+body.light-mode .volunteer-card .card-footer {
+    border-top: 1px solid #e0e0e0;
+    background: rgba(0,0,0,0.02);
+}
+
+body.light-mode .volunteer-card .card-footer-item:hover {
+    background: rgba(41, 137, 216, 0.05);
+}
+
+body.light-mode .spinner {
+    background: rgba(0,0,0,0.02);
+    border: 1px solid #e0e0e0;
+}
+
+/* Mejoras de espaciado y legibilidad */
+.columns.is-variable.is-8 {
+    --columnGap: 2rem;
+}
+
+.dashboard-section .box-content {
+    margin-bottom: 2rem;
+}
+
+.has-text-grey-dark {
+    color: #4a4a4a !important;
+}
+
+body.light-mode .has-text-grey-dark {
+    color: #363636 !important;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Load user data
+    loadUserData();
+    
+    // Setup navigation
+    setupDashboardNavigation();
+});
+
+async function loadUserData() {
+    const user = window.firebaseAuth.currentUser;
+    if (user) {
+        // Load basic info
+        document.getElementById('user-name-display').textContent = user.displayName || user.email;
+        document.getElementById('user-email-display').textContent = user.email;
+        
+        // Load detailed profile
+        try {
+            const userData = await window.authManager.getUserData(user.uid);
+            if (userData) {
+                document.getElementById('profile-first-name').value = userData.firstName || '';
+                document.getElementById('profile-last-name').value = userData.lastName || '';
+                document.getElementById('profile-email').value = user.email;
+                document.getElementById('profile-phone').value = userData.phone || '';
+                document.getElementById('profile-interest').value = userData.volunteerInterest || '';
+                
+                // Update statistics
+                updateUserStats(userData);
+                
+                // Check if user is admin
+                const isAdmin = await window.adminManager.isUserAdmin();
+                if (isAdmin) {
+                    document.getElementById('admin-link').style.display = 'block';
+                }
+            }
+        } catch (error) {
+            console.error('Error loading user data:', error);
+        }
+    }
+}
+
+function updateUserStats(userData) {
+    const voluntariados = userData.voluntariados || {};
+    let totalEvents = 0;
+    let totalHours = 0;
+    
+    Object.values(voluntariados).forEach(vol => {
+        totalEvents += vol.eventsCompleted || 0;
+        totalHours += vol.totalHours || 0;
+    });
+    
+    document.getElementById('volunteer-count').textContent = Object.keys(voluntariados).length;
+    document.getElementById('event-count').textContent = totalEvents;
+    document.getElementById('hours-count').textContent = totalHours;
+}
+
+function setupDashboardNavigation() {
+    const navItems = document.querySelectorAll('.dashboard-nav');
+    const sections = document.querySelectorAll('.dashboard-section');
+    
+    navItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Remove active class from all nav items
+            navItems.forEach(nav => nav.classList.remove('active'));
+            
+            // Add active class to clicked item
+            this.classList.add('active');
+            
+            // Hide all sections
+            sections.forEach(section => section.style.display = 'none');
+            
+            // Show selected section
+            const targetSection = this.dataset.section + '-section';
+            document.getElementById(targetSection).style.display = 'block';
+            
+            // Load section data
+            loadSectionData(this.dataset.section);
+        });
+    });
+}
+
+function toggleEditProfile() {
+    const inputs = document.querySelectorAll('#profile-form input[readonly]');
+    const button = event.target;
+    
+    if (inputs[0].readOnly) {
+        // Enable editing
+        inputs.forEach(input => input.readOnly = false);
+        button.innerHTML = '<span class="icon"><i class="fas fa-save"></i></span><span>Guardar</span>';
+    } else {
+        // Save changes
+        saveProfileChanges();
+        inputs.forEach(input => input.readOnly = true);
+        button.innerHTML = '<span class="icon"><i class="fas fa-edit"></i></span><span>Editar Perfil</span>';
+    }
+}
+
+async function saveProfileChanges() {
+    // Here you would save the changes to Firestore
+    window.authManager.showMessage('Perfil actualizado correctamente.', 'success');
+}
+
+async function loadSectionData(section) {
+    switch (section) {
+        case 'volunteerings':
+            await loadUserVoluntariados();
+            break;
+        case 'events':
+            await loadUserEvents();
+            break;
+        case 'achievements':
+            await loadUserAchievements();
+            break;
+    }
+}
+
+async function loadUserVoluntariados() {
+    const container = document.getElementById('user-voluntariados-container');
+    const spinner = document.getElementById('voluntariados-spinner');
+    
+    try {
+        const userVoluntariados = await window.voluntariadosManager.getUserVoluntariados();
+        
+        spinner.style.display = 'none';
+        
+        if (userVoluntariados.length === 0) {
+            container.innerHTML = `
+                <div class="column is-12 has-text-centered">
+                    <div class="notification is-info">
+                        <p class="mb-3">No perteneces a ningún voluntariado aún.</p>
+                        <a href="{% url 'auth:join_voluntariado' %}" class="button is-primary">
+                            <span class="icon"><i class="fas fa-user-plus"></i></span>
+                            <span>Unirse a un Voluntariado</span>
+                        </a>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = userVoluntariados.map(vol => `
+            <div class="column is-4">
+                <div class="card volunteer-card">
+                    <div class="card-content">
+                        <div class="media">
+                            <div class="media-left">
+                                <figure class="image is-48x48">
+                                    <img src="${vol.logo}" alt="${vol.name}">
+                                </figure>
+                            </div>
+                            <div class="media-content">
+                                <p class="title is-6">${vol.name}</p>
+                                <p class="subtitle is-7">${vol.category}</p>
+                            </div>
+                        </div>
+                        <div class="content">
+                            <p class="has-text-grey">Estado: <span class="has-text-success">${vol.userData.status}</span></p>
+                            <p class="has-text-grey">Eventos: ${vol.userData.eventsCompleted || 0}</p>
+                            <p class="has-text-grey">Horas: ${vol.userData.totalHours || 0}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+        
+    } catch (error) {
+        spinner.style.display = 'none';
+        container.innerHTML = `
+            <div class="column is-12 has-text-centered">
+                <div class="notification is-danger">
+                    <p>Error cargando voluntariados: ${error.message}</p>
+                </div>
+            </div>
+        `;
+    }
+}
+
+async function loadUserEvents() {
+    // Implementar carga de eventos del usuario
+    console.log('Loading user events...');
+}
+
+async function loadUserAchievements() {
+    // Implementar carga de logros del usuario
+    console.log('Loading user achievements...');
+}
+</script>
+{% endblock %}
