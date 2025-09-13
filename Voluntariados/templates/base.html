@@ -40,9 +40,37 @@
           <button class="theme-toggle" id="theme-toggle" title="Cambiar tema"><i class="fas fa-moon"></i></button>
         </div>
         <div class="navbar-item">
-          <div class="buttons">
-            <a class="button is-primary"><strong>Registrarse</strong></a>
-            <a class="button is-light">Iniciar sesión</a>
+          <div class="buttons" id="auth-buttons">
+            <a href="{% url 'auth:register' %}" class="button is-primary" id="register-btn"><strong>Registrarse</strong></a>
+            <a href="{% url 'auth:login' %}" class="button is-light" id="login-btn">Iniciar sesión</a>
+          </div>
+          <!-- User menu (hidden by default) -->
+          <div class="navbar-item has-dropdown is-hoverable" id="user-menu" style="display: none;">
+            <a class="navbar-link has-text-white">
+              <span class="icon">
+                <i class="fas fa-user"></i>
+              </span>
+              <span id="user-name">Usuario</span>
+            </a>
+            <div class="navbar-dropdown has-background-dark">
+              <a href="{% url 'auth:dashboard' %}" class="navbar-item has-text-white">
+                <span class="icon"><i class="fas fa-tachometer-alt"></i></span>
+                <span>Mi Espacio</span>
+              </a>
+              <a href="{% url 'auth:join_voluntariado' %}" class="navbar-item has-text-white">
+                <span class="icon"><i class="fas fa-users"></i></span>
+                <span>Unirse a Voluntariado</span>
+              </a>
+              <a href="#" class="navbar-item has-text-white">
+                <span class="icon"><i class="fas fa-cog"></i></span>
+                <span>Configuración</span>
+              </a>
+              <hr class="navbar-divider">
+              <a href="#" class="navbar-item has-text-white" onclick="window.authManager.signOut()">
+                <span class="icon"><i class="fas fa-sign-out-alt"></i></span>
+                <span>Cerrar Sesión</span>
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -111,6 +139,18 @@
       </div>
     </div>
   </footer>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  
+  <!-- Firebase Configuration -->
+  <script src="{% static 'js/firebase-config.js' %}"></script>
+  <script src="{% static 'js/init-firestore-data.js' %}"></script>
+  <script src="{% static 'js/auth.js' %}"></script>
+  <script src="{% static 'js/voluntariados.js' %}"></script>
+  <script src="{% static 'js/admin-manager.js' %}"></script>
+  <script src="{% static 'js/events-manager.js' %}"></script>
   <script src="{% static 'js/main.js' %}"></script>
 </body>
 </html>

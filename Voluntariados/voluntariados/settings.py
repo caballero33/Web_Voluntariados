@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'home',
     'nuestros_voluntariados',
+    'auth_firebase',
 ]
 
 MIDDLEWARE = [
@@ -125,3 +126,13 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Firebase Configuration
+FIREBASE_CONFIG = {
+    'apiKey': "your-api-key-here",
+    'authDomain': "your-project.firebaseapp.com",
+    'projectId': "your-project-id",
+    'storageBucket': "your-project.appspot.com",
+    'messagingSenderId': "your-sender-id",
+    'appId': "your-app-id"
+}
