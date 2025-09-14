@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Voluntariados{% endblock %}
+{% block content %}
+<script src="{% static 'js/pumas_en_accion.js' %}"></script>
+{% include "partial/portada.html" with nombre="Pumas en Acción" icon="fa-thumbs-up" eslogan="Transformando vidas." logo_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1743287190/f24b026d-f1f9-4f7d-8ada-2bd7f071bb9e_nehray.jpg" %}
+
+<!-- Nuestra Misión -->
+{% include "partial/mision.html" with title="Misión" description="Nuestra misión es..." %}
+
+<!-- Aquí están los eventos -->
+<div class="box-content mt-5">
+    <div class="columns">
+        <div class="column is-12">
+            <h2 class="title is-2 has-text-primary">
+                <i class="fa-solid fa-check mr-2"></i>Nuestras Acciones
+            </h2>
+        </div>
+    </div>
+    
+    <div class="columns is-multiline mt-4">
+
+    </div>
+</div>
+
+<!-- Contact Information Section -->
+{% include "partial/contacto.html" with contacto_mensaje="¿Quieres Ayudar a Pumas en Acción?" contacto_email="pumasenaccion@gmail.com" contacto_slogan="¡Pumas en Acción!" %}
+
+<style>
+    .has-background-primar {
+        background-color: var(--color-primary) !important;
+        color: #fff !important;
+    }
+    .is-primar .message-body {
+    border-color: var(--color-bg-light);
+    color: var(--color-primary-dark);
+    }
+</style>
+{% endblock %}

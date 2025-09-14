@@ -1,0 +1,32 @@
+<div class="column is-6">
+    <div class="event-card card">
+        <div class="card-content">
+            <div class="columns is-vcentered">
+                <div class="column is-2 has-text-centered">
+                    <span class="icon is-large has-text-primary">
+                        <i class="fa-solid {{ evento_icono }} fa-2x"></i>
+                    </span>
+                </div>
+                <div class="column is-7">
+                    <h3 class="title is-4 has-text-white">{{ evento_titulo }}</h3>
+                </div>
+                <div class="column is-3">
+                    <div class="event-image">
+                        <img src="{{ evento_imagen_url }}" 
+                            alt="{{ evento_titulo }}">
+                    </div>
+                </div>
+            </div>
+            <div class="event-details has-text-white">
+                <p class="mb-2"><i class="fas fa-calendar-day mr-2"></i>{{ evento_fecha }}</p>
+                <p><i class="fas fa-map-marker-alt mr-2"></i>{{ evento_ubicacion }}</p>
+            </div>
+            <div class="content mt-4">
+                <p class="has-text-white">
+                    {{ evento_descripcion }}
+                </p>
+                <a href="{{ evento_url }}" class="button is-primary mt-3">Más información</a>
+            </div>
+        </div>
+    </div>
+</div>

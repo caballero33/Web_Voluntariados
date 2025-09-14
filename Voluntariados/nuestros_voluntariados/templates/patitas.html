@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Voluntariados{% endblock %}
+{% block content %}
+<script src="{% static 'js/patitas.js' %}"></script>
+{% include "partial/portada.html" with nombre="Patitas UNAH" icon="fa-paw" eslogan="Protectores de la vida animal universitaria." logo_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741580981/273c01b6-b5ce-4abb-af34-c5046222a2d6-removebg-preview_ycw82u.png" %}
+
+<!-- Nuestra Misión -->
+{% include "partial/mision.html" with title="Nuestro Compromiso" description="Como voluntariado oficial de protección animal, nos dedicamos al rescate, rehabilitación y bienestar de los animales en el campus universitario, promoviendo la tenencia responsable y el respeto por toda forma de vida." %}
+
+<!-- Aquí están los eventos -->
+<div class="box-content mt-5">
+    <div class="columns">
+        <div class="column is-12">
+            <h2 class="title is-2 has-text-primary">
+                <i class="fa-solid fa-check mr-2"></i>Nuestras Acciones
+            </h2>
+        </div>
+    </div>
+    
+    <div class="columns is-multiline mt-4">
+
+        {% include "partial/eventos.html" with icon="fa-stethoscope" title="Atención veterinaria especializada" image_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741581614/48b74baa-ba6c-4f25-a299-e5f0edab2296_y4ebul.jpg" alt="Inauguración espacio voluntariado" description="Brindar servicios de salud animal con personal capacitado y equipos adecuados, garantizando el diagnóstico oportuno, tratamiento y bienestar integral de las mascotas."%}
+
+        {% include "partial/eventos.html" with icon="fa-dog" title="Programas de rehabilitación integral" image_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741581616/2e10523c-cca3-4a5e-beaa-ab159bbd398a_kdqdef.jpg" alt="Talleres de educación ambiental" description="Implementar terapias físicas y programas especializados para la recuperación de la movilidad, fuerza y bienestar de los animales tras lesiones, cirugías o enfermedades, promoviendo su calidad de vida."%}
+
+        {% include "partial/eventos.html" with icon="fa-bone" title="Cuidado diario y alimentación" image_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741581618/31fd0e88-901b-4d3c-b03c-7a6f34a39624_iqpboe.jpg" alt="Reciclaje comunitario" description="Garantizar la atención cotidiana de los animales mediante una dieta balanceada, agua limpia y cuidados básicos, favoreciendo su salud, energía y bienestar general."%}
+
+        {% include "partial/eventos.html" with icon="fa-users" title="Equipo multidisciplinario trabajando" image_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741581623/c2d3e187-6fa9-40ac-a5ee-f09094ad1f96_vrzqqs.jpg" alt="Equipo de voluntarios en acción" description="Fomentar la colaboración de profesionales y voluntarios de distintas áreas para brindar un cuidado integral a los animales, combinando conocimientos y esfuerzos en beneficio de su bienestar."%}
+
+    </div>
+</div>
+
+<!-- Contact Information Section -->
+{% include "partial/contacto.html" with contacto_mensaje="¿Quieres Ayudar a Patitas?" contacto_email="patitasunah.cortes@gmail.com" contacto_slogan="Por un campus más humano con todos los seres vivos." %}
+
+<style>
+    .has-background-primar {
+        background-color: var(--color-primary) !important;
+        color: #fff !important;
+    }
+    .is-primar .message-body {
+    border-color: var(--color-bg-light);
+    color: var(--color-primary-dark);
+    }
+</style>
+{% endblock %}
