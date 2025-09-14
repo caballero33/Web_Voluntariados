@@ -9,11 +9,11 @@
       <div class="columns is-vcentered is-variable is-6">
         <div class="column is-7-desktop is-12-mobile">
           <div class="has-text-centered hero-header-content">
-            <h1 class="title is-1 mb-2"><i class="fa-solid fa-paw mr-3"></i>Pumas Verdes</h1>
+            <h1 class="title is-1 mb-2"><i class="fa-solid fa-leaf mr-3"></i>Pumas Verdes</h1>
             <div class="mt-5 mb-4">
               <div class="buttons is-centered">
                 <a href="#galeria" class="button is-light is-large"><strong>Galería</strong></a>
-                <a href="#unirse" class="button is-success is-large subtitle"><i class="fa-solid fa-hand-point-up mr-3"></i>Únete al Cambio</a>
+                <a href="#unirse" class="button is-primary is-large subtitle"><i class="fa-solid fa-hand-point-up mr-3"></i>Únete al Cambio</a>
               </div>
             </div>
             <p class="subtitle is-3 mt-4">Protectores del medio ambiente universitario.</p>
@@ -38,12 +38,12 @@
                 <section class="mb-6">
                     <div class="card">
                         <div class="card-header">
-                            <h2 class="card-header-title title is-3 has-background-primary p-3">
+                            <h2 class="card-header-title title is-3 has-background-primar p-3">
                                 <i class="fas fa-book mr-2"></i>Nuestra Misión
                             </h2>
                         </div>
                         <div class="card-content">
-                            <article class="message is-success">
+                            <article class="message is-primar">
                                 <div class="message-body">
                                     Como brazo ecológico de la Asociación de Voluntariado Universitario UNAH-CORTÉS, nos dedicamos a promover la sostenibilidad ambiental a través de acciones concretas, educación ecológica y la creación de espacios verdes en nuestro campus y comunidades aledañas. 
                                 </div>
@@ -98,5 +98,14 @@
         </div>
     </section>
 </div>
-
+<style>
+    .has-background-primar {
+        background-color: var(--color-primary) !important;
+        color: #fff !important;
+    }
+    .is-primar .message-body {
+    border-color: var(--color-bg-light);
+    color: var(--color-primary-dark);
+    }
+</style>
 {% endblock %}
