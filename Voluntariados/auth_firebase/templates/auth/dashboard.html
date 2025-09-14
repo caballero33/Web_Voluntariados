@@ -11,43 +11,43 @@
                 <div class="is-size-1 has-text-primary">
                     <i class="fas fa-user-circle"></i>
                 </div>
-                <h3 class="title is-4" id="user-name-display">Usuario</h3>
-                <p class="subtitle is-6" id="user-email-display">email@ejemplo.com</p>
+                <h3 class="title is-4 has-text-white" id="user-name-display">Usuario</h3>
+                <p class="subtitle is-6 has-text-white" id="user-email-display">email@ejemplo.com</p>
             </div>
             
             <nav class="menu">
-                <p class="menu-label">Mi Espacio</p>
+                <p class="menu-label has-text-white">Mi Espacio</p>
                 <ul class="menu-list">
                     <li><a href="#profile" class="dashboard-nav active" data-section="profile">
                         <span class="icon"><i class="fas fa-user"></i></span>
                         Mi Perfil
                     </a></li>
-                    <li><a href="#volunteerings" class="dashboard-nav" data-section="volunteerings">
+                    <li><a href="#volunteerings" class="dashboard-nav has-text-info" data-section="volunteerings">
                         <span class="icon"><i class="fas fa-hands-helping"></i></span>
                         Mis Voluntariados
                     </a></li>
-                    <li><a href="#events" class="dashboard-nav" data-section="events">
+                    <li><a href="#events" class="dashboard-nav has-text-info" data-section="events">
                         <span class="icon"><i class="fas fa-calendar"></i></span>
                         Eventos
                     </a></li>
-                    <li><a href="#achievements" class="dashboard-nav" data-section="achievements">
+                    <li><a href="#achievements" class="dashboard-nav has-text-info" data-section="achievements ">
                         <span class="icon"><i class="fas fa-trophy"></i></span>
                         Logros
                     </a></li>
-                    <li><a href="{% url 'auth:join_voluntariado' %}" class="dashboard-nav">
+                    <li><a href="{% url 'auth:join_voluntariado' %}" class="dashboard-nav has-text-info">
                         <span class="icon"><i class="fas fa-user-plus"></i></span>
                         Unirse a Voluntariado
                     </a></li>
-                    <li><a href="{% url 'auth:admin_panel' %}" class="dashboard-nav" id="admin-link" style="display: none;">
+                    <li><a href="{% url 'auth:admin_panel' %}" class="dashboard-nav has-text-info" id="admin-link" style="display: none;">
                         <span class="icon"><i class="fas fa-crown"></i></span>
                         Panel Admin
                     </a></li>
                 </ul>
-                
-                <p class="menu-label">Acciones</p>
+
+                <p class="menu-label has-text-white">Acciones</p>
                 <ul class="menu-list">
-                    <li><a href="#" onclick="window.authManager.signOut()">
-                        <span class="icon"><i class="fas fa-sign-out-alt"></i></span>
+                    <li><a href="#" class="has-text-info" onclick="window.authManager.signOut()">
+                        <span class="icon has-text-info"><i class="fas fa-sign-out-alt"></i></span>
                         Cerrar Sesión
                     </a></li>
                 </ul>
@@ -70,7 +70,7 @@
                             <div class="columns">
                                 <div class="column">
                                     <div class="field">
-                                        <label class="label">Nombre</label>
+                                        <label class="label has-text-white">Nombre</label>
                                         <div class="control">
                                             <input class="input" type="text" id="profile-first-name" readonly>
                                         </div>
@@ -78,7 +78,7 @@
                                 </div>
                                 <div class="column">
                                     <div class="field">
-                                        <label class="label">Apellido</label>
+                                        <label class="label has-text-white">Apellido</label>
                                         <div class="control">
                                             <input class="input" type="text" id="profile-last-name" readonly>
                                         </div>
@@ -87,21 +87,21 @@
                             </div>
                             
                             <div class="field">
-                                <label class="label">Correo Electrónico</label>
+                                <label class="label has-text-white">Correo Electrónico</label>
                                 <div class="control">
                                     <input class="input" type="email" id="profile-email" readonly>
                                 </div>
                             </div>
                             
                             <div class="field">
-                                <label class="label">Teléfono</label>
+                                <label class="label has-text-white">Teléfono</label>
                                 <div class="control">
                                     <input class="input" type="tel" id="profile-phone" readonly>
                                 </div>
                             </div>
                             
                             <div class="field">
-                                <label class="label">Interés en Voluntariado</label>
+                                <label class="label has-text-white">Interés en Voluntariado</label>
                                 <div class="control">
                                     <input class="input" type="text" id="profile-interest" readonly>
                                 </div>
@@ -123,19 +123,19 @@
                             <div class="is-size-1 has-text-primary mb-4">
                                 <i class="fas fa-user-circle"></i>
                             </div>
-                            <h4 class="title is-5">Estadísticas</h4>
+                            <h4 class="title is-5 has-text-white">Estadísticas</h4>
                             <div class="stats">
                                 <div class="stat-item">
                                     <span class="stat-number" id="volunteer-count">0</span>
-                                    <span class="stat-label">Voluntariados</span>
+                                    <span class="stat-label has-text-white">Voluntariados</span>
                                 </div>
                                 <div class="stat-item">
                                     <span class="stat-number" id="event-count">0</span>
-                                    <span class="stat-label">Eventos</span>
+                                    <span class="stat-label has-text-white">Eventos</span>
                                 </div>
                                 <div class="stat-item">
                                     <span class="stat-number" id="hours-count">0</span>
-                                    <span class="stat-label">Horas</span>
+                                    <span class="stat-label has-text-white">Horas</span>
                                 </div>
                             </div>
                         </div>
