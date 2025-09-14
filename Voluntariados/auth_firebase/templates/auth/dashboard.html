@@ -433,6 +433,8 @@ function setupDashboardNavigation() {
             
             // Remove active class from all nav items
             navItems.forEach(nav => nav.classList.remove('active'));
+            navItems.forEach(nav => nav.classList.add('has-text-info'));
+            this.classList.remove('has-text-info');
             
             // Add active class to clicked item
             this.classList.add('active');
