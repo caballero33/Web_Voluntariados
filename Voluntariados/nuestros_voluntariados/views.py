@@ -38,6 +38,7 @@ def home(request):
         "tags_patitas_unah": tags_patitas_unah,
         "url_patitas_unah": reverse('nuestros_voluntariados:patitas_unah'),
         "tags_pumas_unidos": tags_pumas_unidos,
+        "url_pumas_unidos": reverse('nuestros_voluntariados:pumas_unidos'),
         "tags_pumas_en_accion": tags_pumas_en_accion,
         "url_pumas_en_accion": reverse('nuestros_voluntariados:pumas_en_accion'),
         "tags_vtic": tags_vtic,
@@ -56,3 +57,6 @@ def sonriendo_juntos(request):
 
 def pumas_en_accion(request):
     return render(request, 'pumas_en_accion.html')
+
+def pumas_unidos(request):
+    return render(request, 'pumas_unidos.html')
