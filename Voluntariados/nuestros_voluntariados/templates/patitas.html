@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Voluntariados{% endblock %}
+{% block content %}
+<script src="{% static 'js/patitas.js' %}"></script>
+<section class="hero is-medium is-primary">
+  <div class="hero-body">
+    <div class="container">
+      <div class="columns is-vcentered is-variable is-6">
+        <div class="column is-7-desktop is-12-mobile">
+          <div class="has-text-centered hero-header-content">
+            <h1 class="title is-1 mb-2"><i class="fa-solid fa-paw mr-3"></i>Patitas UNAH</h1>
+            <div class="mt-5 mb-4">
+              <div class="buttons is-centered">
+                <a href="#galeria" class="button is-light is-large"><strong>Galería</strong></a>
+                <a href="#unirse" class="button is-primary is-large subtitle"><i class="fa-solid fa-hand-point-up mr-3"></i>Únete al Cambio</a>
+              </div>
+            </div>
+            <p class="subtitle is-3 mt-4">Protectores de la vida animal universitaria.</p>
+          </div>
+        </div>
+        <div class="column is-5-desktop is-12-mobile">
+          <div class="hero-logo-container hero-logo-responsive">
+            <img src="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741580981/273c01b6-b5ce-4abb-af34-c5046222a2d6-removebg-preview_ycw82u.png"
+                 alt="Logo Pumas Verdes">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="box-content mt-5">
+    <div class="container">
+        <div class="content">
+            <!-- Nuestra Misión -->
+            <div>
+                <section class="mb-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-header-title title is-3 has-background-primar p-3">
+                                <i class="fas fa-book mr-2"></i>Nuestro Compromiso
+                            </h2>
+                        </div>
+                        <div class="card-content">
+                            <article class="message is-primar">
+                                <div class="message-body">
+                                    Como voluntariado oficial de protección animal, nos dedicamos al rescate, rehabilitación y bienestar de los animales en el campus universitario, promoviendo la tenencia responsable y el respeto por toda forma de vida. 
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Aquí están los eventos -->
+<div class="box-content mt-5">
+    <div class="columns">
+        <div class="column is-12">
+            <h2 class="title is-2 has-text-primary">
+                <i class="fa-solid fa-check mr-2"></i>Nuestras Acciones
+            </h2>
+        </div>
+    </div>
+    
+    <div class="columns is-multiline mt-4">
+
+        {% include "partial/eventos.html" with icon="fa-stethoscope" title="Atención veterinaria especializada" image_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741581614/48b74baa-ba6c-4f25-a299-e5f0edab2296_y4ebul.jpg" alt="Inauguración espacio voluntariado" description="Brindar servicios de salud animal con personal capacitado y equipos adecuados, garantizando el diagnóstico oportuno, tratamiento y bienestar integral de las mascotas."%}
+
+        {% include "partial/eventos.html" with icon="fa-dog" title="Programas de rehabilitación integral" image_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741581616/2e10523c-cca3-4a5e-beaa-ab159bbd398a_kdqdef.jpg" alt="Talleres de educación ambiental" description="Implementar terapias físicas y programas especializados para la recuperación de la movilidad, fuerza y bienestar de los animales tras lesiones, cirugías o enfermedades, promoviendo su calidad de vida."%}
+
+        {% include "partial/eventos.html" with icon="fa-bone" title="Cuidado diario y alimentación" image_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741581618/31fd0e88-901b-4d3c-b03c-7a6f34a39624_iqpboe.jpg" alt="Reciclaje comunitario" description="Garantizar la atención cotidiana de los animales mediante una dieta balanceada, agua limpia y cuidados básicos, favoreciendo su salud, energía y bienestar general."%}
+
+        {% include "partial/eventos.html" with icon="fa-users" title="Equipo multidisciplinario trabajando" image_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741581623/c2d3e187-6fa9-40ac-a5ee-f09094ad1f96_vrzqqs.jpg" alt="Equipo de voluntarios en acción" description="Fomentar la colaboración de profesionales y voluntarios de distintas áreas para brindar un cuidado integral a los animales, combinando conocimientos y esfuerzos en beneficio de su bienestar."%}
+
+    </div>
+</div>
+
+<!-- Contact Information Section -->
+<div class="box-content mt-5">
+    <section class="section">
+        <div class="container">
+            <h2 class="title is-2 has-text-primary">
+                <i class="fa-solid fa-envelope mr-2"></i>Contacto
+            </h2>
+            <div class="box set-bg-light card">
+                <p class="mb-3">
+                    ¿Tienes preguntas o deseas unirte a Patitas? ¡Contáctanos!
+                </p>
+                <ul>
+                    <li><strong>Email:</strong> <a href="mailto:patitasunah.cortes@gmail.com">patitasunah.cortes@gmail.com</a></li>
+                    <li><strong>Ubicación:</strong> UNAH-CORTÉS, San Pedro Sula, Honduras</li>
+                    <li>Por un campus más humano con todos los seres vivos.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+</div>
+<style>
+    .has-background-primar {
+        background-color: var(--color-primary) !important;
+        color: #fff !important;
+    }
+    .is-primar .message-body {
+    border-color: var(--color-bg-light);
+    color: var(--color-primary-dark);
+    }
+</style>
+{% endblock %}
