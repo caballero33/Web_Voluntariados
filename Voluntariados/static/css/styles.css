@@ -331,6 +331,10 @@ body.light-mode .theme-toggle:hover { background: rgba(0,0,0,0.15); }
 }
 
 /* Estilos adicionales para mejor UX */
+.hero.is-primary {
+    background-color: var(--color-primary) !important;
+    color: #fff;
+}
 
 .has-text-primary {
     color: var(--color-primary) !important;
