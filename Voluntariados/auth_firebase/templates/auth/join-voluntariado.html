@@ -8,9 +8,9 @@
         <div class="box-content">
             <div class="has-text-centered mb-6">
                 <h1 class="title is-2 has-text-primary">
-                    <i class="fas fa-users mr-3"></i>Unirse a Voluntariado
+                    <i class="fas fa-users mr-3"></i>Unirse a Voluntariados
                 </h1>
-                <p class="subtitle has-text-white">Ingresa el código único del voluntariado al que deseas unirte</p>
+                <p class="subtitle has-text-white">Puedes unirte a múltiples voluntariados. Ingresa el código único del voluntariado al que deseas unirte</p>
             </div>
 
             <form id="join-voluntariado-form" class="box">
@@ -43,6 +43,7 @@
                 <h3 class="title is-4 has-text-primary mb-4">
                     <i class="fas fa-info-circle mr-2"></i>Voluntariados Disponibles
                 </h3>
+                <p class="subtitle is-6 has-text-grey mb-4">Puedes unirte a cualquiera de estos voluntariados usando su código único</p>
                 
                 <div class="columns is-multiline" id="voluntariados-list">
                     <!-- Se cargarán dinámicamente -->
@@ -124,24 +125,42 @@ async function loadAvailableVoluntariados() {
         
         container.innerHTML = voluntariados.map(vol => `
             <div class="column is-6">
-                <div class="card">
+                <div class="card available-volunteer-card">
                     <div class="card-content">
                         <div class="media">
                             <div class="media-left">
                                 <figure class="image is-48x48">
-                                    <img src="${vol.logo}" alt="${vol.name}">
+                                    <img src="${vol.logo}" alt="${vol.name}" style="border-radius: 8px;">
                                 </figure>
                             </div>
                             <div class="media-content">
-                                <p class="title is-6">${vol.name}</p>
-                                <p class="subtitle is-7 has-text-grey">Código: <strong>${vol.code}</strong></p>
+                                <p class="title is-6 has-text-primary">${vol.name}</p>
+                                <p class="subtitle is-7 has-text-info">
+                                    <i class="fas fa-key mr-1"></i>Código: <strong>${vol.code}</strong>
+                                </p>
                             </div>
                         </div>
                         <div class="content">
-                            <p class="is-small">${vol.description}</p>
-                            <div class="tags">
-                                <span class="tag is-${getCategoryColor(vol.category)}">${vol.category}</span>
-                                <span class="tag is-light">${vol.memberCount}/${vol.maxMembers} miembros</span>
+                            <p class="is-small has-text-grey">${vol.description}</p>
+                            <div class="level is-mobile mt-3">
+                                <div class="level-item has-text-centered">
+                                    <div>
+                                        <p class="heading">Categoría</p>
+                                        <span class="tag is-${getCategoryColor(vol.category)}">${vol.category}</span>
+                                    </div>
+                                </div>
+                                <div class="level-item has-text-centered">
+                                    <div>
+                                        <p class="heading">Miembros</p>
+                                        <p class="title is-6">${vol.memberCount}/${vol.maxMembers}</p>
+                                    </div>
+                                </div>
+                                <div class="level-item has-text-centered">
+                                    <div>
+                                        <p class="heading">Estado</p>
+                                        <span class="tag is-${vol.active ? 'success' : 'danger'}">${vol.active ? 'Activo' : 'Inactivo'}</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -168,23 +187,24 @@ async function loadUserVoluntariados() {
         section.style.display = 'block';
         container.innerHTML = userVoluntariados.map(vol => `
             <div class="column is-6">
-                <div class="card volunteer-card">
+                <div class="card my-volunteer-card">
                     <div class="card-content">
                         <div class="media">
                             <div class="media-left">
                                 <figure class="image is-48x48">
-                                    <img src="${vol.logo}" alt="${vol.name}">
+                                    <img src="${vol.logo}" alt="${vol.name}" style="border-radius: 8px;">
                                 </figure>
                             </div>
                             <div class="media-content">
-                                <p class="title is-6">${vol.name}</p>
+                                <p class="title is-6 has-text-success">${vol.name}</p>
                                 <p class="subtitle is-7 has-text-success">
                                     <i class="fas fa-check-circle mr-1"></i>Miembro Activo
                                 </p>
+                                <p class="is-size-7 has-text-info">Código: ${vol.code}</p>
                             </div>
                         </div>
                         <div class="content">
-                            <div class="level">
+                            <div class="level is-mobile">
                                 <div class="level-item has-text-centered">
                                     <div>
                                         <p class="heading">Eventos</p>
@@ -197,8 +217,17 @@ async function loadUserVoluntariados() {
                                         <p class="title is-6">${vol.userData.totalHours || 0}</p>
                                     </div>
                                 </div>
+                                <div class="level-item has-text-centered">
+                                    <div>
+                                        <p class="heading">Estado</p>
+                                        <span class="tag is-success">${vol.userData.status}</span>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="buttons is-centered">
+                            <div class="has-text-centered mt-3">
+                                <span class="tag is-${getCategoryColor(vol.category)}">${vol.category}</span>
+                            </div>
+                            <div class="buttons is-centered mt-3">
                                 <button class="button is-small is-info" onclick="viewVoluntariadoDetails('${vol.id}')">
                                     <span class="icon"><i class="fas fa-eye"></i></span>
                                     <span>Ver Detalles</span>
@@ -253,13 +282,36 @@ function viewVoluntariadoDetails(voluntariadoId) {
 </script>
 
 <style>
-.volunteer-card {
+.available-volunteer-card, .my-volunteer-card {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 2px solid transparent;
 }
 
-.volunteer-card:hover {
+.available-volunteer-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    border-color: var(--color-primary);
+}
+
+.my-volunteer-card {
+    border-color: #00d1b2;
+    background: linear-gradient(135deg, rgba(0, 209, 178, 0.05), rgba(0, 209, 178, 0.02));
+}
+
+.my-volunteer-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 209, 178, 0.2);
+}
+
+.level-item {
+    margin: 0 0.5rem;
+}
+
+.heading {
+    font-size: 0.75rem;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 @keyframes slideInRight {
@@ -281,6 +333,36 @@ function viewVoluntariadoDetails(voluntariadoId) {
     to {
         transform: translateX(100%);
         opacity: 0;
+    }
+}
+
+/* Mejoras para las tarjetas */
+.card-content .media {
+    margin-bottom: 1rem;
+}
+
+.card-content .content {
+    padding-top: 0;
+}
+
+/* Estilos para los botones */
+.buttons .button {
+    margin: 0 0.25rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .level.is-mobile .level-item {
+        margin: 0.5rem 0;
+    }
+    
+    .buttons.is-centered {
+        flex-direction: column;
+    }
+    
+    .buttons .button {
+        margin: 0.25rem 0;
+        width: 100%;
     }
 }
 </style>

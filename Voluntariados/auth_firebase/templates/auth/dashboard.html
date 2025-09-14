@@ -34,11 +34,11 @@
                         <span class="icon"><i class="fas fa-trophy"></i></span>
                         Logros
                     </a></li>
-                    <li><a href="{% url 'auth:join_voluntariado' %}" class="dashboard-nav has-text-info">
+                    <li><a href="{% url 'auth:join_voluntariado' %}" class="dashboard-nav has-text-info" onclick="navigateToJoinVoluntariados(event)">
                         <span class="icon"><i class="fas fa-user-plus"></i></span>
-                        Unirse a Voluntariado
+                        Unirse a Voluntariados
                     </a></li>
-                    <li><a href="{% url 'auth:admin_panel' %}" class="dashboard-nav has-text-info" id="admin-link" style="display: none;">
+                    <li><a href="{% url 'auth:admin_panel' %}" class="dashboard-nav has-text-info" id="admin-link" style="display: block;">
                         <span class="icon"><i class="fas fa-crown"></i></span>
                         Panel Admin
                     </a></li>
@@ -147,9 +147,23 @@
         <!-- Volunteerings Section -->
         <div id="volunteerings-section" class="dashboard-section" style="display: none;">
             <div class="box-content">
-                <h2 class="title is-3 has-text-primary">
-                    <i class="fas fa-hands-helping mr-3"></i>Mis Voluntariados
-                </h2>
+                <div class="level">
+                    <div class="level-left">
+                        <div class="level-item">
+                            <h2 class="title is-3 has-text-primary">
+                                <i class="fas fa-hands-helping mr-3"></i>Mis Voluntariados
+                            </h2>
+                        </div>
+                    </div>
+                    <div class="level-right">
+                        <div class="level-item">
+                            <a href="{% url 'auth:join_voluntariado' %}" class="button is-primary" onclick="navigateToJoinVoluntariados(event)">
+                                <span class="icon"><i class="fas fa-user-plus"></i></span>
+                                <span>Unirse a Voluntariados</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
                 
                 <div class="columns is-multiline" id="user-voluntariados-container">
                     <!-- Se cargarán dinámicamente -->
@@ -170,21 +184,10 @@
                     <i class="fas fa-calendar mr-3"></i>Próximos Eventos
                 </h2>
                 
-                <div class="columns is-multiline">
-                    <div class="column is-6">
-                        <div class="card event-card">
-                            <div class="card-content">
-                                <h4 class="title is-5">Inauguración del Nuevo Espacio</h4>
-                                <p class="subtitle is-6 has-text-grey">15 de Octubre, 2024</p>
-                                <div class="content">
-                                    <p>Únete a nosotros en este hito histórico para nuestra organización universitaria.</p>
-                                    <div class="buttons">
-                                        <button class="button is-primary is-small">Ver Detalles</button>
-                                        <button class="button is-success is-small">Participar</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                <div id="user-events-container">
+                    <div class="has-text-centered py-6">
+                        <i class="fas fa-spinner fa-spin fa-2x"></i>
+                        <p class="mt-3">Cargando eventos...</p>
                     </div>
                 </div>
             </div>
@@ -197,18 +200,8 @@
                     <i class="fas fa-trophy mr-3"></i>Mis Logros
                 </h2>
                 
-                <div class="columns is-multiline">
-                    <div class="column is-12 has-text-centered">
-                        <div class="card achievement-card">
-                            <div class="card-content has-text-centered">
-                                <div class="is-size-1 has-text-warning mb-3">
-                                    <i class="fas fa-medal"></i>
-                                </div>
-                                <h4 class="title is-6 has-text-white">Primer Voluntariado</h4>
-                                <p class="subtitle is-7 has-text-white">¡Bienvenido al equipo!</p>
-                            </div>
-                        </div>
-                    </div>
+                <div class="achievements-grid" id="user-achievements-grid">
+                    <!-- Los logros se cargarán dinámicamente aquí -->
                 </div>
             </div>
         </div>
@@ -305,10 +298,69 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.achievement-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
 }
 
 .achievement-card .card-content {
     padding: 2rem 1.5rem;
+}
+
+.achievements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.achievement-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.achievement-icon {
+    margin-right: 1rem;
+}
+
+.achievement-info h4 {
+    color: white;
+    margin-bottom: 0.5rem;
+}
+
+.achievement-info .subtitle {
+    color: rgba(255,255,255,0.8);
+}
+
+.achievement-body {
+    margin-top: auto;
+}
+
+.achievement-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.achievement-meta .tag {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+}
+
+.achievement-meta .has-text-grey {
+    color: rgba(255,255,255,0.7) !important;
 }
 
 .has-opacity-50 {
@@ -365,19 +417,167 @@ body.light-mode .spinner {
 body.light-mode .has-text-grey-dark {
     color: #363636 !important;
 }
+
+/* Estilos específicos para el dashboard */
+.dashboard-volunteer-card {
+    margin-bottom: 1.5rem;
+    border: 2px solid #e8e8e8;
+    transition: all 0.3s ease;
+}
+
+.dashboard-volunteer-card:hover {
+    border-color: #00d1b2;
+    box-shadow: 0 8px 25px rgba(0, 209, 178, 0.15);
+    transform: translateY(-2px);
+}
+
+.volunteer-info .title {
+    margin-bottom: 0.5rem;
+}
+
+.volunteer-info .subtitle {
+    margin-bottom: 1rem;
+}
+
+.buttons.is-vertical .button {
+    margin-bottom: 0.5rem;
+}
+
+.buttons.is-vertical .button:last-child {
+    margin-bottom: 0;
+}
+
+.heading {
+    font-size: 0.75rem;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.25rem;
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+    .dashboard-volunteer-card .columns {
+        flex-direction: column;
+    }
+    
+    .dashboard-volunteer-card .column {
+        margin-bottom: 1rem;
+    }
+    
+    .dashboard-volunteer-card .column:last-child {
+        margin-bottom: 0;
+    }
+    
+    .level.is-mobile {
+        justify-content: space-around;
+    }
+}
+
+/* Notificaciones */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    max-width: 400px;
+    animation: slideInRight 0.3s ease;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
 </style>
 
 <script>
+// Función de utilidad para mostrar/ocultar elementos de manera segura
+function safeDisplayElement(elementId, display = 'block') {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.style.display = display;
+        return true;
+    } else {
+        console.warn(`Elemento ${elementId} no encontrado`);
+        return false;
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    // Wait for Firebase to be ready
+    if (window.firebaseAuth) {
+        initializeDashboard();
+    } else {
+        window.addEventListener('firebaseReady', initializeDashboard);
+    }
+});
+
+function initializeDashboard() {
     // Load user data
     loadUserData();
     
     // Setup navigation
     setupDashboardNavigation();
-});
+    
+    // Load initial section
+    showSection('profile');
+    
+    // Load user events
+    loadUserEvents();
+}
+
+function showSection(sectionName) {
+    // Hide all sections
+    const sections = document.querySelectorAll('.dashboard-section');
+    sections.forEach(section => {
+        section.style.display = 'none';
+    });
+    
+    // Show selected section
+    safeDisplayElement(`${sectionName}-section`, 'block');
+    
+    // Load section data
+    loadSectionData(sectionName);
+}
 
 async function loadUserData() {
-    const user = window.firebaseAuth.currentUser;
+    console.log('🔄 Cargando datos del usuario...');
+    
+    // Esperar a que Firebase esté completamente listo
+    if (!window.firebaseAuth || !window.firebaseDb) {
+        console.log('⏳ Firebase no está listo, esperando...');
+        setTimeout(loadUserData, 500);
+        return;
+    }
+    
+    // Esperar a que el usuario esté autenticado
+    let user = window.firebaseAuth.currentUser;
+    if (!user) {
+        console.log('⏳ Usuario no autenticado, esperando...');
+        // Escuchar cambios de autenticación
+        window.firebaseAuth.onAuthStateChanged((authUser) => {
+            if (authUser) {
+                console.log('✅ Usuario autenticado:', authUser);
+                loadUserData(); // Recargar datos
+            } else {
+                console.log('❌ Usuario no autenticado');
+                showMessage('No estás autenticado. Redirigiendo al login...', 'warning');
+                setTimeout(() => {
+                    window.location.href = "{% url 'auth:login' %}";
+                }, 2000);
+            }
+        });
+        return;
+    }
+    
+    console.log('👤 Usuario actual:', user);
+    
     if (user) {
         // Load basic info
         document.getElementById('user-name-display').textContent = user.displayName || user.email;
@@ -385,7 +585,10 @@ async function loadUserData() {
         
         // Load detailed profile
         try {
+            console.log('📊 Obteniendo datos del usuario desde Firestore...');
             const userData = await window.authManager.getUserData(user.uid);
+            console.log('📊 Datos del usuario obtenidos:', userData);
+            
             if (userData) {
                 document.getElementById('profile-first-name').value = userData.firstName || '';
                 document.getElementById('profile-last-name').value = userData.lastName || '';
@@ -397,14 +600,41 @@ async function loadUserData() {
                 updateUserStats(userData);
                 
                 // Check if user is admin
-                const isAdmin = await window.adminManager.isUserAdmin();
-                if (isAdmin) {
-                    document.getElementById('admin-link').style.display = 'block';
+                if (window.adminManager) {
+                    try {
+                        // Verificar si el usuario es admin de algún voluntariado
+                        const user = window.firebaseAuth.currentUser;
+                        if (user) {
+                            const userDoc = await window.firebaseDb.collection('users').doc(user.uid).get();
+                            const userData = userDoc.data();
+                            
+                            if (userData && userData.adminVoluntariados && userData.adminVoluntariados.length > 0) {
+                                if (safeDisplayElement('admin-link', 'block')) {
+                                    console.log('✅ Usuario es administrador, mostrando Panel Admin');
+                                }
+                            } else {
+                                console.log('❌ Usuario no es administrador');
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Error checking admin status:', error);
+                    }
                 }
+            } else {
+                console.log('⚠️ No se encontraron datos del usuario en Firestore');
+                // Mostrar mensaje de que no hay datos
+                document.getElementById('profile-first-name').placeholder = 'No disponible';
+                document.getElementById('profile-last-name').placeholder = 'No disponible';
+                document.getElementById('profile-phone').placeholder = 'No disponible';
+                document.getElementById('profile-interest').placeholder = 'No disponible';
             }
         } catch (error) {
-            console.error('Error loading user data:', error);
+            console.error('❌ Error loading user data:', error);
+            showMessage('Error al cargar los datos del perfil: ' + error.message, 'danger');
         }
+    } else {
+        console.log('❌ No hay usuario autenticado');
+        showMessage('No estás autenticado. Por favor, inicia sesión.', 'warning');
     }
 }
 
@@ -429,25 +659,29 @@ function setupDashboardNavigation() {
     
     navItems.forEach(item => {
         item.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            // Remove active class from all nav items
-            navItems.forEach(nav => nav.classList.remove('active'));
-            navItems.forEach(nav => nav.classList.add('has-text-info'));
-            this.classList.remove('has-text-info');
-            
-            // Add active class to clicked item
-            this.classList.add('active');
-            
-            // Hide all sections
-            sections.forEach(section => section.style.display = 'none');
-            
-            // Show selected section
-            const targetSection = this.dataset.section + '-section';
-            document.getElementById(targetSection).style.display = 'block';
-            
-            // Load section data
-            loadSectionData(this.dataset.section);
+            // Solo interceptar enlaces internos (que tienen data-section)
+            if (this.dataset.section) {
+                e.preventDefault();
+                
+                // Remove active class from all nav items
+                navItems.forEach(nav => nav.classList.remove('active'));
+                navItems.forEach(nav => nav.classList.add('has-text-info'));
+                this.classList.remove('has-text-info');
+                
+                // Add active class to clicked item
+                this.classList.add('active');
+                
+                // Hide all sections
+                sections.forEach(section => section.style.display = 'none');
+                
+                // Show selected section
+                const targetSection = this.dataset.section + '-section';
+                safeDisplayElement(targetSection, 'block');
+                
+                // Load section data
+                loadSectionData(this.dataset.section);
+            }
+            // Si no tiene data-section, permitir navegación normal (enlaces externos)
         });
     });
 }
@@ -488,23 +722,44 @@ async function loadSectionData(section) {
 }
 
 async function loadUserVoluntariados() {
+    console.log('🔄 Cargando voluntariados del usuario...');
+    
     const container = document.getElementById('user-voluntariados-container');
     const spinner = document.getElementById('voluntariados-spinner');
     
+    if (!container) {
+        console.error('❌ Container user-voluntariados-container no encontrado');
+        return;
+    }
+    
+    // Esperar a que Firebase esté listo
+    if (!window.firebaseAuth || !window.firebaseDb || !window.voluntariadosManager) {
+        console.log('⏳ Firebase o VoluntariadosManager no está listo, esperando...');
+        setTimeout(loadUserVoluntariados, 500);
+        return;
+    }
+    
     try {
+        console.log('📊 Obteniendo voluntariados del usuario...');
         const userVoluntariados = await window.voluntariadosManager.getUserVoluntariados();
+        console.log('📊 Voluntariados obtenidos:', userVoluntariados);
         
-        spinner.style.display = 'none';
+        safeDisplayElement('voluntariados-spinner', 'none');
         
         if (userVoluntariados.length === 0) {
             container.innerHTML = `
                 <div class="column is-12 has-text-centered">
-                    <div class="notification is-info">
-                        <p class="mb-3">No perteneces a ningún voluntariado aún.</p>
-                        <a href="{% url 'auth:join_voluntariado' %}" class="button is-primary">
-                            <span class="icon"><i class="fas fa-user-plus"></i></span>
-                            <span>Unirse a un Voluntariado</span>
-                        </a>
+                    <div class="notification is-info is-light">
+                        <div class="content">
+                            <h4 class="title is-5 has-text-info">¡Comienza tu aventura voluntaria!</h4>
+                            <p class="mb-4">No perteneces a ningún voluntariado aún. Únete a uno de nuestros programas y comienza a hacer la diferencia.</p>
+                            <div class="buttons is-centered">
+                                <a href="{% url 'auth:join_voluntariado' %}" class="button is-primary is-large" onclick="navigateToJoinVoluntariados(event)">
+                                    <span class="icon"><i class="fas fa-user-plus"></i></span>
+                                    <span>Unirse a un Voluntariado</span>
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             `;
@@ -512,24 +767,71 @@ async function loadUserVoluntariados() {
         }
         
         container.innerHTML = userVoluntariados.map(vol => `
-            <div class="column is-4">
-                <div class="card volunteer-card">
+            <div class="column is-12">
+                <div class="card volunteer-card dashboard-volunteer-card">
                     <div class="card-content">
-                        <div class="media">
-                            <div class="media-left">
-                                <figure class="image is-48x48">
-                                    <img src="${vol.logo}" alt="${vol.name}">
-                                </figure>
+                        <div class="columns is-vcentered">
+                            <!-- Logo y Info Principal -->
+                            <div class="column is-3">
+                                <div class="has-text-centered">
+                                    <figure class="image is-64x64 is-inline-block">
+                                        <img src="${vol.logo}" alt="${vol.name}" style="border-radius: 12px;">
+                                    </figure>
+                                    <div class="mt-3">
+                                        <span class="tag is-${getCategoryColor(vol.category)} is-medium">${vol.category}</span>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="media-content">
-                                <p class="title is-6">${vol.name}</p>
-                                <p class="subtitle is-7">${vol.category}</p>
+                            
+                            <!-- Información del Voluntariado -->
+                            <div class="column is-6">
+                                <div class="volunteer-info">
+                                    <h3 class="title is-4 has-text-primary mb-2">${vol.name}</h3>
+                                    <p class="subtitle is-6 has-text-grey mb-3">
+                                        <i class="fas fa-tag mr-2"></i>${vol.category}
+                                    </p>
+                                    <div class="level is-mobile">
+                                        <div class="level-item has-text-centered">
+                                            <div>
+                                                <p class="heading">Estado</p>
+                                                <p class="title is-5 has-text-${vol.userData.status === 'activo' ? 'success' : 'danger'}">${vol.userData.status}</p>
+                                            </div>
+                                        </div>
+                                        <div class="level-item has-text-centered">
+                                            <div>
+                                                <p class="heading">Eventos Completados</p>
+                                                <p class="title is-5">${vol.userData.eventsCompleted || 0}</p>
+                                            </div>
+                                        </div>
+                                        <div class="level-item has-text-centered">
+                                            <div>
+                                                <p class="heading">Horas Totales</p>
+                                                <p class="title is-5">${vol.userData.totalHours || 0}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="content">
-                            <p class="has-text-grey">Estado: <span class="has-text-success">${vol.userData.status}</span></p>
-                            <p class="has-text-grey">Eventos: ${vol.userData.eventsCompleted || 0}</p>
-                            <p class="has-text-grey">Horas: ${vol.userData.totalHours || 0}</p>
+                            
+                            <!-- Acciones -->
+                            <div class="column is-3">
+                                <div class="has-text-centered">
+                                    <div class="buttons is-vertical">
+                                        <button class="button is-primary is-fullwidth" onclick="viewVoluntariadoDetails('${vol.id}')">
+                                            <span class="icon"><i class="fas fa-eye"></i></span>
+                                            <span>Ver Detalles</span>
+                                        </button>
+                                        <button class="button is-info is-fullwidth" onclick="viewEvents('${vol.id}')">
+                                            <span class="icon"><i class="fas fa-calendar"></i></span>
+                                            <span>Ver Eventos</span>
+                                        </button>
+                                        <button class="button is-warning is-fullwidth is-outlined" onclick="leaveVoluntariado('${vol.id}')">
+                                            <span class="icon"><i class="fas fa-sign-out-alt"></i></span>
+                                            <span>Abandonar</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -537,14 +839,16 @@ async function loadUserVoluntariados() {
         `).join('');
         
     } catch (error) {
-        spinner.style.display = 'none';
-        container.innerHTML = `
-            <div class="column is-12 has-text-centered">
-                <div class="notification is-danger">
-                    <p>Error cargando voluntariados: ${error.message}</p>
+        safeDisplayElement('voluntariados-spinner', 'none');
+        if (container) {
+            container.innerHTML = `
+                <div class="column is-12 has-text-centered">
+                    <div class="notification is-danger">
+                        <p>Error cargando voluntariados: ${error.message}</p>
+                    </div>
                 </div>
-            </div>
-        `;
+            `;
+        }
     }
 }
 
@@ -554,8 +858,445 @@ async function loadUserEvents() {
 }
 
 async function loadUserAchievements() {
-    // Implementar carga de logros del usuario
-    console.log('Loading user achievements...');
+    try {
+        console.log('🏆 Cargando logros del usuario...');
+        
+        // Verificar que Firebase esté disponible
+        if (!window.firebaseAuth || !window.firebaseDb) {
+            console.log('⚠️ Firebase no está disponible, esperando...');
+            // Esperar un poco y reintentar
+            setTimeout(loadUserAchievements, 1000);
+            return;
+        }
+        
+        if (!window.firebaseAuth.currentUser) {
+            console.log('⚠️ Usuario no autenticado');
+            return;
+        }
+
+        const currentUser = window.firebaseAuth.currentUser;
+        const userDoc = await window.firebaseDb.collection('users').doc(currentUser.uid).get();
+        
+        if (!userDoc.exists) {
+            console.log('⚠️ Usuario no encontrado en Firestore');
+            return;
+        }
+
+        const userData = userDoc.data();
+        const achievementsContainer = document.getElementById('user-achievements-grid');
+        
+        if (!achievementsContainer) {
+            console.log('⚠️ Contenedor de logros no encontrado');
+            return;
+        }
+
+        // Obtener todos los logros del usuario desde user_achievements
+        const userAchievementsSnapshot = await window.firebaseDb
+            .collection('user_achievements')
+            .where('userId', '==', currentUser.uid)
+            .get();
+
+        console.log('📊 Logros encontrados:', userAchievementsSnapshot.docs.length);
+
+        if (userAchievementsSnapshot.docs.length === 0) {
+            achievementsContainer.innerHTML = `
+                <div class="has-text-centered py-6" style="grid-column: 1 / -1;">
+                    <i class="fas fa-trophy fa-3x has-text-grey-light"></i>
+                    <p class="has-text-grey mt-3">Aún no tienes logros asignados</p>
+                    <p class="has-text-info is-size-7">Los administradores pueden asignarte logros por tu participación</p>
+                </div>
+            `;
+            return;
+        }
+
+        // Obtener detalles de cada logro
+        const achievementsData = await Promise.all(
+            userAchievementsSnapshot.docs.map(async (doc) => {
+                const userAchievementData = doc.data();
+                
+                // Obtener detalles del logro
+                const achievementDoc = await window.firebaseDb
+                    .collection('logros')
+                    .doc(userAchievementData.achievementId)
+                    .get();
+                
+                if (achievementDoc.exists) {
+                    const achievementData = achievementDoc.data();
+                    return {
+                        id: userAchievementData.achievementId,
+                        name: achievementData.name,
+                        description: achievementData.description,
+                        icon: achievementData.icon,
+                        hours: userAchievementData.achievementHours || 0,
+                        assignedAt: userAchievementData.assignedAt,
+                        voluntariadoId: userAchievementData.voluntariadoId
+                    };
+                }
+                return null;
+            })
+        );
+
+        const validAchievements = achievementsData.filter(achievement => achievement !== null);
+
+        if (validAchievements.length === 0) {
+            achievementsContainer.innerHTML = `
+                <div class="has-text-centered py-6" style="grid-column: 1 / -1;">
+                    <i class="fas fa-trophy fa-3x has-text-grey-light"></i>
+                    <p class="has-text-grey mt-3">No se encontraron detalles de logros</p>
+                </div>
+            `;
+            return;
+        }
+
+        // Mostrar logros
+        achievementsContainer.innerHTML = validAchievements.map(achievement => `
+            <div class="achievement-card">
+                <div class="achievement-header">
+                    <div class="achievement-icon">
+                        <i class="${achievement.icon || 'fas fa-trophy'} fa-2x has-text-warning"></i>
+                    </div>
+                    <div class="achievement-info">
+                        <h4 class="title is-5">${achievement.name}</h4>
+                        <p class="subtitle is-6 has-text-grey">${achievement.description || 'Sin descripción'}</p>
+                    </div>
+                </div>
+                <div class="achievement-body">
+                    <div class="achievement-meta">
+                        <span class="tag is-success">
+                            <span class="icon"><i class="fas fa-clock"></i></span>
+                            <span>${achievement.hours}h</span>
+                        </span>
+                        <span class="has-text-grey is-size-7">
+                            ${achievement.assignedAt ? achievement.assignedAt.toDate().toLocaleDateString() : 'Sin fecha'}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+        console.log('✅ Logros cargados exitosamente:', validAchievements.length);
+        
+    } catch (error) {
+        console.error('❌ Error cargando logros del usuario:', error);
+        
+        const achievementsContainer = document.getElementById('user-achievements-grid');
+        if (achievementsContainer) {
+            achievementsContainer.innerHTML = `
+                <div class="has-text-centered py-6" style="grid-column: 1 / -1;">
+                    <i class="fas fa-exclamation-triangle fa-3x has-text-danger"></i>
+                    <p class="has-text-danger mt-3">Error al cargar logros</p>
+                    <p class="has-text-grey is-size-7">Intenta recargar la página</p>
+                </div>
+            `;
+        }
+    }
+}
+
+function getCategoryColor(category) {
+    const colors = {
+        'medio-ambiente': 'success',
+        'social': 'info',
+        'animales': 'warning',
+        'educacion': 'danger',
+        'salud': 'primary'
+    };
+    return colors[category] || 'light';
+}
+
+// Funciones para los botones de acción
+function viewVoluntariadoDetails(voluntariadoId) {
+    console.log('Ver detalles del voluntariado:', voluntariadoId);
+    // Navegar a la página de detalles
+    window.location.href = `{% url 'auth:volunteer_details' %}?id=${voluntariadoId}`;
+}
+
+function viewEvents(voluntariadoId) {
+    console.log('Ver eventos del voluntariado:', voluntariadoId);
+    // Cambiar a la sección de eventos
+    const eventsNav = document.querySelector('[data-section="events"]');
+    if (eventsNav) {
+        eventsNav.click();
+    }
+}
+
+function leaveVoluntariado(voluntariadoId) {
+    if (confirm('¿Estás seguro de que quieres abandonar este voluntariado?')) {
+        window.voluntariadosManager.leaveVoluntariado(voluntariadoId)
+            .then(() => {
+                loadUserVoluntariados(); // Recargar la lista
+                showMessage('Has abandonado el voluntariado correctamente.', 'success');
+            })
+            .catch(error => {
+                showMessage('Error al abandonar el voluntariado: ' + error.message, 'danger');
+            });
+    }
+}
+
+function showMessage(message, type = 'info') {
+    // Crear notificación temporal
+    const notification = document.createElement('div');
+    notification.className = `notification is-${type} is-light`;
+    notification.innerHTML = `
+        <button class="delete"></button>
+        ${message}
+    `;
+    
+    // Agregar al DOM
+    document.body.appendChild(notification);
+    
+    // Auto-remover después de 5 segundos
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+        }
+    }, 5000);
+    
+    // Remover al hacer clic en X
+    notification.querySelector('.delete').addEventListener('click', () => {
+        if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+        }
+    });
+}
+
+function navigateToJoinVoluntariados(event) {
+    // Verificar si el usuario está autenticado
+    if (!window.firebaseAuth || !window.firebaseAuth.currentUser) {
+        event.preventDefault();
+        showMessage('Debes estar autenticado para unirte a voluntariados.', 'warning');
+        
+        // Redirigir al login
+        setTimeout(() => {
+            window.location.href = "{% url 'auth:login' %}";
+        }, 2000);
+        return;
+    }
+    
+    // Si está autenticado, permitir la navegación normal
+    console.log('✅ Usuario autenticado, navegando a Unirse a Voluntariados...');
+    // No hacer preventDefault() para permitir la navegación normal
+}
+
+async function loadUserEvents() {
+    console.log('🔄 Cargando eventos del usuario...');
+    const container = document.getElementById('user-events-container');
+    
+    if (!container) {
+        console.error('❌ Container user-events-container no encontrado');
+        return;
+    }
+
+    // Verificar que Firebase esté listo
+    if (!window.firebaseAuth || !window.firebaseDb) {
+        console.log('⏳ Firebase no está listo, reintentando en 1 segundo...');
+        setTimeout(loadUserEvents, 1000);
+        return;
+    }
+
+    const user = window.firebaseAuth.currentUser;
+    if (!user) {
+        container.innerHTML = `
+            <div class="has-text-centered py-6">
+                <p class="has-text-danger">Usuario no autenticado</p>
+            </div>
+        `;
+        return;
+    }
+
+    try {
+        // Cerrar eventos pasados automáticamente
+        await window.adminManager.closePastEvents();
+        
+        // Obtener voluntariados del usuario
+        const userDoc = await window.firebaseDb.collection('users').doc(user.uid).get();
+        const userData = userDoc.data();
+        
+        if (!userData || !userData.voluntariados) {
+            container.innerHTML = `
+                <div class="has-text-centered py-6">
+                    <i class="fas fa-calendar fa-3x has-text-grey-light"></i>
+                    <p class="mt-3 has-text-grey">No estás inscrito en ningún voluntariado</p>
+                    <p class="has-text-info">Únete a un voluntariado para ver eventos</p>
+                </div>
+            `;
+            return;
+        }
+
+        const voluntariadoIds = Object.keys(userData.voluntariados);
+        console.log('📅 Voluntariados del usuario:', voluntariadoIds);
+
+        // Obtener eventos de todos los voluntariados
+        const allEvents = [];
+        for (const voluntariadoId of voluntariadoIds) {
+            try {
+                const events = await window.adminManager.getVolunteerEvents(voluntariadoId);
+                events.forEach(event => {
+                    allEvents.push({
+                        ...event,
+                        voluntariadoId: voluntariadoId,
+                        voluntariadoName: userData.voluntariados[voluntariadoId].name || voluntariadoId
+                    });
+                });
+            } catch (error) {
+                console.error(`Error cargando eventos de ${voluntariadoId}:`, error);
+            }
+        }
+
+        // Filtrar eventos futuros y abiertos, ordenar por fecha
+        const futureEvents = allEvents
+            .filter(event => {
+                const eventDate = event.eventDate ? event.eventDate.toDate() : new Date();
+                const now = new Date();
+                return eventDate > now && event.status === 'abierto';
+            })
+            .sort((a, b) => {
+                const dateA = a.eventDate ? a.eventDate.toDate() : new Date();
+                const dateB = b.eventDate ? b.eventDate.toDate() : new Date();
+                return dateA - dateB;
+            })
+            .slice(0, 6); // Mostrar solo los próximos 6 eventos
+
+        console.log('📅 Eventos futuros encontrados:', futureEvents);
+
+        if (futureEvents.length === 0) {
+            container.innerHTML = `
+                <div class="has-text-centered py-6">
+                    <i class="fas fa-calendar fa-3x has-text-grey-light"></i>
+                    <p class="mt-3 has-text-grey">No hay eventos próximos</p>
+                    <p class="has-text-info">Los eventos aparecerán aquí cuando estén disponibles</p>
+                </div>
+            `;
+            return;
+        }
+
+        // Renderizar eventos
+        container.innerHTML = `
+            <div class="columns is-multiline">
+                ${futureEvents.map(event => {
+                    const eventDate = event.eventDate ? event.eventDate.toDate() : new Date();
+                    const isEnrolled = event.participants && event.participants.includes(user.uid);
+                    const canEnroll = event.status === 'abierto' && event.currentParticipants < event.maxParticipants && !isEnrolled;
+                    
+                    return `
+                        <div class="column is-6">
+                            <div class="card event-card">
+                                <div class="card-content">
+                                    <div class="level is-mobile mb-2">
+                                        <div class="level-left">
+                                            <div class="level-item">
+                                                <h4 class="title is-5">${event.title}</h4>
+                                            </div>
+                                        </div>
+                                        <div class="level-right">
+                                            <div class="level-item">
+                                                <span class="tag is-${event.status === 'abierto' ? 'success' : 'danger'}">
+                                                    ${event.status === 'abierto' ? '🟢 Abierto' : '🔴 Cerrado'}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <p class="subtitle is-6 has-text-grey mb-2">
+                                        <i class="fas fa-calendar mr-1"></i>
+                                        ${eventDate.toLocaleDateString()} - ${eventDate.toLocaleTimeString()}
+                                    </p>
+                                    
+                                    <p class="subtitle is-6 has-text-info mb-2">
+                                        <i class="fas fa-users mr-1"></i>
+                                        ${event.currentParticipants || 0}/${event.maxParticipants} participantes
+                                    </p>
+                                    
+                                    <p class="subtitle is-6 has-text-primary mb-3">
+                                        <i class="fas fa-hands-helping mr-1"></i>
+                                        ${event.voluntariadoName}
+                                    </p>
+                                    
+                                    <div class="content">
+                                        <p class="mb-3">${event.description}</p>
+                                        
+                                        <div class="buttons">
+                                            <a href="{% url 'auth:volunteer_details' %}?id=${event.voluntariadoId}" class="button is-primary is-small">
+                                                <span class="icon"><i class="fas fa-eye"></i></span>
+                                                <span>Ver Detalles</span>
+                                            </a>
+                                            
+                                            ${canEnroll ? `
+                                                <button class="button is-success is-small" onclick="enrollInEventFromDashboard('${event.id}', '${event.voluntariadoId}')">
+                                                    <span class="icon"><i class="fas fa-user-plus"></i></span>
+                                                    <span>Inscribirse</span>
+                                                </button>
+                                            ` : ''}
+                                            
+                                            ${isEnrolled ? `
+                                                <span class="tag is-success">
+                                                    <i class="fas fa-check mr-1"></i>Inscrito
+                                                </span>
+                                            ` : ''}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+        `;
+        
+    } catch (error) {
+        console.error('❌ Error loading user events:', error);
+        container.innerHTML = `
+            <div class="has-text-centered py-6">
+                <p class="has-text-danger">Error al cargar eventos: ${error.message}</p>
+            </div>
+        `;
+    }
+}
+
+// Función para inscribirse en evento desde el dashboard
+async function enrollInEventFromDashboard(eventId, voluntariadoId) {
+    try {
+        await window.adminManager.manageEventParticipants(eventId, 'add');
+        showMessage('Te has inscrito al evento exitosamente', 'success');
+        await loadUserEvents(); // Recargar eventos
+    } catch (error) {
+        console.error('Error enrolling in event:', error);
+        showMessage('Error al inscribirse: ' + error.message, 'danger');
+    }
+}
+
+function showMessage(message, type = 'info') {
+    // Crear notificación temporal
+    const notification = document.createElement('div');
+    notification.className = `notification is-${type} is-light`;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        max-width: 400px;
+        animation: slideInRight 0.3s ease;
+    `;
+    notification.innerHTML = `
+        <button class="delete"></button>
+        ${message}
+    `;
+    
+    // Agregar al DOM
+    document.body.appendChild(notification);
+    
+    // Auto-remover después de 5 segundos
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+        }
+    }, 5000);
+    
+    // Remover al hacer clic en X
+    notification.querySelector('.delete').addEventListener('click', () => {
+        if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+        }
+    });
 }
 </script>
 {% endblock %}
