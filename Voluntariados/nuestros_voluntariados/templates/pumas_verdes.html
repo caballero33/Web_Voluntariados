@@ -3,58 +3,10 @@
 {% block title %}Voluntariados{% endblock %}
 {% block content %}
 <script src="{% static 'js/pumas_verdes.js' %}"></script>
-<section class="hero is-medium is-primary">
-  <div class="hero-body">
-    <div class="container">
-      <div class="columns is-vcentered is-variable is-6">
-        <div class="column is-7-desktop is-12-mobile">
-          <div class="has-text-centered hero-header-content">
-            <h1 class="title is-1 mb-2"><i class="fa-solid fa-leaf mr-3"></i>Pumas Verdes</h1>
-            <div class="mt-5 mb-4">
-              <div class="buttons is-centered">
-                <a href="#galeria" class="button is-light is-large"><strong>Galería</strong></a>
-                <a href="#unirse" class="button is-primary is-large subtitle"><i class="fa-solid fa-hand-point-up mr-3"></i>Únete al Cambio</a>
-              </div>
-            </div>
-            <p class="subtitle is-3 mt-4">Protectores del medio ambiente universitario.</p>
-          </div>
-        </div>
-        <div class="column is-5-desktop is-12-mobile">
-          <div class="hero-logo-container hero-logo-responsive">
-            <img src="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741580608/Logo_PV_UNAH_VS-removebg-preview_jadsip.png"
-                 alt="Logo Pumas Verdes">
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+{% include "partial/portada.html" with nombre="Pumas Verdes" icon="fa-leaf" eslogan="Protectores del medio ambiente universitario." logo_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741580608/Logo_PV_UNAH_VS-removebg-preview_jadsip.png" %}
 
-<div class="box-content mt-5">
-    <div class="container">
-        <div class="content">
-            <!-- Nuestra Misión -->
-            <div>
-                <section class="mb-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h2 class="card-header-title title is-3 has-background-primar p-3">
-                                <i class="fas fa-book mr-2"></i>Nuestra Misión
-                            </h2>
-                        </div>
-                        <div class="card-content">
-                            <article class="message is-primar">
-                                <div class="message-body">
-                                    Como brazo ecológico de la Asociación de Voluntariado Universitario UNAH-CORTÉS, nos dedicamos a promover la sostenibilidad ambiental a través de acciones concretas, educación ecológica y la creación de espacios verdes en nuestro campus y comunidades aledañas. 
-                                </div>
-                            </article>
-                        </div>
-                    </div>
-                </section>
-            </div>
-        </div>
-    </div>
-</div>
+<!-- Nuestra Misión -->
+{% include "partial/mision.html" with title="Nuestra Misión" description="Como brazo ecológico de la Asociación de Voluntariado Universitario UNAH-CORTÉS, nos dedicamos a promover la sostenibilidad ambiental a través de acciones concretas, educación ecológica y la creación de espacios verdes en nuestro campus y comunidades aledañas." %}
 
 <!-- Aquí están los eventos -->
 <div class="box-content mt-5">
@@ -80,24 +32,8 @@
 </div>
 
 <!-- Contact Information Section -->
-<div class="box-content mt-5">
-    <section class="section">
-        <div class="container">
-            <h2 class="title is-2 has-text-primary">
-                <i class="fa-solid fa-envelope mr-2"></i>Contacto
-            </h2>
-            <div class="box set-bg-light card">
-                <p class="mb-3">
-                    ¿Tienes preguntas o deseas unirte a Pumas Verdes? ¡Contáctanos!
-                </p>
-                <ul>
-                    <li><strong>Email:</strong> <a href="mailto:pumasverdesunahvs10@gmail.com">pumasverdesunahvs10@gmail.com</a></li>
-                    <li><strong>Ubicación:</strong> UNAH-CORTÉS, San Pedro Sula, Honduras</li>
-                </ul>
-            </div>
-        </div>
-    </section>
-</div>
+{% include "partial/contacto.html" with contacto_mensaje="¿Quieres Ayudar a Pumas Verdes?" contacto_email="pumasverdesunahvs10@gmail.com" contacto_slogan="Comprometidos con un futuro sostenible." %}
+
 <style>
     .has-background-primar {
         background-color: var(--color-primary) !important;

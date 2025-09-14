@@ -3,58 +3,10 @@
 {% block title %}Voluntariados{% endblock %}
 {% block content %}
 <script src="{% static 'js/sonriendo_juntos.js' %}"></script>
-<section class="hero is-medium is-primary">
-  <div class="hero-body">
-    <div class="container">
-      <div class="columns is-vcentered is-variable is-6">
-        <div class="column is-7-desktop is-12-mobile">
-          <div class="has-text-centered hero-header-content">
-            <h1 class="title is-1 mb-2"><i class="fa-solid fa-face-smile-wink mr-3"></i>Sonriendo Juntos</h1>
-            <div class="mt-5 mb-4">
-              <div class="buttons is-centered">
-                <a href="#galeria" class="button is-light is-large"><strong>Galería</strong></a>
-                <a href="#unirse" class="button is-primary is-large subtitle"><i class="fa-solid fa-hand-point-up mr-3"></i>Únete al Cambio</a>
-              </div>
-            </div>
-            <p class="subtitle is-3 mt-4">Transformando vidas a través de la solidaridad.</p>
-          </div>
-        </div>
-        <div class="column is-5-desktop is-12-mobile">
-          <div class="hero-logo-container hero-logo-responsive">
-            <img src="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741580995/c31eebe3-8666-4c25-ba58-c81ae0da5ab6-removebg-preview_b1an3v.png"
-                 alt="Logo Sonriendo Juntos">
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+{% include "partial/portada.html" with nombre="Sonriendo Juntos" icon="fa-face-smile-wink" eslogan="Transformando vidas a través de la solidaridad." logo_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741580995/c31eebe3-8666-4c25-ba58-c81ae0da5ab6-removebg-preview_b1an3v.png" %}
 
-<div class="box-content mt-5">
-    <div class="container">
-        <div class="content">
-            <!-- Nuestra Misión -->
-            <div>
-                <section class="mb-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h2 class="card-header-title title is-3 has-background-primar p-3">
-                                <i class="fas fa-book mr-2"></i>Nuestra Labor
-                            </h2>
-                        </div>
-                        <div class="card-content">
-                            <article class="message is-primar">
-                                <div class="message-body">
-                                     Como aliados oficiales de Operación Sonrisa Honduras, trabajamos para brindar atención médica especializada y mejorar la calidad de vida en comunidades vulnerables, promoviendo el acceso a salud y bienestar integral. 
-                                </div>
-                            </article>
-                        </div>
-                    </div>
-                </section>
-            </div>
-        </div>
-    </div>
-</div>
+<!-- Nuestra Misión -->
+{% include "partial/mision.html" with title="Nuestra Labor" description="Como aliados oficiales de Operación Sonrisa Honduras, trabajamos para brindar atención médica especializada y mejorar la calidad de vida en comunidades vulnerables, promoviendo el acceso a salud y bienestar integral." %}
 
 <!-- Aquí están los eventos -->
 <div class="box-content mt-5">
@@ -78,25 +30,8 @@
 </div>
 
 <!-- Contact Information Section -->
-<div class="box-content mt-5">
-    <section class="section">
-        <div class="container">
-            <h2 class="title is-2 has-text-primary">
-                <i class="fa-solid fa-envelope mr-2"></i>Contacto
-            </h2>
-            <div class="box set-bg-light card">
-                <p class="mb-3">
-                    ¿Quieres Ayudar a Sonreír? ¡Contáctanos!
-                </p>
-                <ul>
-                    <li><strong>Email:</strong> <a href="mailto:sonriendojuntossps@gmail.com">sonriendojuntossps@gmail.com</a></li>
-                    <li><strong>Ubicación:</strong> UNAH-CORTÉS, San Pedro Sula, Honduras</li>
-                    <li>Creando sonrisas, transformando vidas</li>
-                </ul>
-            </div>
-        </div>
-    </section>
-</div>
+{% include "partial/contacto.html" with contacto_mensaje="¿Quieres Ayudar a Sonreír?" contacto_email="sonriendojuntossps@gmail.com" contacto_slogan="Creando sonrisas, transformando vidas" %}
+
 <style>
     .has-background-primar {
         background-color: var(--color-primary) !important;
