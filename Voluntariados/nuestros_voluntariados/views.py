@@ -25,16 +25,26 @@ def home(request):
         {"class": "is-danger", "text": "Educacion"},
     ]
     
+    tags_vtic = [ 
+        {"class": "is-info", "text": "Social"},
+        {"class": "is-danger", "text": "Educacion"},
+    ]
+    
     context = {
         "tags_pumas_verdes": tags_pumas_verdes,
         "url_pumas_verdes": reverse('nuestros_voluntariados:pumas_verdes'),
         "tags_sonriendo_juntos": tags_sonriendo_juntos,
         "tags_patitas_unah": tags_patitas_unah,
+        "url_patitas_unah": reverse('nuestros_voluntariados:patitas_unah'),
         "tags_pumas_unidos": tags_pumas_unidos,
         "tags_pumas_en_accion": tags_pumas_en_accion,
+        "tags_vtic": tags_vtic,
     }
     
     return render(request, 'voluntariados.html', context)
 
 def pumas_verdes(request):
     return render(request, 'pumas_verdes.html')
+
+def patitas_unah(request):
+    return render(request, 'patitas.html')
