@@ -20,6 +20,10 @@ def join_voluntariado_view(request):
     """Vista para unirse a voluntariados usando códigos"""
     return render(request, 'auth/join-voluntariado.html')
 
+def volunteer_details_view(request):
+    """Vista para mostrar detalles de un voluntariado específico"""
+    return render(request, 'auth/volunteer-details.html')
+
 def admin_panel_view(request):
     """Vista para el panel de administración"""
     return render(request, 'auth/admin-panel.html')

@@ -1,453 +1,2073 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Panel de Administración{% endblock %}
+<!-- Forzar recarga de cache -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+
+{% block title %}Panel de Administración - Campus Voluntariados{% endblock %}
 
 {% block content %}
-<div class="columns">
-    <!-- Sidebar -->
-    <div class="column is-3">
-        <div class="box-content">
-            <div class="has-text-centered mb-4">
-                <h3 class="title is-4 has-text-primary">
-                    <i class="fas fa-crown mr-2"></i>Panel Admin
-                </h3>
-                <p class="subtitle is-6">Gestión de Voluntariados</p>
+<div class="admin-panel-container">
+    <!-- Header del Panel -->
+    <div class="panel-header">
+        <div class="header-content">
+            <div class="header-info">
+                <h1 class="title is-2">
+                    <span class="icon"><i class="fas fa-crown"></i></span>
+                    Panel de Administración
+                </h1>
+                <p class="subtitle is-5">Gestiona tu voluntariado y supervisa a los miembros</p>
             </div>
-            
-            <nav class="menu">
-                <p class="menu-label">Administración</p>
-                <ul class="menu-list">
-                    <li><a href="#voluntariados" class="admin-nav active" data-section="voluntariados">
-                        <span class="icon"><i class="fas fa-users"></i></span>
-                        Mis Voluntariados
-                    </a></li>
-                    <li><a href="#eventos" class="admin-nav" data-section="eventos">
-                        <span class="icon"><i class="fas fa-calendar-plus"></i></span>
-                        Crear Evento
-                    </a></li>
-                    <li><a href="#miembros" class="admin-nav" data-section="miembros">
-                        <span class="icon"><i class="fas fa-user-friends"></i></span>
-                        Gestionar Miembros
-                    </a></li>
-                    <li><a href="#estadisticas" class="admin-nav" data-section="estadisticas">
-                        <span class="icon"><i class="fas fa-chart-bar"></i></span>
-                        Estadísticas
-                    </a></li>
-                </ul>
-            </nav>
+            <div class="header-stats">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="total-members">0</span>
+                        <span class="stat-label">Miembros</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="total-events">0</span>
+                        <span class="stat-label">Eventos</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="total-hours">0</span>
+                        <span class="stat-label">Horas</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    
-    <!-- Main Content -->
-    <div class="column is-9">
-        <!-- Voluntariados Section -->
-        <div id="voluntariados-section" class="admin-section">
-            <div class="box-content">
-                <h2 class="title is-3 has-text-primary">
-                    <i class="fas fa-users mr-3"></i>Mis Voluntariados
+
+    <!-- Selector de Voluntariado -->
+    <div class="volunteer-selector">
+        <div class="field is-grouped">
+            <div class="control is-expanded">
+                <div class="select is-large">
+                    <select id="volunteer-select">
+                        <option value="">Selecciona un voluntariado...</option>
+                    </select>
+                </div>
+            </div>
+            <div class="control">
+                <button class="button is-primary is-large" onclick="loadVolunteerData()">
+                    <span class="icon"><i class="fas fa-search"></i></span>
+                    <span>Cargar Datos</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenido Principal -->
+    <div class="panel-content" id="panel-content" style="display: none;">
+        
+        <!-- Pestañas de Navegación -->
+        <div class="tabs is-centered is-fullwidth is-large">
+            <ul>
+                <li class="is-active" data-tab="members">
+                    <a>
+                        <span class="icon"><i class="fas fa-users"></i></span>
+                        <span>Miembros</span>
+                    </a>
+                </li>
+                <li data-tab="statistics">
+                    <a>
+                        <span class="icon"><i class="fas fa-chart-bar"></i></span>
+                        <span>Estadísticas</span>
+                    </a>
+                </li>
+                <li data-tab="hours">
+                    <a>
+                        <span class="icon"><i class="fas fa-clock"></i></span>
+                        <span>Gestión de Horas</span>
+                    </a>
+                </li>
+                <li data-tab="achievements">
+                    <a>
+                        <span class="icon"><i class="fas fa-trophy"></i></span>
+                        <span>Logros</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Contenido de las Pestañas -->
+        
+        <!-- Pestaña Miembros -->
+        <div id="members-content" class="tab-content">
+            <div class="members-header">
+                <h2 class="title is-4">
+                    <span class="icon"><i class="fas fa-users"></i></span>
+                    Miembros del Voluntariado
                 </h2>
-                
-                <div class="columns is-multiline" id="admin-voluntariados-list">
-                    <!-- Se cargarán dinámicamente -->
+                <div class="members-actions">
+                    <button class="button is-info" onclick="exportMembersData()">
+                        <span class="icon"><i class="fas fa-download"></i></span>
+                        <span>Exportar Datos</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="members-list" id="members-list">
+                <!-- Los miembros se cargarán aquí dinámicamente -->
+            </div>
+        </div>
+
+        <!-- Pestaña Estadísticas -->
+        <div id="statistics-content" class="tab-content" style="display: none;">
+            <div class="statistics-header">
+                <h2 class="title is-4">
+                    <span class="icon"><i class="fas fa-chart-bar"></i></span>
+                    Estadísticas Generales
+                </h2>
+            </div>
+            
+            <div class="charts-grid">
+                <!-- Gráfico de Participación en Eventos -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3 class="title is-5">Participación en Eventos</h3>
+                    </div>
+                    <div class="chart-content">
+                        <canvas id="eventsChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Gráfico de Horas por Mes -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3 class="title is-5">Horas Voluntariadas por Mes</h3>
+                    </div>
+                    <div class="chart-content">
+                        <canvas id="hoursChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Gráfico de Miembros Activos -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3 class="title is-5">Miembros Más Activos</h3>
+                    </div>
+                    <div class="chart-content">
+                        <canvas id="activeMembersChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Tabla de Estadísticas Detalladas -->
+                <div class="chart-container full-width">
+                    <div class="chart-header">
+                        <h3 class="title is-5">Resumen Detallado</h3>
+                    </div>
+                    <div class="chart-content">
+                        <div class="table-container">
+                            <table class="table is-fullwidth is-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Miembro</th>
+                                        <th>Eventos Participados</th>
+                                        <th>Horas Totales</th>
+                                        <th>Último Evento</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="detailed-stats-table">
+                                    <!-- Los datos se cargarán aquí -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        
-        <!-- Crear Evento Section -->
-        <div id="eventos-section" class="admin-section" style="display: none;">
-            <div class="box-content">
-                <h2 class="title is-3 has-text-primary">
-                    <i class="fas fa-calendar-plus mr-3"></i>Crear Nuevo Evento
+
+        <!-- Pestaña Gestión de Horas -->
+        <div id="hours-content" class="tab-content" style="display: none;">
+            <div class="hours-header">
+                <h2 class="title is-4">
+                    <span class="icon"><i class="fas fa-clock"></i></span>
+                    Gestión de Horas
                 </h2>
-                
-                <form id="create-event-form" class="box">
-                    <div class="field">
-                        <label class="label">Voluntariado</label>
-                        <div class="control">
-                            <div class="select is-fullwidth">
-                                <select id="event-voluntariado" required>
-                                    <option value="">Selecciona un voluntariado</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="field">
-                        <label class="label">Título del Evento</label>
-                        <div class="control">
-                            <input class="input" type="text" id="event-title" placeholder="Ej: Limpieza del Campus" required>
-                        </div>
-                    </div>
-
-                    <div class="field">
-                        <label class="label">Descripción</label>
-                        <div class="control">
-                            <textarea class="textarea" id="event-description" placeholder="Describe el evento..." required></textarea>
-                        </div>
-                    </div>
-
-                    <div class="columns">
-                        <div class="column">
-                            <div class="field">
-                                <label class="label">Fecha y Hora</label>
-                                <div class="control">
-                                    <input class="input" type="datetime-local" id="event-date" required>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="column">
-                            <div class="field">
-                                <label class="label">Duración (horas)</label>
-                                <div class="control">
-                                    <input class="input" type="number" id="event-hours" placeholder="4" min="1" max="12" required>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="columns">
-                        <div class="column">
-                            <div class="field">
-                                <label class="label">Ubicación</label>
-                                <div class="control">
-                                    <input class="input" type="text" id="event-location" placeholder="UNAH Campus Cortés" required>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="column">
-                            <div class="field">
-                                <label class="label">Máximo Participantes</label>
-                                <div class="control">
-                                    <input class="input" type="number" id="event-max-participants" placeholder="30" min="1" max="100" required>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="field">
-                        <label class="label">Requisitos (opcional)</label>
-                        <div class="control">
-                            <textarea class="textarea" id="event-requirements" placeholder="Ej: Guantes, botas de trabajo, ropa cómoda"></textarea>
-                        </div>
-                        <p class="help">Lista los elementos que los participantes deben traer</p>
-                    </div>
-
-                    <div class="field">
-                        <div class="control">
-                            <button class="button is-primary is-fullwidth" type="submit">
-                                <span class="icon"><i class="fas fa-calendar-plus"></i></span>
-                                <span>Crear Evento</span>
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-        
-        <!-- Gestionar Miembros Section -->
-        <div id="miembros-section" class="admin-section" style="display: none;">
-            <div class="box-content">
-                <h2 class="title is-3 has-text-primary">
-                    <i class="fas fa-user-friends mr-3"></i>Gestionar Miembros
-                </h2>
-                
-                <div class="field">
-                    <label class="label">Seleccionar Voluntariado</label>
-                    <div class="control">
-                        <div class="select is-fullwidth">
-                            <select id="members-voluntariado">
-                                <option value="">Selecciona un voluntariado</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="members-list" style="display: none;">
-                    <!-- Se cargarán los miembros dinámicamente -->
+                <div class="hours-actions">
+                    <button class="button is-success" onclick="showAddHoursModal()">
+                        <span class="icon"><i class="fas fa-plus"></i></span>
+                        <span>Agregar Horas</span>
+                    </button>
                 </div>
             </div>
+            
+            <div class="hours-list" id="hours-list">
+                <!-- La lista de horas se cargará aquí -->
+            </div>
         </div>
-        
-        <!-- Estadísticas Section -->
-        <div id="estadisticas-section" class="admin-section" style="display: none;">
-            <div class="box-content">
-                <h2 class="title is-3 has-text-primary">
-                    <i class="fas fa-chart-bar mr-3"></i>Estadísticas
+
+        <!-- Pestaña Logros -->
+        <div id="achievements-content" class="tab-content" style="display: none;">
+            <div class="achievements-header">
+                <h2 class="title is-4">
+                    <span class="icon"><i class="fas fa-trophy"></i></span>
+                    Sistema de Logros
                 </h2>
-                
-                <div class="columns is-multiline" id="admin-stats">
-                    <!-- Se cargarán las estadísticas dinámicamente -->
+                <div class="achievements-actions">
+                    <button class="button is-warning" onclick="showCreateAchievementModal()">
+                        <span class="icon"><i class="fas fa-plus"></i></span>
+                        <span>Crear Logro</span>
+                    </button>
+                    <button class="button is-info is-outlined" onclick="window.debugAdminPanel()">
+                        <span class="icon"><i class="fas fa-bug"></i></span>
+                        <span>Debug</span>
+                    </button>
                 </div>
+            </div>
+            
+            <div class="achievements-grid" id="achievements-grid">
+                <!-- Los logros se cargarán aquí -->
             </div>
         </div>
     </div>
 </div>
 
+<!-- Modal para Agregar Horas -->
+<div class="modal" id="add-hours-modal">
+    <div class="modal-background" onclick="closeModal()"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">Agregar Horas a Miembro</p>
+            <button class="delete" onclick="closeModal()"></button>
+        </header>
+        <section class="modal-card-body">
+            <form id="add-hours-form">
+                <div class="field">
+                    <label class="label">Miembro</label>
+                    <div class="control">
+                        <div class="select is-fullwidth">
+                            <select id="hours-member-select" required>
+                                <option value="">Selecciona un miembro...</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Evento</label>
+                    <div class="control">
+                        <input class="input" type="text" id="hours-event" placeholder="Nombre del evento" required>
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Horas</label>
+                    <div class="control">
+                        <input class="input" type="number" id="hours-amount" min="0.5" step="0.5" placeholder="2.5" required>
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Fecha</label>
+                    <div class="control">
+                        <input class="input" type="date" id="hours-date" required>
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Comentarios (Opcional)</label>
+                    <div class="control">
+                        <textarea class="textarea" id="hours-comments" rows="3" placeholder="Comentarios adicionales..."></textarea>
+                    </div>
+                </div>
+            </form>
+        </section>
+        <footer class="modal-card-foot">
+            <button class="button is-success" onclick="addHours()">
+                <span class="icon"><i class="fas fa-save"></i></span>
+                <span>Agregar Horas</span>
+            </button>
+            <button class="button" onclick="closeModal()">Cancelar</button>
+        </footer>
+    </div>
+</div>
+
+<!-- Modal para Crear Logro -->
+<div class="modal" id="create-achievement-modal">
+    <div class="modal-background" onclick="closeModal()"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">Crear Nuevo Logro</p>
+            <button class="delete" onclick="closeModal()"></button>
+        </header>
+        <section class="modal-card-body">
+            <form id="create-achievement-form">
+                <div class="field">
+                    <label class="label">Nombre del Logro</label>
+                    <div class="control">
+                        <input class="input" type="text" id="achievement-name" placeholder="Ej: Voluntario Estrella" required>
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Descripción</label>
+                    <div class="control">
+                        <textarea class="textarea" id="achievement-description" rows="3" placeholder="Descripción del logro..." required></textarea>
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Criterio</label>
+                    <div class="control">
+                        <div class="select is-fullwidth">
+                            <select id="achievement-criteria" required>
+                                <option value="">Selecciona un criterio...</option>
+                                <option value="hours">Horas Voluntariadas</option>
+                                <option value="events">Eventos Participados</option>
+                                <option value="months">Meses Activo</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Valor Requerido</label>
+                    <div class="control">
+                        <input class="input" type="number" id="achievement-value" min="1" placeholder="10" required>
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Horas del Logro</label>
+                    <div class="control">
+                        <input class="input" type="number" id="achievement-hours" min="0" placeholder="5" value="0">
+                    </div>
+                    <p class="help">Número de horas que se otorgarán al miembro al asignar este logro</p>
+                </div>
+                <div class="field">
+                    <label class="label">Icono (FontAwesome)</label>
+                    <div class="control">
+                        <div class="select is-fullwidth">
+                            <select id="achievement-icon">
+                                <option value="fas fa-trophy">🏆 Trophy</option>
+                                <option value="fas fa-star">⭐ Star</option>
+                                <option value="fas fa-medal">🥇 Medal</option>
+                                <option value="fas fa-award">🏅 Award</option>
+                                <option value="fas fa-certificate">📜 Certificate</option>
+                                <option value="fas fa-heart">❤️ Heart</option>
+                                <option value="fas fa-hands-helping">🤝 Helping Hands</option>
+                                <option value="fas fa-leaf">🍃 Leaf</option>
+                                <option value="fas fa-globe">🌍 Globe</option>
+                                <option value="fas fa-graduation-cap">🎓 Graduation</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </section>
+        <footer class="modal-card-foot">
+            <button class="button is-success" onclick="createAchievement()">
+                <span class="icon"><i class="fas fa-save"></i></span>
+                <span>Crear Logro</span>
+            </button>
+            <button class="button" onclick="closeModal()">Cancelar</button>
+        </footer>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+let currentVolunteerId = '';
+let membersData = [];
+let eventsData = [];
+let achievementsData = [];
+
+// Inicializar panel
 document.addEventListener('DOMContentLoaded', function() {
-    setupAdminNavigation();
-    loadAdminData();
+    initializeAdminPanel();
 });
 
-function setupAdminNavigation() {
-    const navItems = document.querySelectorAll('.admin-nav');
-    const sections = document.querySelectorAll('.admin-section');
+async function initializeAdminPanel() {
+    console.log('🔄 Inicializando panel de administración...');
     
-    navItems.forEach(item => {
-        item.addEventListener('click', function(e) {
-            e.preventDefault();
+    // Esperar a que Firebase esté listo
+    if (!window.firebaseAuth || !window.firebaseDb) {
+        console.log('⏳ Firebase no está listo, reintentando...');
+        setTimeout(initializeAdminPanel, 1000);
+        return;
+    }
+
+    const user = window.firebaseAuth.currentUser;
+    if (!user) {
+        console.log('❌ Usuario no autenticado');
+        showMessage('Debes iniciar sesión para acceder al panel de administración', 'danger');
+        return;
+    }
+
+    // Cargar voluntariados del admin
+    await loadAdminVolunteers();
+    
+    // Configurar pestañas
+    setupTabs();
+    
+    console.log('✅ Panel de administración inicializado');
+}
+
+async function loadAdminVolunteers() {
+    try {
+        const userDoc = await window.firebaseDb.collection('users').doc(window.firebaseAuth.currentUser.uid).get();
+        const userData = userDoc.data();
+        
+        if (!userData || !userData.adminVoluntariados || userData.adminVoluntariados.length === 0) {
+            showMessage('No tienes permisos de administrador en ningún voluntariado', 'warning');
+            return;
+        }
+
+        const volunteerSelect = document.getElementById('volunteer-select');
+        volunteerSelect.innerHTML = '<option value="">Selecciona un voluntariado...</option>';
+        
+        for (const voluntariadoId of userData.adminVoluntariados) {
+            const voluntariadoDoc = await window.firebaseDb.collection('voluntariados').doc(voluntariadoId).get();
+            const voluntariadoData = voluntariadoDoc.data();
             
-            // Remove active class from all nav items
-            navItems.forEach(nav => nav.classList.remove('active'));
+            if (voluntariadoData) {
+                const option = document.createElement('option');
+                option.value = voluntariadoId;
+                option.textContent = voluntariadoData.name || voluntariadoId;
+                volunteerSelect.appendChild(option);
+            }
+        }
+    } catch (error) {
+        console.error('Error loading admin volunteers:', error);
+        showMessage('Error al cargar voluntariados', 'danger');
+    }
+}
+
+function setupTabs() {
+    const tabs = document.querySelectorAll('.tabs li');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            // Remover clase activa de todas las pestañas
+            tabs.forEach(t => t.classList.remove('is-active'));
+            tabContents.forEach(content => content.style.display = 'none');
             
-            // Add active class to clicked item
-            this.classList.add('active');
+            // Activar pestaña seleccionada
+            tab.classList.add('is-active');
+            const tabName = tab.dataset.tab;
+            document.getElementById(`${tabName}-content`).style.display = 'block';
             
-            // Hide all sections
-            sections.forEach(section => section.style.display = 'none');
-            
-            // Show selected section
-            const targetSection = this.dataset.section + '-section';
-            document.getElementById(targetSection).style.display = 'block';
-            
-            // Load section data
-            loadSectionData(this.dataset.section);
+            // Cargar contenido específico de la pestaña
+            switch(tabName) {
+                case 'members':
+                    loadMembersData();
+                    break;
+                case 'statistics':
+                    loadStatisticsData();
+                    break;
+                case 'hours':
+                    loadHoursData();
+                    break;
+                case 'achievements':
+                    loadAchievementsData();
+                    break;
+            }
         });
     });
 }
 
-async function loadAdminData() {
-    try {
-        // Verificar permisos de admin
-        const isAdmin = await window.adminManager.isUserAdmin();
-        if (!isAdmin) {
-            window.location.href = '/auth/dashboard/';
-            return;
-        }
-
-        // Cargar voluntariados del admin
-        const adminVoluntariados = await window.adminManager.getAdminVoluntariados();
-        
-        // Llenar selects con voluntariados
-        fillVoluntariadoSelects(adminVoluntariados);
-        
-        // Mostrar voluntariados en la sección principal
-        displayAdminVoluntariados(adminVoluntariados);
-        
-    } catch (error) {
-        console.error('Error cargando datos de admin:', error);
-    }
-}
-
-function fillVoluntariadoSelects(voluntariados) {
-    const eventSelect = document.getElementById('event-voluntariado');
-    const membersSelect = document.getElementById('members-voluntariado');
+async function loadVolunteerData() {
+    const volunteerSelect = document.getElementById('volunteer-select');
+    currentVolunteerId = volunteerSelect.value;
     
-    const options = voluntariados.map(vol => 
-        `<option value="${vol.id}">${vol.name}</option>`
-    ).join('');
-    
-    eventSelect.innerHTML = '<option value="">Selecciona un voluntariado</option>' + options;
-    membersSelect.innerHTML = '<option value="">Selecciona un voluntariado</option>' + options;
-}
-
-function displayAdminVoluntariados(voluntariados) {
-    const container = document.getElementById('admin-voluntariados-list');
-    
-    if (voluntariados.length === 0) {
-        container.innerHTML = '<p class="has-text-grey">No eres administrador de ningún voluntariado.</p>';
+    if (!currentVolunteerId) {
+        showMessage('Por favor selecciona un voluntariado', 'warning');
         return;
     }
     
-    container.innerHTML = voluntariados.map(vol => `
-        <div class="column is-6">
-            <div class="card admin-card">
-                <div class="card-content">
-                    <div class="media">
-                        <div class="media-left">
-                            <figure class="image is-48x48">
-                                <img src="${vol.logo}" alt="${vol.name}">
-                            </figure>
+    console.log('🔄 Cargando datos del voluntariado:', currentVolunteerId);
+    
+    try {
+        // Mostrar contenido del panel
+        document.getElementById('panel-content').style.display = 'block';
+        
+        // Cargar datos generales
+        await loadGeneralStats();
+        
+        // Cargar datos de miembros por defecto
+        await loadMembersData();
+        
+        showMessage('Datos cargados exitosamente', 'success');
+    } catch (error) {
+        console.error('Error loading volunteer data:', error);
+        showMessage('Error al cargar datos del voluntariado', 'danger');
+    }
+}
+
+async function loadGeneralStats() {
+    try {
+        // Usar la nueva función de estadísticas del AdminManager
+        const stats = await window.adminManager.getVolunteerStatistics(currentVolunteerId);
+        
+        // Actualizar estadísticas generales
+        document.getElementById('total-members').textContent = stats.totalMembers;
+        document.getElementById('total-events').textContent = stats.totalEvents;
+        document.getElementById('total-hours').textContent = stats.totalHours;
+        
+        // Guardar datos para uso posterior
+        membersData = stats.membersByActivity;
+        eventsData = stats.eventParticipation;
+        
+    } catch (error) {
+        console.error('Error loading general stats:', error);
+        showMessage('Error al cargar estadísticas', 'danger');
+    }
+}
+
+async function loadMembersData() {
+    if (!currentVolunteerId) return;
+    
+    try {
+        console.log('🔄 Cargando miembros del voluntariado:', currentVolunteerId);
+        
+        // Obtener miembros directamente usando AdminManager
+        const members = await window.adminManager.getVoluntariadoMembers(currentVolunteerId);
+        console.log('📊 Miembros obtenidos:', members);
+        
+        const membersList = document.getElementById('members-list');
+        
+        if (!members || members.length === 0) {
+            membersList.innerHTML = `
+                <div class="has-text-centered py-6">
+                    <i class="fas fa-users fa-3x has-text-grey-light"></i>
+                    <p class="has-text-grey mt-3">No hay miembros en este voluntariado</p>
+                </div>
+            `;
+            return;
+        }
+        
+        membersList.innerHTML = members.map(member => {
+            const volunteerData = member.voluntariadoData || {};
+            const eventsCompleted = volunteerData.eventsCompleted || 0;
+            const totalHours = volunteerData.totalHours || 0;
+            const joinedDate = volunteerData.joinedDate ? volunteerData.joinedDate.toDate() : new Date();
+            
+            return `
+                <div class="member-card">
+                    <div class="member-info">
+                        <div class="member-avatar">
+                            <i class="fas fa-user"></i>
                         </div>
-                        <div class="media-content">
-                            <p class="title is-6">${vol.name}</p>
-                            <p class="subtitle is-7 has-text-grey">Código: ${vol.code}</p>
+                        <div class="member-details">
+                            <h4 class="title is-5">${member.firstName || ''} ${member.lastName || ''}</h4>
+                            <p class="subtitle is-6">${member.email}</p>
+                            <div class="member-stats">
+                                <span class="tag is-primary">${eventsCompleted} eventos</span>
+                                <span class="tag is-info">${totalHours}h</span>
+                                <span class="tag is-light">Miembro desde ${joinedDate.toLocaleDateString()}</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="content">
-                        <p class="is-small">${vol.description}</p>
-                        <div class="level">
-                            <div class="level-item has-text-centered">
-                                <div>
-                                    <p class="heading">Miembros</p>
-                                    <p class="title is-6">${vol.memberCount}/${vol.maxMembers}</p>
-                                </div>
-                            </div>
-                            <div class="level-item has-text-centered">
-                                <div>
-                                    <p class="heading">Estado</p>
-                                    <p class="title is-6 has-text-${vol.active ? 'success' : 'danger'}">
-                                        ${vol.active ? 'Activo' : 'Inactivo'}
-                                    </p>
-                                </div>
+                    <div class="member-actions">
+                        <button class="button is-small is-info" onclick="viewMemberDetails('${member.uid}')">
+                            <span class="icon"><i class="fas fa-eye"></i></span>
+                            <span>Ver Detalles</span>
+                        </button>
+                        <button class="button is-small is-success" onclick="addHoursToMember('${member.uid}')">
+                            <span class="icon"><i class="fas fa-plus"></i></span>
+                            <span>Agregar Horas</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        // Guardar miembros para uso posterior
+        membersData = members;
+        
+    } catch (error) {
+        console.error('❌ Error loading members data:', error);
+        showMessage('Error al cargar miembros: ' + error.message, 'danger');
+    }
+}
+
+async function loadStatisticsData() {
+    if (!currentVolunteerId) return;
+    
+    try {
+        // Crear gráficos
+        createEventsChart();
+        await createHoursChart(); // Ahora es async
+        createActiveMembersChart();
+        createDetailedStatsTable();
+        
+    } catch (error) {
+        console.error('Error loading statistics data:', error);
+    }
+}
+
+function createEventsChart() {
+    const ctx = document.getElementById('eventsChart').getContext('2d');
+    
+    // Usar datos reales
+    const eventParticipation = eventsData.slice(0, 10).map(event => ({
+        name: event.title,
+        participants: event.participants || 0
+    }));
+    
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: eventParticipation.map(e => e.name),
+            datasets: [{
+                label: 'Participantes',
+                data: eventParticipation.map(e => e.participants),
+                backgroundColor: '#2989d8',
+                borderColor: '#18559b',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Participación por Evento'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+async function createHoursChart() {
+    try {
+        const ctx = document.getElementById('hoursChart').getContext('2d');
+        
+        // Verificar que AdminManager esté disponible
+        if (!window.adminManager || typeof window.adminManager.getHoursByActivity !== 'function') {
+            console.error('❌ AdminManager o getHoursByActivity no está disponible');
+            ctx.canvas.parentElement.innerHTML = `
+                <div class="has-text-centered py-6">
+                    <i class="fas fa-exclamation-triangle fa-3x has-text-warning"></i>
+                    <p class="has-text-grey mt-3">Error: AdminManager no está disponible</p>
+                </div>
+            `;
+            return;
+        }
+        
+        // Obtener datos reales de actividades
+        const activitiesData = await window.adminManager.getHoursByActivity(currentVolunteerId);
+        
+        if (!activitiesData || activitiesData.length === 0) {
+            // Mostrar mensaje si no hay datos
+            ctx.canvas.parentElement.innerHTML = `
+                <div class="has-text-centered py-6">
+                    <i class="fas fa-chart-line fa-3x has-text-grey-light"></i>
+                    <p class="has-text-grey mt-3">No hay datos de horas por actividad</p>
+                </div>
+            `;
+            return;
+        }
+        
+        // Tomar las primeras 8 actividades para el gráfico
+        const topActivities = activitiesData.slice(0, 8);
+        
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: topActivities.map(a => a.name),
+                datasets: [{
+                    label: 'Horas por Actividad',
+                    data: topActivities.map(a => a.totalHours),
+                    backgroundColor: [
+                        '#2989d8',
+                        '#28a745',
+                        '#ffc107',
+                        '#dc3545',
+                        '#6f42c1',
+                        '#20c997',
+                        '#fd7e14',
+                        '#6c757d'
+                    ],
+                    borderColor: [
+                        '#18559b',
+                        '#1e7e34',
+                        '#e0a800',
+                        '#bd2130',
+                        '#5a32a3',
+                        '#1aa179',
+                        '#e8650e',
+                        '#545b62'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Horas Voluntariadas por Actividad'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            afterLabel: function(context) {
+                                const activity = topActivities[context.dataIndex];
+                                return `Participantes: ${activity.participantCount}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Horas Totales'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Actividades'
+                        }
+                    }
+                }
+            }
+        });
+        
+    } catch (error) {
+        console.error('❌ Error creando gráfico de horas:', error);
+        const ctx = document.getElementById('hoursChart').getContext('2d');
+        ctx.canvas.parentElement.innerHTML = `
+            <div class="has-text-centered py-6">
+                <i class="fas fa-exclamation-triangle fa-3x has-text-warning"></i>
+                <p class="has-text-grey mt-3">Error al cargar datos del gráfico</p>
+            </div>
+        `;
+    }
+}
+
+function createActiveMembersChart() {
+    const ctx = document.getElementById('activeMembersChart').getContext('2d');
+    
+    // Verificar que membersData existe y tiene datos
+    if (!membersData || membersData.length === 0) {
+        ctx.canvas.parentElement.innerHTML = `
+            <div class="has-text-centered py-6">
+                <i class="fas fa-users fa-3x has-text-grey-light"></i>
+                <p class="has-text-grey mt-3">No hay datos de miembros disponibles</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Datos de ejemplo - reemplazar con datos reales
+    const activeMembers = membersData.slice(0, 5).map(member => {
+        const volunteerData = member.voluntariadoData || member.voluntariados?.[currentVolunteerId] || {};
+        return {
+            name: `${member.firstName || ''} ${member.lastName || ''}`.trim() || member.email,
+            hours: volunteerData.totalHours || 0
+        };
+    });
+    
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: activeMembers.map(m => m.name),
+            datasets: [{
+                data: activeMembers.map(m => m.hours),
+                backgroundColor: [
+                    '#2989d8',
+                    '#18559b',
+                    '#3498db',
+                    '#5dade2',
+                    '#85c1e9'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Top 5 Miembros Más Activos'
+                },
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+}
+
+function createDetailedStatsTable() {
+    const tableBody = document.getElementById('detailed-stats-table');
+    
+    tableBody.innerHTML = membersData.map(member => {
+        const volunteerData = member.voluntariados[currentVolunteerId] || {};
+        const eventsCompleted = volunteerData.eventsCompleted || 0;
+        const totalHours = volunteerData.totalHours || 0;
+        const lastEvent = volunteerData.lastEventDate ? volunteerData.lastEventDate.toDate() : null;
+        const status = eventsCompleted > 0 ? 'Activo' : 'Inactivo';
+        
+        return `
+            <tr>
+                <td>
+                    <strong>${member.firstName || ''} ${member.lastName || ''}</strong><br>
+                    <small class="has-text-grey">${member.email}</small>
+                </td>
+                <td><span class="tag is-primary">${eventsCompleted}</span></td>
+                <td><span class="tag is-info">${totalHours}h</span></td>
+                <td>${lastEvent ? lastEvent.toLocaleDateString() : 'Nunca'}</td>
+                <td>
+                    <span class="tag is-${status === 'Activo' ? 'success' : 'warning'}">${status}</span>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+async function loadHoursData() {
+    if (!currentVolunteerId) return;
+    
+    try {
+        console.log('🔄 Cargando datos de horas del voluntariado:', currentVolunteerId);
+        
+        const hoursList = document.getElementById('hours-list');
+        
+        // Obtener miembros para mostrar sus horas
+        const members = await window.adminManager.getVoluntariadoMembers(currentVolunteerId);
+        
+        if (!members || members.length === 0) {
+            hoursList.innerHTML = `
+                <div class="has-text-centered py-6">
+                    <i class="fas fa-clock fa-3x has-text-grey-light"></i>
+                    <p class="has-text-grey mt-3">No hay miembros en este voluntariado</p>
+                </div>
+            `;
+            return;
+        }
+        
+        hoursList.innerHTML = members.map(member => {
+            const volunteerData = member.voluntariadoData || {};
+            const totalHours = volunteerData.totalHours || 0;
+            const eventsCompleted = volunteerData.eventsCompleted || 0;
+            const hoursHistory = volunteerData.hoursHistory || [];
+            
+            return `
+                <div class="hours-member-card">
+                    <div class="hours-member-info">
+                        <div class="hours-member-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="hours-member-details">
+                            <h4 class="title is-5">${member.firstName || ''} ${member.lastName || ''}</h4>
+                            <p class="subtitle is-6">${member.email}</p>
+                            <div class="hours-member-stats">
+                                <span class="tag is-primary is-large">${totalHours}h totales</span>
+                                <span class="tag is-info">${eventsCompleted} eventos</span>
                             </div>
                         </div>
+                    </div>
+                    <div class="hours-member-actions">
+                        <button class="button is-small is-success" onclick="showAddHoursModalForMember('${member.uid}')">
+                            <span class="icon"><i class="fas fa-plus"></i></span>
+                            <span>Agregar Horas</span>
+                        </button>
+                        <button class="button is-small is-info" onclick="viewHoursHistory('${member.uid}')">
+                            <span class="icon"><i class="fas fa-history"></i></span>
+                            <span>Ver Historial</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+    } catch (error) {
+        console.error('❌ Error loading hours data:', error);
+        showMessage('Error al cargar datos de horas: ' + error.message, 'danger');
+    }
+}
+
+async function loadAchievementsData() {
+    if (!currentVolunteerId) return;
+    
+    try {
+        console.log('🔄 Cargando logros para voluntariado:', currentVolunteerId);
+        const achievementsGrid = document.getElementById('achievements-grid');
+        
+        // Obtener logros del voluntariado
+        achievementsData = await window.adminManager.getVolunteerAchievements(currentVolunteerId);
+        console.log('📊 Logros obtenidos:', achievementsData);
+        
+        if (!achievementsData || achievementsData.length === 0) {
+            console.log('⚠️ No se encontraron logros para el voluntariado:', currentVolunteerId);
+            achievementsGrid.innerHTML = `
+                <div class="has-text-centered py-6" style="grid-column: 1 / -1;">
+                    <i class="fas fa-trophy fa-3x has-text-grey-light"></i>
+                    <p class="has-text-grey mt-3">No hay logros creados para este voluntariado</p>
+                    <p class="has-text-info">Crea el primer logro usando el botón "Crear Logro"</p>
+                </div>
+            `;
+            return;
+        }
+        
+        achievementsGrid.innerHTML = achievementsData.map(achievement => `
+            <div class="achievement-card">
+                <div class="achievement-header">
+                    <div class="achievement-icon">
+                        <i class="${achievement.icon || 'fas fa-trophy'} fa-2x has-text-warning"></i>
+                    </div>
+                    <div class="achievement-info">
+                        <h4 class="title is-5">${achievement.name}</h4>
+                        <p class="subtitle is-6">${achievement.description || 'Sin descripción'}</p>
+                    </div>
+                </div>
+                <div class="achievement-details">
+                    <div class="achievement-criteria">
+                        <span class="tag is-info">${achievement.criteria || 'Requisitos'}: ${achievement.value || 'N/A'}</span>
+                    </div>
+                    <div class="achievement-meta">
+                        <span class="tag ${achievement.isActive ? 'is-success' : 'is-danger'}">
+                            ${achievement.isActive ? 'Activo' : 'Inactivo'}
+                        </span>
+                        <span class="has-text-grey">
+                            ${achievement.createdAt ? achievement.createdAt.toDate().toLocaleDateString() : 'Sin fecha'}
+                        </span>
+                    </div>
+                    <div class="achievement-actions">
+                        <button class="button is-small is-info" onclick="viewAchievementDetails('${achievement.id}')">
+                            <span class="icon"><i class="fas fa-eye"></i></span>
+                            <span>Ver Detalles</span>
+                        </button>
+                        <button class="button is-small is-warning" onclick="assignAchievement('${achievement.id}')">
+                            <span class="icon"><i class="fas fa-user-plus"></i></span>
+                            <span>Asignar</span>
+                        </button>
+                        <button class="button is-small is-danger" onclick="deleteAchievement('${achievement.id}')">
+                            <span class="icon"><i class="fas fa-trash"></i></span>
+                            <span>Eliminar</span>
+                        </button>
                     </div>
                 </div>
             </div>
-        </div>
-    `).join('');
-}
-
-async function loadSectionData(section) {
-    switch (section) {
-        case 'eventos':
-            // El formulario ya está listo
-            break;
-        case 'miembros':
-            // Cargar cuando se seleccione un voluntariado
-            break;
-        case 'estadisticas':
-            await loadAdminStats();
-            break;
+        `).join('');
+        
+    } catch (error) {
+        console.error('Error loading achievements data:', error);
+        showMessage('Error al cargar logros', 'danger');
     }
 }
 
-// Crear evento
-document.getElementById('create-event-form').addEventListener('submit', async function(e) {
-    e.preventDefault();
+// Funciones de utilidad
+function showMessage(message, type = 'info') {
+    // Crear notificación
+    const notification = document.createElement('div');
+    notification.className = `notification is-${type}`;
+    notification.innerHTML = `
+        <button class="delete" onclick="this.parentElement.remove()"></button>
+        ${message}
+    `;
     
-    const formData = {
-        title: document.getElementById('event-title').value,
-        description: document.getElementById('event-description').value,
-        date: new Date(document.getElementById('event-date').value),
-        location: document.getElementById('event-location').value,
-        maxParticipants: parseInt(document.getElementById('event-max-participants').value),
-        hours: parseInt(document.getElementById('event-hours').value),
-        requirements: document.getElementById('event-requirements').value
-    };
+    // Insertar al inicio del contenido
+    const container = document.querySelector('.admin-panel-container');
+    container.insertBefore(notification, container.firstChild);
     
-    const voluntariadoId = document.getElementById('event-voluntariado').value;
-    
-    try {
-        const result = await window.eventsManager.createEvent(voluntariadoId, formData);
-        if (result.success) {
-            window.authManager.showMessage(result.message, 'success');
-            this.reset();
+    // Auto-remover después de 5 segundos
+    setTimeout(() => {
+        if (notification.parentElement) {
+            notification.remove();
         }
-    } catch (error) {
-        window.authManager.showMessage(error.message, 'error');
-    }
-});
+    }, 5000);
+}
 
-// Cargar miembros cuando se seleccione un voluntariado
-document.getElementById('members-voluntariado').addEventListener('change', async function() {
-    const voluntariadoId = this.value;
-    const membersList = document.getElementById('members-list');
+function closeModal() {
+    const modals = document.querySelectorAll('.modal.is-active');
+    modals.forEach(modal => modal.classList.remove('is-active'));
+}
+
+async function showAddHoursModal() {
+    document.getElementById('add-hours-modal').classList.add('is-active');
     
-    if (!voluntariadoId) {
-        membersList.style.display = 'none';
+    // Si no hay datos de miembros, cargarlos
+    if (!membersData || membersData.length === 0) {
+        console.log('🔄 Cargando datos de miembros para el modal...');
+        try {
+            await loadMembersData();
+        } catch (error) {
+            console.error('❌ Error cargando miembros:', error);
+        }
+    }
+    
+    populateMembersSelect();
+    
+    // Establecer fecha actual por defecto
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('hours-date').value = today;
+}
+
+function showCreateAchievementModal() {
+    document.getElementById('create-achievement-modal').classList.add('is-active');
+}
+
+function populateMembersSelect() {
+    const select = document.getElementById('hours-member-select');
+    select.innerHTML = '<option value="">Selecciona un miembro...</option>';
+    
+    if (!membersData || membersData.length === 0) {
+        console.log('⚠️ No hay datos de miembros para poblar el select');
         return;
     }
     
+    membersData.forEach(member => {
+        const option = document.createElement('option');
+        option.value = member.uid || member.id; // Usar uid si está disponible
+        option.textContent = `${member.firstName || ''} ${member.lastName || ''}`.trim() || member.email;
+        select.appendChild(option);
+    });
+}
+
+async function addHours() {
     try {
-        const members = await window.adminManager.getVoluntariadoMembers(voluntariadoId);
-        displayMembers(members);
-        membersList.style.display = 'block';
+        console.log('🔄 Agregando horas...');
+        
+        const memberId = document.getElementById('hours-member-select').value;
+        const event = document.getElementById('hours-event').value.trim();
+        const hours = parseFloat(document.getElementById('hours-amount').value);
+        const date = document.getElementById('hours-date').value;
+        const comments = document.getElementById('hours-comments').value.trim();
+        
+        if (!memberId || !event || !hours || !date || isNaN(hours)) {
+            showMessage('Por favor completa todos los campos requeridos correctamente', 'warning');
+            return;
+        }
+        
+        if (!currentVolunteerId) {
+            showMessage('No hay voluntariado seleccionado', 'warning');
+            return;
+        }
+        
+        console.log('📊 Datos de horas:', {
+            memberId, event, hours, date, comments, voluntariadoId: currentVolunteerId
+        });
+        
+        // Usar AdminManager para agregar horas
+        const result = await window.adminManager.addHoursToMember(memberId, currentVolunteerId, {
+            hours: hours,
+            event: event,
+            date: new Date(date),
+            comments: comments
+        });
+        
+        console.log('✅ Horas agregadas:', result);
+        showMessage('Horas agregadas exitosamente', 'success');
+        closeModal();
+        
+        // Limpiar formulario
+        document.getElementById('add-hours-form').reset();
+        
+        // Recargar datos
+        await loadGeneralStats();
+        await loadMembersData();
+        
     } catch (error) {
-        window.authManager.showMessage(error.message, 'error');
+        console.error('❌ Error adding hours:', error);
+        showMessage('Error al agregar horas: ' + error.message, 'danger');
     }
-});
+}
 
-function displayMembers(members) {
-    const container = document.getElementById('members-list');
-    
-    if (members.length === 0) {
-        container.innerHTML = '<p class="has-text-grey">No hay miembros en este voluntariado.</p>';
-        return;
+async function createAchievement() {
+    try {
+        console.log('🔄 Creando logro...');
+        
+        const name = document.getElementById('achievement-name').value.trim();
+        const description = document.getElementById('achievement-description').value.trim();
+        const criteria = document.getElementById('achievement-criteria').value;
+        const value = parseInt(document.getElementById('achievement-value').value);
+        const hours = parseInt(document.getElementById('achievement-hours').value) || 0;
+        const icon = document.getElementById('achievement-icon').value || 'fas fa-trophy';
+        
+        if (!name || !description || !criteria || !value || isNaN(value)) {
+            showMessage('Por favor completa todos los campos requeridos correctamente', 'warning');
+            return;
+        }
+        
+        if (!currentVolunteerId) {
+            showMessage('No hay voluntariado seleccionado', 'warning');
+            return;
+        }
+        
+        console.log('📊 Datos del logro:', {
+            name, description, criteria, value, hours, icon, voluntariadoId: currentVolunteerId
+        });
+        
+        // Usar AdminManager para crear logro
+        const result = await window.adminManager.createAchievement(currentVolunteerId, {
+            name: name,
+            description: description,
+            criteria: criteria,
+            value: value,
+            hours: hours,
+            icon: icon
+        });
+        
+        console.log('✅ Logro creado:', result);
+        showMessage('Logro creado exitosamente', 'success');
+        closeModal();
+        
+        // Limpiar formulario
+        document.getElementById('create-achievement-form').reset();
+        
+        // Recargar datos
+        await loadAchievementsData();
+        
+    } catch (error) {
+        console.error('❌ Error creating achievement:', error);
+        showMessage('Error al crear logro: ' + error.message, 'danger');
     }
+}
+
+function viewMemberDetails(memberId) {
+    // Implementar vista de detalles del miembro
+    console.log('Ver detalles del miembro:', memberId);
+}
+
+function addHoursToMember(memberId) {
+    // Pre-seleccionar el miembro en el modal
+    showAddHoursModal();
+    setTimeout(() => {
+        document.getElementById('hours-member-select').value = memberId;
+    }, 100);
+}
+
+function showAddHoursModalForMember(memberId) {
+    // Mostrar modal con miembro pre-seleccionado
+    showAddHoursModal();
+    setTimeout(() => {
+        document.getElementById('hours-member-select').value = memberId;
+    }, 100);
+}
+
+async function viewHoursHistory(memberId) {
+    try {
+        console.log('🔄 Obteniendo historial de horas del miembro:', memberId);
+        
+        if (!currentVolunteerId) {
+            showMessage('No hay voluntariado seleccionado', 'warning');
+            return;
+        }
+        
+        const historyData = await window.adminManager.getMemberHoursHistory(memberId, currentVolunteerId);
+        
+        // Crear modal para mostrar historial
+        showHoursHistoryModal(historyData);
+        
+    } catch (error) {
+        console.error('❌ Error obteniendo historial de horas:', error);
+        showMessage('Error al obtener historial de horas: ' + error.message, 'danger');
+    }
+}
+
+async function viewAchievementDetails(achievementId) {
+    try {
+        console.log('🔍 Ver detalles del logro:', achievementId);
+        
+        if (!window.adminManager) {
+            showMessage('AdminManager no está disponible', 'danger');
+            return;
+        }
+        
+        const achievementDetails = await window.adminManager.getAchievementDetails(achievementId);
+        showAchievementDetailsModal(achievementDetails);
+        
+    } catch (error) {
+        console.error('❌ Error obteniendo detalles del logro:', error);
+        showMessage('Error al obtener detalles del logro: ' + error.message, 'danger');
+    }
+}
+
+async function assignAchievement(achievementId) {
+    try {
+        console.log('🎯 Asignar logro:', achievementId);
+        
+        if (!currentVolunteerId) {
+            showMessage('No hay voluntariado seleccionado', 'warning');
+            return;
+        }
+        
+        if (!window.adminManager) {
+            showMessage('AdminManager no está disponible', 'danger');
+            return;
+        }
+        
+        // Obtener miembros del voluntariado
+        const members = await window.adminManager.getVoluntariadoMembers(currentVolunteerId);
+        showAssignAchievementModal(achievementId, members);
+        
+    } catch (error) {
+        console.error('❌ Error preparando asignación de logro:', error);
+        showMessage('Error al preparar asignación: ' + error.message, 'danger');
+    }
+}
+
+async function deleteAchievement(achievementId) {
+    try {
+        console.log('🗑️ Eliminar logro:', achievementId);
+        
+        if (!window.adminManager) {
+            showMessage('AdminManager no está disponible', 'danger');
+            return;
+        }
+        
+        // Confirmar eliminación
+        if (!confirm('¿Estás seguro de que quieres eliminar este logro? Esta acción no se puede deshacer.')) {
+            return;
+        }
+        
+        await window.adminManager.deleteAchievement(achievementId);
+        showMessage('Logro eliminado exitosamente', 'success');
+        
+        // Recargar logros
+        await loadAchievementsData();
+        
+    } catch (error) {
+        console.error('❌ Error eliminando logro:', error);
+        showMessage('Error al eliminar logro: ' + error.message, 'danger');
+    }
+}
+
+function exportMembersData() {
+    // Implementar exportación de datos
+    console.log('Exportando datos de miembros...');
+    showMessage('Función de exportación próximamente', 'info');
+}
+
+// FUNCIÓN DE DEBUGGING: Recargar logros manualmente
+async function debugReloadAchievements() {
+    try {
+        console.log('🔍 DEBUGGING: Recargando logros...');
+        console.log('Voluntariado actual:', currentVolunteerId);
+        
+        // Ver todos los logros en Firestore
+        const allAchievements = await window.debugAchievements();
+        console.log('📊 Todos los logros en Firestore:', allAchievements);
+        
+        // Recargar logros del voluntariado actual
+        await loadAchievementsData();
+        
+        showMessage('Logros recargados. Revisa la consola para más detalles.', 'info');
+        
+    } catch (error) {
+        console.error('❌ Error en debug:', error);
+        showMessage('Error en debugging: ' + error.message, 'danger');
+    }
+}
+
+function showHoursHistoryModal(historyData) {
+    const modal = document.createElement('div');
+    modal.className = 'modal is-active';
+    modal.innerHTML = `
+        <div class="modal-background" onclick="closeModal()"></div>
+        <div class="modal-card" style="width: 90%; max-width: 800px;">
+            <header class="modal-card-head">
+                <p class="modal-card-title">
+                    <span class="icon"><i class="fas fa-history"></i></span>
+                    Historial de Horas - ${historyData.memberInfo.firstName} ${historyData.memberInfo.lastName}
+                </p>
+                <button class="delete" onclick="closeModal()"></button>
+            </header>
+            <section class="modal-card-body">
+                <div class="has-text-centered mb-4">
+                    <h3 class="title is-4">Total de Horas: ${historyData.totalHours}h</h3>
+                </div>
+                
+                ${historyData.history.length === 0 ? `
+                    <div class="has-text-centered py-6">
+                        <i class="fas fa-clock fa-3x has-text-grey-light"></i>
+                        <p class="has-text-grey mt-3">No hay registro de horas para este miembro</p>
+                    </div>
+                ` : `
+                    <div class="table-container">
+                        <table class="table is-fullwidth is-striped">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Actividad</th>
+                                    <th>Horas</th>
+                                    <th>Comentarios</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${historyData.history.map(entry => {
+                                    // Manejar diferentes formatos de fecha
+                                    let dateStr = 'Fecha no disponible';
+                                    try {
+                                        if (entry.date && typeof entry.date.toLocaleDateString === 'function') {
+                                            dateStr = entry.date.toLocaleDateString();
+                                        } else if (entry.date && typeof entry.date === 'string') {
+                                            dateStr = new Date(entry.date).toLocaleDateString();
+                                        } else if (entry.addedAt && typeof entry.addedAt.toLocaleDateString === 'function') {
+                                            dateStr = entry.addedAt.toLocaleDateString();
+                                        } else if (entry.addedAt && typeof entry.addedAt === 'string') {
+                                            dateStr = new Date(entry.addedAt).toLocaleDateString();
+                                        }
+                                    } catch (error) {
+                                        console.warn('Error formateando fecha:', error);
+                                        dateStr = 'Fecha inválida';
+                                    }
+                                    
+                                    return `
+                                        <tr>
+                                            <td>${dateStr}</td>
+                                            <td><strong>${entry.event || entry.activity || 'Actividad'}</strong></td>
+                                            <td><span class="tag is-primary">${entry.hours}h</span></td>
+                                            <td>${entry.comments || '-'}</td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `}
+            </section>
+            <footer class="modal-card-foot">
+                <button class="button" onclick="closeModal()">Cerrar</button>
+            </footer>
+        </div>
+    `;
     
-    container.innerHTML = `
-        <h3 class="title is-5 mb-4">Miembros (${members.length})</h3>
-        <div class="columns is-multiline">
-            ${members.map(member => `
-                <div class="column is-6">
-                    <div class="card member-card">
-                        <div class="card-content">
-                            <div class="media">
-                                <div class="media-content">
-                                    <p class="title is-6">${member.fullName}</p>
-                                    <p class="subtitle is-7 has-text-grey">${member.email}</p>
-                                </div>
+    document.body.appendChild(modal);
+}
+
+// Modal para mostrar detalles del logro
+function showAchievementDetailsModal(achievementDetails) {
+    const modal = document.createElement('div');
+    modal.className = 'modal is-active';
+    modal.innerHTML = `
+        <div class="modal-background" onclick="closeModal()"></div>
+        <div class="modal-card" style="width: 90%; max-width: 800px;">
+            <header class="modal-card-head">
+                <p class="modal-card-title">
+                    <span class="icon"><i class="fas fa-trophy"></i></span>
+                    ${achievementDetails.name}
+                </p>
+                <button class="delete" onclick="closeModal()"></button>
+            </header>
+            <section class="modal-card-body">
+                <div class="columns">
+                    <div class="column is-one-third">
+                        <div class="has-text-centered">
+                            <div class="achievement-icon-large">
+                                <i class="${achievementDetails.icon || 'fas fa-trophy'} fa-4x has-text-warning"></i>
                             </div>
-                            <div class="content">
-                                <div class="level">
-                                    <div class="level-item has-text-centered">
-                                        <div>
-                                            <p class="heading">Eventos</p>
-                                            <p class="title is-6">${member.voluntariadoData.eventsCompleted || 0}</p>
-                                        </div>
-                                    </div>
-                                    <div class="level-item has-text-centered">
-                                        <div>
-                                            <p class="heading">Horas</p>
-                                            <p class="title is-6">${member.voluntariadoData.totalHours || 0}</p>
-                                        </div>
-                                    </div>
-                                    <div class="level-item has-text-centered">
-                                        <div>
-                                            <p class="heading">Estado</p>
-                                            <p class="title is-6 has-text-${member.voluntariadoData.status === 'activo' ? 'success' : 'danger'}">
-                                                ${member.voluntariadoData.status}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <p class="title is-5 mt-3">${achievementDetails.name}</p>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="content">
+                            <h4 class="title is-6">Descripción</h4>
+                            <p>${achievementDetails.description || 'Sin descripción'}</p>
+                            
+                            <h4 class="title is-6 mt-4">Requisitos</h4>
+                            <p>${achievementDetails.requirements || 'Sin requisitos específicos'}</p>
+                            
+                            <h4 class="title is-6 mt-4">Estado</h4>
+                            <span class="tag ${achievementDetails.isActive ? 'is-success' : 'is-danger'}">
+                                ${achievementDetails.isActive ? 'Activo' : 'Inactivo'}
+                            </span>
+                            
+                            <h4 class="title is-6 mt-4">Horas del Logro</h4>
+                            <p class="has-text-primary">
+                                <span class="icon"><i class="fas fa-clock"></i></span>
+                                <strong>${achievementDetails.hours || 0} horas</strong>
+                            </p>
+                            
+                            <h4 class="title is-6 mt-4">Fecha de Creación</h4>
+                            <p>${achievementDetails.createdAt ? achievementDetails.createdAt.toDate().toLocaleDateString() : 'No disponible'}</p>
                         </div>
                     </div>
                 </div>
-            `).join('')}
+                
+                <div class="mt-5">
+                    <h4 class="title is-6">Miembros Asignados (${achievementDetails.assignedMembers.length})</h4>
+                    ${achievementDetails.assignedMembers.length === 0 ? `
+                        <div class="has-text-centered py-4">
+                            <i class="fas fa-users fa-2x has-text-grey-light"></i>
+                            <p class="has-text-grey mt-2">Ningún miembro tiene este logro asignado</p>
+                        </div>
+                    ` : `
+                        <div class="table-container">
+                            <table class="table is-fullwidth is-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Miembro</th>
+                                        <th>Email</th>
+                                        <th>Horas Obtenidas</th>
+                                        <th>Asignado el</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${achievementDetails.assignedMembers.map(member => `
+                                        <tr>
+                                            <td>
+                                                <div class="is-flex is-align-items-center">
+                                                    <figure class="image is-24x24 mr-2">
+                                                        <div class="is-rounded has-background-primary" style="width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                                            <span class="has-text-white is-size-7">
+                                                                ${member.name.charAt(0).toUpperCase()}
+                                                            </span>
+                                                        </div>
+                                                    </figure>
+                                                    ${member.name}
+                                                </div>
+                                            </td>
+                                            <td>${member.email}</td>
+                                            <td>
+                                                <span class="tag is-success">
+                                                    <span class="icon"><i class="fas fa-clock"></i></span>
+                                                    <span>${member.achievementHours || 0}h</span>
+                                                </span>
+                                            </td>
+                                            <td>${member.assignedAt ? member.assignedAt.toDate().toLocaleDateString() : 'No disponible'}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `}
+                </div>
+            </section>
+            <footer class="modal-card-foot">
+                <button class="button is-warning" onclick="assignAchievement('${achievementDetails.id}')">
+                    <span class="icon"><i class="fas fa-user-plus"></i></span>
+                    <span>Asignar a Miembro</span>
+                </button>
+                <button class="button is-danger" onclick="deleteAchievement('${achievementDetails.id}')">
+                    <span class="icon"><i class="fas fa-trash"></i></span>
+                    <span>Eliminar</span>
+                </button>
+                <button class="button" onclick="closeModal()">Cerrar</button>
+            </footer>
         </div>
     `;
+    
+    document.body.appendChild(modal);
 }
 
-async function loadAdminStats() {
-    // Implementar estadísticas del admin
-    const container = document.getElementById('admin-stats');
-    container.innerHTML = '<p class="has-text-grey">Estadísticas en desarrollo...</p>';
+// Modal para asignar logro a un miembro
+async function showAssignAchievementModal(achievementId, members) {
+    try {
+        // Obtener detalles del logro para mostrar las horas
+        const achievementDetails = await window.adminManager.getAchievementDetails(achievementId);
+        
+        // Filtrar miembros que ya tienen este logro
+        // Por ahora mostramos todos los miembros, la verificación real se hace en el backend
+        const availableMembers = members;
+
+        const modal = document.createElement('div');
+        modal.className = 'modal is-active';
+        modal.innerHTML = `
+            <div class="modal-background" onclick="closeModal()"></div>
+            <div class="modal-card" style="width: 90%; max-width: 600px;">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">
+                        <span class="icon"><i class="fas fa-user-plus"></i></span>
+                        Asignar Logro: ${achievementDetails.name}
+                    </p>
+                    <button class="delete" onclick="closeModal()"></button>
+                </header>
+                <section class="modal-card-body">
+                    <div class="notification is-info is-light">
+                        <p><strong>Horas del logro:</strong> ${achievementDetails.hours || 0} horas</p>
+                        <p class="is-size-7">Estas horas se sumarán automáticamente al total del miembro</p>
+                    </div>
+                    
+                    <div class="field">
+                        <label class="label">Seleccionar Miembro</label>
+                        <div class="control">
+                            <div class="select is-fullwidth">
+                                <select id="member-select">
+                                    <option value="">Selecciona un miembro...</option>
+                                    ${availableMembers.map(member => `
+                                        <option value="${member.uid || member.id}">
+                                            ${member.firstName || ''} ${member.lastName || ''} - ${member.email}
+                                        </option>
+                                    `).join('')}
+                                </select>
+                            </div>
+                        </div>
+                        ${availableMembers.length === 0 ? `
+                            <p class="help is-warning">
+                                <span class="icon"><i class="fas fa-exclamation-triangle"></i></span>
+                                Todos los miembros ya tienen este logro asignado
+                            </p>
+                        ` : `
+                            <p class="help">${availableMembers.length} miembros disponibles</p>
+                        `}
+                    </div>
+                    
+                    <div class="field">
+                        <label class="label">Comentarios (Opcional)</label>
+                        <div class="control">
+                            <textarea class="textarea" id="assignment-comments" placeholder="Comentarios sobre la asignación del logro..."></textarea>
+                        </div>
+                    </div>
+                </section>
+                <footer class="modal-card-foot">
+                    <button class="button is-success" onclick="confirmAssignAchievement('${achievementId}')" ${availableMembers.length === 0 ? 'disabled' : ''}>
+                        <span class="icon"><i class="fas fa-check"></i></span>
+                        <span>Asignar Logro</span>
+                    </button>
+                    <button class="button" onclick="closeModal()">Cancelar</button>
+                </footer>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+    } catch (error) {
+        console.error('Error mostrando modal de asignación:', error);
+        showMessage('Error al mostrar modal de asignación: ' + error.message, 'danger');
+    }
 }
+
+// Confirmar asignación de logro
+async function confirmAssignAchievement(achievementId) {
+    try {
+        const memberSelect = document.getElementById('member-select');
+        const comments = document.getElementById('assignment-comments').value;
+        
+        if (!memberSelect.value) {
+            showMessage('Por favor selecciona un miembro', 'warning');
+            return;
+        }
+        
+        if (!currentVolunteerId) {
+            showMessage('No hay voluntariado seleccionado', 'warning');
+            return;
+        }
+        
+        if (!window.adminManager) {
+            showMessage('AdminManager no está disponible', 'danger');
+            return;
+        }
+        
+        await window.adminManager.assignAchievementToMember(memberSelect.value, currentVolunteerId, achievementId);
+        showMessage('Logro asignado exitosamente', 'success');
+        
+        closeModal();
+        
+        // Recargar logros para mostrar los cambios
+        await loadAchievementsData();
+        
+    } catch (error) {
+        console.error('❌ Error asignando logro:', error);
+        showMessage('Error al asignar logro: ' + error.message, 'danger');
+    }
+}
+
+// Exponer función de debugging globalmente
+window.debugReloadAchievements = debugReloadAchievements;
+
+// Función de debugging completa para el panel de administración
+window.debugAdminPanel = async function() {
+    console.log('🔍 === DEBUGGING COMPLETO DEL PANEL ADMIN ===');
+    
+    // 1. Verificar AdminManager
+    console.log('1. Verificando AdminManager...');
+    console.log('AdminManager disponible:', !!window.adminManager);
+    console.log('getHoursByActivity:', typeof window.adminManager?.getHoursByActivity);
+    console.log('getVolunteerAchievements:', typeof window.adminManager?.getVolunteerAchievements);
+    console.log('addHoursToMember:', typeof window.adminManager?.addHoursToMember);
+    
+    // 2. Verificar voluntariado actual
+    console.log('2. Voluntariado actual:', currentVolunteerId);
+    
+    // 3. Verificar todos los logros en Firestore
+    console.log('3. Verificando logros en Firestore...');
+    try {
+        const allAchievements = await window.debugAchievements();
+        console.log('Total logros en Firestore:', allAchievements.length);
+        
+        // Filtrar logros del voluntariado actual
+        const currentVolunteerAchievements = allAchievements.filter(a => a.voluntariadoId === currentVolunteerId);
+        console.log('Logros del voluntariado actual:', currentVolunteerAchievements.length);
+        currentVolunteerAchievements.forEach(a => {
+            console.log(`🏆 ${a.name} (${a.id}) - Activo: ${a.isActive}`);
+        });
+    } catch (error) {
+        console.error('Error obteniendo logros:', error);
+    }
+    
+    // 4. Verificar datos de miembros
+    console.log('4. Datos de miembros:', membersData?.length || 0);
+    
+    // 5. Recargar logros
+    console.log('5. Recargando logros...');
+    await loadAchievementsData();
+    
+    console.log('✅ Debugging completo terminado');
+};
+
+// Función específica para debugging del historial de horas
+window.debugHoursHistory = async function(memberId) {
+    console.log('🔍 === DEBUGGING HISTORIAL DE HORAS ===');
+    
+    if (!memberId) {
+        console.error('❌ No se proporcionó memberId');
+        return;
+    }
+    
+    try {
+        console.log('1. Verificando AdminManager...');
+        console.log('AdminManager disponible:', !!window.adminManager);
+        console.log('getMemberHoursHistory:', typeof window.adminManager?.getMemberHoursHistory);
+        
+        console.log('2. Voluntariado actual:', currentVolunteerId);
+        
+        console.log('3. Obteniendo historial de horas...');
+        const historyData = await window.adminManager.getMemberHoursHistory(memberId, currentVolunteerId);
+        
+        console.log('✅ Historial obtenido exitosamente:');
+        console.log('Total horas:', historyData.totalHours);
+        console.log('Número de entradas:', historyData.history.length);
+        console.log('Información del miembro:', historyData.memberInfo);
+        console.log('Historial completo:', historyData.history);
+        
+        // Mostrar modal con el historial
+        showHoursHistoryModal(historyData);
+        
+    } catch (error) {
+        console.error('❌ Error en debugging de historial:', error);
+        console.error('Stack trace:', error.stack);
+    }
+};
 </script>
 
 <style>
-.admin-nav {
+/* Estilos para el Panel de Administración */
+.admin-panel-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 2rem;
+}
+
+.panel-header {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 2rem;
+}
+
+.header-info h1 {
+    color: #2989d8;
+    margin-bottom: 0.5rem;
+}
+
+.header-stats {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, #2989d8, #18559b);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 12px;
     display: flex;
     align-items: center;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    transition: background-color 0.3s ease;
+    gap: 1rem;
+    min-width: 150px;
 }
 
-.admin-nav:hover {
-    background-color: rgba(41, 137, 216, 0.1);
+.stat-icon {
+    font-size: 2rem;
+    opacity: 0.8;
 }
 
-.admin-nav.active {
-    background-color: var(--color-primary);
-    color: white;
+.stat-number {
+    display: block;
+    font-size: 2rem;
+    font-weight: bold;
+    line-height: 1;
 }
 
-.admin-nav .icon {
-    margin-right: 0.5rem;
+.stat-label {
+    font-size: 0.9rem;
+    opacity: 0.9;
 }
 
-.admin-card, .member-card {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+.volunteer-selector {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
-.admin-card:hover, .member-card:hover {
+.panel-content {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.tab-content {
+    margin-top: 2rem;
+}
+
+.members-header, .statistics-header, .hours-header, .achievements-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.member-card {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 4px solid #2989d8;
+    transition: transform 0.2s ease;
+}
+
+.member-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.member-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.member-avatar {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #2989d8, #18559b);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.member-details h4 {
+    margin-bottom: 0.25rem;
+    color: #2c3e50;
+}
+
+.member-details .subtitle {
+    color: #7f8c8d;
+    margin-bottom: 0.5rem;
+}
+
+.member-stats {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.member-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.hours-member-card {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 4px solid #28a745;
+    transition: transform 0.2s ease;
+}
+
+.hours-member-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.hours-member-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.hours-member-avatar {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #28a745, #1e7e34);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.hours-member-details h4 {
+    margin-bottom: 0.25rem;
+    color: #2c3e50;
+}
+
+.hours-member-details .subtitle {
+    color: #7f8c8d;
+    margin-bottom: 0.5rem;
+}
+
+.hours-member-stats {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.hours-member-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.chart-container {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.chart-container.full-width {
+    grid-column: 1 / -1;
+}
+
+.chart-header {
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.chart-content {
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.table-container {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.achievements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.achievement-card {
+    background: linear-gradient(135deg, #fff, #f8f9fa);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.achievement-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    border-color: #2989d8;
+}
+
+.achievement-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.achievement-icon {
+    font-size: 2.5rem;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #2989d8, #18559b);
+    border-radius: 50%;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.achievement-info h4 {
+    color: #2c3e50;
+    margin-bottom: 0.25rem;
+}
+
+.achievement-info .subtitle {
+    color: #7f8c8d;
+    margin-bottom: 0;
+}
+
+.achievement-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.achievement-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.notification {
+    margin-bottom: 1rem;
+    border-radius: 8px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .admin-panel-container {
+        padding: 1rem;
+    }
+    
+    .header-content {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .header-stats {
+        justify-content: center;
+    }
+    
+    .member-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .member-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+    
+    .hours-member-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .hours-member-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+    
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Estilos para funcionalidades de logros */
+.achievement-icon-large {
+    margin-bottom: 1rem;
+}
+
+.achievement-meta {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.achievement-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
+.achievement-actions .button {
+    flex: 0 0 auto;
+}
+
+/* Estilos para modales de logros */
+.achievement-details-modal .columns {
+    margin-bottom: 1.5rem;
+}
+
+.achievement-details-modal .achievement-icon-large {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.achievement-details-modal .content h4 {
+    margin-bottom: 0.5rem;
+}
+
+.achievement-details-modal .table-container {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* Estilos para modal de asignación */
+.assign-achievement-modal .field {
+    margin-bottom: 1.5rem;
+}
+
+.assign-achievement-modal .select {
+    width: 100%;
+}
+
+.assign-achievement-modal .textarea {
+    min-height: 100px;
+}
+
+/* Responsive para funcionalidades de logros */
+@media (max-width: 768px) {
+    .achievement-actions {
+        justify-content: center;
+    }
+    
+    .achievement-actions .button {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .achievement-meta {
+        justify-content: center;
+    }
 }
 </style>
 {% endblock %}
