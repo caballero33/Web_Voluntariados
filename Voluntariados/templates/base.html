@@ -8,6 +8,14 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  <style>
+    .hero.is-primary {
+        background-color: var(--color-primary) !important;
+        color: #fff;
+    }
+    .button.is-primary { background: var(--color-bg-dark); color: var(--color-text-light); }
+    .button.is-primary:hover { background: var(--color-primary-dark); }
+  </style>
 </head>
 <body>
   <nav class="navbar has-background-dark fijo" role="navigation" aria-label="main navigation">
