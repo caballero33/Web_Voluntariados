@@ -687,19 +687,57 @@ function setupDashboardNavigation() {
 }
 
 function toggleEditProfile() {
-    const inputs = document.querySelectorAll('#profile-form input[readonly]');
-    const button = event.target;
-    
-    if (inputs[0].readOnly) {
-        // Enable editing
+    const inputs = document.querySelectorAll('#profile-form input');
+    const button = event.target.closest('button'); // Asegura que obtenemos el botón, incluso si se hace clic en un hijo
+
+    // Verifica si hay inputs disponibles
+    if (inputs.length === 0) {
+        console.log('⚠️ No se encontraron campos de entrada en el formulario.');
+        return;
+    }
+
+    // Deshabilita el botón temporalmente para evitar clics rápidos
+    button.disabled = true;
+
+    // Busca los elementos específicos dentro del botón
+    let iconSpan = button.querySelector('.icon');
+    let textSpan = button.querySelector('span:not(.icon)');
+
+    // Si no existen, crea la estructura inicial
+    if (!iconSpan || !textSpan) {
+        button.innerHTML = '<span class="icon"><i class="fas fa-edit"></i></span><span>Editar Perfil</span>';
+        iconSpan = button.querySelector('.icon');
+        textSpan = button.querySelector('span:not(.icon)');
+    }
+
+    // Asegúrate de que el span.icon contenga exactamente un <i>
+    const iconElement = iconSpan.querySelector('i');
+    if (!iconElement) {
+        iconSpan.innerHTML = '<i class="fas fa-edit"></i>'; // Inicializa con el ícono de edición
+    }
+
+    // Determina el estado basado en el primer input
+    const isReadOnly = inputs[0].readOnly;
+
+    if (isReadOnly) {
+        // Habilitar edición
+        console.log('✏️ Habilitando edición de perfil...');
         inputs.forEach(input => input.readOnly = false);
-        button.innerHTML = '<span class="icon"><i class="fas fa-save"></i></span><span>Guardar</span>';
+        iconSpan.innerHTML = '<i class="fas fa-save"></i>'; // Reemplaza el ícono
+        textSpan.textContent = 'Guardar'; // Actualiza el texto
     } else {
-        // Save changes
+        // Guardar cambios
+        console.log('💾 Guardando cambios de perfil...');
         saveProfileChanges();
         inputs.forEach(input => input.readOnly = true);
-        button.innerHTML = '<span class="icon"><i class="fas fa-edit"></i></span><span>Editar Perfil</span>';
+        iconSpan.innerHTML = '<i class="fas fa-edit"></i>'; // Reemplaza el ícono
+        textSpan.textContent = 'Editar Perfil'; // Actualiza el texto
     }
+
+    // Vuelve a habilitar el botón
+    setTimeout(() => {
+        button.disabled = false;
+    }, 100); // Pequeña demora para evitar clics múltiples
 }
 
 async function saveProfileChanges() {
