@@ -15,6 +15,14 @@
     }
     .button.is-primary { background: var(--color-bg-dark); color: var(--color-text-light); }
     .button.is-primary:hover { background: var(--color-primary-dark); }
+    .has-background-primar {
+        background-color: var(--color-primary) !important;
+        color: #fff !important;
+    }
+    .is-primar .message-body {
+    border-color: var(--color-bg-light);
+    color: var(--color-primary-dark);
+    }
   </style>
 </head>
 <body>
@@ -39,7 +47,7 @@
             <a class="navbar-item has-text-white"><i class="fas fa-users mr-2"></i>Sobre nosotros</a>
             <a class="navbar-item has-text-white" href="{% url 'nuestros_voluntariados:home' %}"><i class="fas fa-hand-holding-heart mr-2"></i>Voluntariados</a>
             <hr class="navbar-divider">
-            <a class="navbar-item has-text-white"><i class="fas fa-bug mr-2"></i>Reportar un problema</a>
+            <a class="navbar-item has-text-white" href="{% url 'errores' %}"><i class="fas fa-bug mr-2"></i>Reportar un problema</a>
           </div>
         </div>
       </div>

@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Reglamento{% endblock %}
+
+{% block content %}
+
+{% include "partial/portada_template.html" with icon="fa-bug" nombre="Reportar un problema" boton1="Ir al Inicio" boton2="Contactar Soporte" eslogan="¿Has encontrado un error? ¡Ayúdanos a mejorar!" logo_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741579925/ckeskhupgmw0tlfyvgmj.png" icon_boton2="fa-envelope" %}
+
+<div class="box-content mt-5">
+    <div class="container">
+        <div class="content">
+            <div>
+                <section class="mb-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-header-title title is-3 has-background-primar p-3">
+                                <i class="fas fa-bug mr-2"></i>Reportar un Error
+                            </h2>
+                        </div>
+                        <nav class="menu">
+                        <div class="columns">
+                            <div class="column is-2"></div>
+                    <div class="column is-8">
+                        <form id="error-report-form">
+                            <div class="columns">
+                                <div class="column">
+                                    <div class="field">
+                                        <label class="label has-text-white" for="user_name">Nombre</label>
+                                        <div class="control">
+                                            <input class="input" type="text" id="user_name" name="user_name" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="column">
+                                    <div class="field">
+                                        <label class="label has-text-white" for="user_affiliation">Afiliación</label>
+                                        <div class="control">
+                                            <input class="input" type="text" id="user_affiliation" placeholder="Ej. Voluntario, Externo, etc." name="user_affiliation" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <label class="label has-text-white" for="user_email">Correo Electrónico</label>
+                                <div class="control">
+                                    <input class="input" type="email" id="user_email" name="user_email" required>
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <label for="error_description" class="label has-text-white">Descripción del error</label>
+                                <div class="control">
+                                    <textarea class="input" id="error_description" name="error_description" style="width: 400px; height: 200px;" required></textarea>
+                                </div>
+                            </div>
+                            
+                            <div class="field">
+                                <div class="control">
+                                    <button class="button is-primary" type="button" onclick="reporte()">
+                                        <span class="icon"><i class="fas fa-edit"></i></span>
+                                        <span>Reportar</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="column is-2"></div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script type="text/javascript">
+    (function(){
+        // Inicializa EmailJS 
+        emailjs.init("LLcgsxhA0om-c1-wR");
+    })();
+
+    function reporte() {
+        // Maneja el envío del formulario
+
+        // Recoge los datos del formulario
+        const templateParams = {
+            user_name: document.getElementById("user_name").value,
+            user_affiliation: document.getElementById("user_affiliation").value,
+            user_email: document.getElementById("user_email").value,
+            error_description: document.getElementById("error_description").value,
+            page_url: window.location.href,
+            user_agent: navigator.userAgent
+        };
+
+        // Envía el correo con EmailJS
+        emailjs.send("service_y1jho2b", "template_6lf0ank", templateParams)
+            .then(function(response) {
+                console.log("Reporte enviado!", response.status, response.text);
+                alert("¡Reporte de error enviado con éxito!");
+                document.getElementById("error-report-form").reset(); // Limpia el formulario
+            }, function(error) {
+                console.log("Error al enviar:", error);
+                alert("Hubo un problema al enviar el reporte. Intenta de nuevo.");
+            });
+        console.log("Formulario preparado para enviar.");
+    }
+</script>
+
+{% endblock %}
