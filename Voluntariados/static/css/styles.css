@@ -7,7 +7,7 @@
   --color-warning: #ffc107;
   --color-danger: #dc3545;
   --color-bg-dark: #18559b;
-  --color-bg-light: #f8f9fa;
+  --color-bg-light: #b1ceeb;
   --color-text-dark: #333;
   --color-text-light: #fff;
   --radius: 10px;
@@ -193,8 +193,8 @@ body.light-mode .footer { background: var(--color-bg-light); color: var(--color-
 .tags { margin-bottom: 0.5rem; }
 .volunteer-description { margin-bottom: 1rem; }
 .button { border-radius: var(--radius); transition: background var(--transition); }
-.button.is-primary { background: var(--color-primary); color: var(--color-text-light); }
-.button.is-primary:hover { background: var(--color-info); }
+.button.is-primary { background: var(--color-primary-dark); color: var(--color-text-light); }
+.button.is-primary:hover { background: var(--color-bg-dark); }
 
 .card, .volunteer-card, .event-card {
   border-radius: var(--radius);
@@ -331,6 +331,10 @@ body.light-mode .theme-toggle:hover { background: rgba(0,0,0,0.15); }
 }
 
 /* Estilos adicionales para mejor UX */
+.hero.is-primary {
+    background-color: var(--color-primary) !important;
+    color: #fff;
+}
 
 .has-text-primary {
     color: var(--color-primary) !important;

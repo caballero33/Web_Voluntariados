@@ -15,3 +15,6 @@ def reglamento(request):
 
 def voluntariados(request):
     return render(request, 'voluntariados.html')
+
+def errores(request):
+    return render(request, 'errores.html')
