@@ -21,7 +21,7 @@ class EventsManager {
     setupFirestore() {
         this.db = window.firebaseDb;
         this.currentUser = window.firebaseAuth.currentUser;
-        console.log('📅 EventsManager inicializado');
+        // EventsManager inicializado
     }
 
     // Crear evento (solo admins)
@@ -48,7 +48,7 @@ class EventsManager {
                 status: 'activo'
             });
 
-            console.log('✅ Evento creado:', eventRef.id);
+            // Debug log removed
             return {
                 success: true,
                 message: 'Evento creado exitosamente',

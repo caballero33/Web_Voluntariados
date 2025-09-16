@@ -371,18 +371,27 @@ async function loadVolunteerDetails() {
         // Load user status
         const user = window.firebaseAuth.currentUser;
         if (user) {
-            console.log('🔍 Cargando datos del usuario para voluntariado:', currentVolunteerId);
+            // Cargando datos del usuario para voluntariado
             
             const userDoc = await window.firebaseDb.collection('users').doc(user.uid).get();
             
             if (userDoc.exists) {
                 const userData = userDoc.data();
-                console.log('👤 Datos del usuario:', userData);
+                // Datos del usuario cargados
                 
                 // Verificar si el usuario está en este voluntariado
                 if (userData.voluntariados && userData.voluntariados[currentVolunteerId]) {
                     const volunteerData = userData.voluntariados[currentVolunteerId];
-                    console.log('📊 Datos del voluntariado:', volunteerData);
+                    // Debug log removed
+                    
+                    // Verificar si el usuario está activo en este voluntariado
+                    const userStatus = volunteerData.status || 'inactivo';
+                    if (userStatus !== 'activo') {
+                        // Debug log removed
+                        // Bloquear acceso a eventos para usuarios inactivos
+                        blockInactiveUserAccess();
+                        return;
+                    }
                     
                     // Actualizar estado
                     const statusElement = document.getElementById('user-status');
@@ -416,9 +425,9 @@ async function loadVolunteerDetails() {
                         }
                     }
                     
-                                console.log('✅ Datos del usuario actualizados correctamente');
+                                // Debug log removed
                 } else {
-                    console.log('❌ Usuario no encontrado en este voluntariado');
+                    // Debug log removed
                     // Si no está en el voluntariado, mostrar datos por defecto
                     document.getElementById('user-status').textContent = 'No miembro';
                     document.getElementById('user-status').className = 'tag is-warning';
@@ -427,7 +436,7 @@ async function loadVolunteerDetails() {
                     document.getElementById('join-date').textContent = '-';
                 }
             } else {
-                console.log('❌ Documento de usuario no encontrado');
+                // Debug log removed
             }
         }
         
@@ -449,18 +458,18 @@ async function loadVolunteerDetails() {
 function setupUserDataListener() {
     const user = window.firebaseAuth.currentUser;
     if (!user || !currentVolunteerId) {
-        console.log('❌ No se puede configurar listener: usuario o voluntariado no válido');
+        // Debug log removed
         return;
     }
     
-    console.log('👂 Configurando listener en tiempo real para usuario:', user.uid);
+    // Debug log removed
     
     // Escuchar cambios en tiempo real en el documento del usuario
     window.firebaseDb.collection('users').doc(user.uid)
         .onSnapshot((doc) => {
             if (doc.exists) {
                 const userData = doc.data();
-                console.log('🔄 Datos del usuario actualizados en tiempo real:', userData);
+                // Debug log removed
                 
                 // Verificar si el usuario está en este voluntariado
                 if (userData.voluntariados && userData.voluntariados[currentVolunteerId]) {
@@ -483,7 +492,7 @@ function setupUserDataListener() {
                         hoursElement.textContent = volunteerData.totalHours || 0;
                     }
                     
-                    console.log('✅ Datos actualizados en tiempo real');
+                    // Debug log removed
                 }
             }
         }, (error) => {
@@ -493,11 +502,11 @@ function setupUserDataListener() {
 
 // Función para actualizar manualmente los datos del usuario
 async function refreshUserData() {
-    console.log('🔄 Actualizando datos del usuario manualmente...');
+    // Debug log removed
     
     const user = window.firebaseAuth.currentUser;
     if (!user || !currentVolunteerId) {
-        console.log('❌ No se puede actualizar: usuario o voluntariado no válido');
+        // Debug log removed
         return;
     }
     
@@ -527,11 +536,49 @@ async function refreshUserData() {
                     hoursElement.textContent = volunteerData.totalHours || 0;
                 }
                 
-                console.log('✅ Datos del usuario actualizados manualmente');
+                // Debug log removed
             }
         }
     } catch (error) {
         console.error('❌ Error actualizando datos del usuario:', error);
+    }
+}
+
+// Función para bloquear acceso de usuarios inactivos
+function blockInactiveUserAccess() {
+    // Ocultar sección de eventos
+    const eventsSection = document.getElementById('events-section');
+    if (eventsSection) {
+        eventsSection.innerHTML = `
+            <div class="has-text-centered py-6">
+                <div class="notification is-warning">
+                    <h3 class="title is-4">
+                        <span class="icon"><i class="fas fa-user-slash"></i></span>
+                        Acceso Restringido
+                    </h3>
+                    <p class="subtitle is-5">Tu cuenta está inactiva en este voluntariado</p>
+                    <p>Para acceder a los eventos y actividades, un administrador debe activar tu cuenta.</p>
+                    <p class="mt-3">
+                        <a href="/auth/dashboard/" class="button is-primary">
+                            <span class="icon"><i class="fas fa-arrow-left"></i></span>
+                            <span>Volver al Dashboard</span>
+                        </a>
+                    </p>
+                </div>
+            </div>
+        `;
+    }
+    
+    // Ocultar sección de miembros
+    const membersSection = document.getElementById('members-section');
+    if (membersSection) {
+        membersSection.style.display = 'none';
+    }
+    
+    // Ocultar sección de logros
+    const achievementsSection = document.getElementById('achievements-section');
+    if (achievementsSection) {
+        achievementsSection.style.display = 'none';
     }
 }
 
@@ -542,13 +589,13 @@ async function checkUserRole() {
     try {
         const user = window.firebaseAuth.currentUser;
         if (!user) {
-            console.log('❌ Usuario no autenticado');
+            // Debug log removed
             window.isAdmin = false;
             return false;
         }
 
         if (!currentVolunteerId) {
-            console.log('❌ No hay voluntariado seleccionado');
+            // Debug log removed
             window.isAdmin = false;
             return false;
         }
@@ -574,26 +621,26 @@ async function checkUserRole() {
             if (window.isAdmin) {
                 if (adminForm) {
                     adminForm.style.display = 'block';
-                    console.log('✅ Formulario de posts de admin mostrado');
+                    // Debug log removed
                 }
                 if (adminEventForm) {
                     adminEventForm.style.display = 'block';
-                    console.log('✅ Formulario de eventos de admin mostrado');
+                    // Debug log removed
                 }
             } else {
                 if (adminForm) {
                     adminForm.style.display = 'none';
-                    console.log('❌ Formulario de posts de admin ocultado');
+                    // Debug log removed
                 }
                 if (adminEventForm) {
                     adminEventForm.style.display = 'none';
-                    console.log('❌ Formulario de eventos de admin ocultado');
+                    // Debug log removed
                 }
             }
             
             return window.isAdmin;
         } else {
-            console.log('❌ Voluntariado no encontrado:', currentVolunteerId);
+            // Debug log removed
             window.isAdmin = false;
             return false;
         }
@@ -605,12 +652,12 @@ async function checkUserRole() {
 }
 
 async function loadPosts() {
-    console.log('🔄 Cargando posts del muro...');
+    // Debug log removed
     const container = document.getElementById('posts-container');
     try {
         const posts = await window.adminManager.getVolunteerPosts(currentVolunteerId);
-        console.log('📝 Posts obtenidos:', posts);
-        console.log('📝 Primer post:', posts[0]);
+        // Debug log removed
+        // Debug log removed
         if (posts.length === 0) {
             container.innerHTML = `
                 <div class="has-text-centered py-6">
@@ -687,7 +734,7 @@ async function loadPosts() {
 }
 
 async function loadEvents() {
-    console.log('🔄 Cargando eventos del voluntariado...');
+    // Debug log removed
     const container = document.getElementById('events-list');
     
     if (!container) {
@@ -705,9 +752,36 @@ async function loadEvents() {
         return;
     }
     
-    console.log('🏢 Cargando eventos para voluntariado:', currentVolunteerId);
+    // Debug log removed
     
     try {
+        // Verificar si el usuario está activo en este voluntariado
+        const user = window.firebaseAuth.currentUser;
+        if (user) {
+            const userDoc = await window.firebaseDb.collection('users').doc(user.uid).get();
+            if (userDoc.exists) {
+                const userData = userDoc.data();
+                const volunteerData = userData.voluntariados?.[currentVolunteerId];
+                const userStatus = volunteerData?.status || 'inactivo';
+                
+                if (userStatus !== 'activo') {
+                    container.innerHTML = `
+                        <div class="has-text-centered py-6">
+                            <div class="notification is-warning">
+                                <h3 class="title is-4">
+                                    <span class="icon"><i class="fas fa-user-slash"></i></span>
+                                    Acceso Restringido
+                                </h3>
+                                <p class="subtitle is-5">Tu cuenta está inactiva en este voluntariado</p>
+                                <p>Para acceder a los eventos, un administrador debe activar tu cuenta.</p>
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+            }
+        }
+        
         // Verificar permisos de admin cada vez que se cargan eventos
         await checkUserRole();
         
@@ -715,7 +789,7 @@ async function loadEvents() {
         await window.adminManager.closePastEvents();
         
         const events = await window.adminManager.getVolunteerEvents(currentVolunteerId);
-        console.log('📅 Eventos obtenidos:', events);
+        // Debug log removed
         
         if (events.length === 0) {
             container.innerHTML = `
@@ -860,7 +934,7 @@ async function loadEvents() {
 }
 
 async function loadMembers() {
-    console.log('🔄 Cargando miembros del voluntariado...');
+    // Debug log removed
     const container = document.getElementById('members-container');
     
     try {
@@ -869,7 +943,7 @@ async function loadMembers() {
         const volunteerData = volunteerDoc.data();
         const adminUids = volunteerData.adminUids || [];
         
-        console.log('👑 Admin UIDs:', adminUids);
+        // Debug log removed
         
         // Obtener todos los usuarios que tienen este voluntariado
         const usersSnapshot = await window.firebaseDb.collection('users').get();
@@ -901,7 +975,7 @@ async function loadMembers() {
             }
         });
         
-        console.log('👥 Miembros encontrados:', members);
+        // Debug log removed
         
         if (members.length === 0) {
             container.innerHTML = `
@@ -1004,11 +1078,11 @@ function setupTabs() {
             
             // Si se cambia a la pestaña de eventos, verificar permisos de admin
             if (tabName === 'events') {
-                console.log('🔄 Cambiando a pestaña de eventos, verificando permisos...');
+                // Debug log removed
                 await checkUserRole();
                 await loadEvents();
             } else if (tabName === 'wall') {
-                console.log('🔄 Cambiando a pestaña del muro, verificando permisos...');
+                // Debug log removed
                 await checkUserRole();
                 await loadPosts();
             }
@@ -1461,7 +1535,7 @@ function closeModal() {
 
 // Función de debug para verificar permisos de admin
 window.debugAdminPermissions = async function() {
-    console.log('🔍 DEBUG: Verificando permisos de admin...');
+    // Debug log removed
     console.log('📊 Estado actual:', {
         currentVolunteerId: currentVolunteerId,
         windowIsAdmin: window.isAdmin,
@@ -1470,7 +1544,7 @@ window.debugAdminPermissions = async function() {
     });
     
     const result = await checkUserRole();
-    console.log('✅ Resultado de verificación:', result);
+    // Debug log removed
     
     // Verificar elementos DOM
     const adminForm = document.getElementById('admin-post-form');
@@ -1485,10 +1559,10 @@ window.debugAdminPermissions = async function() {
 
 // Función para forzar verificación de permisos
 window.forceCheckAdmin = async function() {
-    console.log('🔄 Forzando verificación de permisos...');
+    // Debug log removed
     await checkUserRole();
     await loadEvents();
-    console.log('✅ Verificación completada');
+    // Debug log removed
 };
 
 // Función para eliminar evento

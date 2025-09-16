@@ -22,12 +22,11 @@ class AdminManager {
         this.db = window.firebaseDb;
         this.auth = window.firebaseAuth;
         this.currentUser = window.firebaseAuth.currentUser;
-        console.log('👑 AdminManager inicializado');
+        // AdminManager inicializado
         
         // Escuchar cambios en la autenticación
         this.auth.onAuthStateChanged((user) => {
             this.currentUser = user;
-            console.log('👤 Usuario actualizado en AdminManager:', user ? user.email : 'No autenticado');
         });
     }
 
@@ -37,7 +36,6 @@ class AdminManager {
         const currentUser = window.firebaseAuth.currentUser;
         
         if (!this.db || !currentUser) {
-            console.log('❌ No hay usuario autenticado para verificar admin');
             return false;
         }
 
@@ -256,13 +254,13 @@ class AdminManager {
                 attended: [] // Lista de asistencias (inicialmente vacía)
             };
 
-            console.log('📝 Datos del evento a guardar:', eventToSave);
+            // Debug log removed
 
             // Crear el evento
             const eventRef = await this.db.collection('eventos').add(eventToSave);
 
-            console.log('✅ Evento creado exitosamente:', eventRef.id);
-            console.log('👤 Admin inscrito automáticamente:', currentUser.uid);
+            // Debug log removed
+            // Debug log removed
 
             return {
                 success: true,
@@ -393,7 +391,7 @@ class AdminManager {
                 priority: postData.priority || 'medium'
             });
 
-            console.log('✅ Post creado exitosamente');
+            // Debug log removed
             return postRef.id;
         } catch (error) {
             console.error('❌ Error creating post:', error);
@@ -419,7 +417,7 @@ class AdminManager {
                 }));
             } catch (indexError) {
                 // Si falla por índice, obtener todos y filtrar localmente
-                console.log('Índice no disponible, obteniendo todos los posts...');
+                // Debug log removed
                 const allPostsSnapshot = await this.db
                     .collection('posts')
                     .get();
@@ -494,14 +492,14 @@ class AdminManager {
                     currentParticipants: firebase.firestore.FieldValue.increment(1)
                 });
 
-                console.log(`✅ Usuario inscrito en evento: ${eventData.title}`);
+                // Debug log removed
             } else if (action === 'remove') {
                 await eventDoc.ref.update({
                     participants: firebase.firestore.FieldValue.arrayRemove(targetUserId),
                     currentParticipants: firebase.firestore.FieldValue.increment(-1)
                 });
 
-                console.log(`✅ Usuario desinscrito del evento: ${eventData.title}`);
+                // Debug log removed
             }
 
             return true;
@@ -514,7 +512,7 @@ class AdminManager {
     // NUEVO: Obtener eventos de un voluntariado
     async getVolunteerEvents(voluntariadoId) {
         try {
-            console.log('🔄 Obteniendo eventos para voluntariado:', voluntariadoId);
+            // Debug log removed
             
             // Intentar con orderBy primero, si falla usar solo where
             let eventsSnapshot;
@@ -525,14 +523,14 @@ class AdminManager {
                     .orderBy('eventDate', 'desc')
                     .get();
             } catch (indexError) {
-                console.log('⚠️ Índice no disponible, obteniendo eventos sin ordenar...');
+                // Debug log removed
                 eventsSnapshot = await this.db
                     .collection('eventos')
                     .where('voluntariadoId', '==', voluntariadoId)
                     .get();
             }
 
-            console.log('📅 Eventos encontrados:', eventsSnapshot.size);
+            // Debug log removed
             
             const events = eventsSnapshot.docs.map(doc => {
                 const data = doc.data();
@@ -557,14 +555,14 @@ class AdminManager {
                 return dateB - dateA;
             });
 
-            console.log('✅ Eventos procesados y ordenados:', events.length);
+            // Debug log removed
             return events;
         } catch (error) {
             console.error('❌ Error getting events:', error);
             
             // Intentar sin orderBy si falla por índice
             try {
-                console.log('🔄 Reintentando sin orderBy...');
+                // Debug log removed
                 const eventsSnapshot = await this.db
                     .collection('eventos')
                     .where('voluntariadoId', '==', voluntariadoId)
@@ -579,7 +577,7 @@ class AdminManager {
                     return dateB - dateA;
                 });
 
-                console.log('📅 Eventos obtenidos sin orderBy:', events.length);
+                // Debug log removed
                 return events;
             } catch (fallbackError) {
                 console.error('❌ Error en fallback:', fallbackError);
@@ -703,7 +701,7 @@ class AdminManager {
                 status: newStatus
             });
 
-            console.log(`Estado del evento actualizado a: ${newStatus}`);
+            // Debug log removed
             return true;
         } catch (error) {
             console.error('Error updating event status:', error);
@@ -739,7 +737,7 @@ class AdminManager {
             
             // Verificar si ya se marcó asistencia para evitar duplicados
             if (attendedList.includes(participantId)) {
-                console.log('⚠️ El usuario ya tiene asistencia marcada en este evento');
+                // Debug log removed
                 return true;
             }
             
@@ -788,7 +786,7 @@ class AdminManager {
                 [`voluntariados.${eventData.voluntariadoId}.hoursHistory`]: updatedHistory
             });
 
-            console.log(`✅ Asistencia marcada y horas agregadas: ${participantId} - ${eventHours}h por evento: ${eventData.title}`);
+            // Debug log removed
             return true;
         } catch (error) {
             console.error('Error marking attendance:', error);
@@ -831,7 +829,7 @@ class AdminManager {
 
                     // Verificar si ya se marcó asistencia
                     if (attendedList.includes(participantId)) {
-                        console.log(`⚠️ Usuario ${participantId} ya tiene asistencia marcada`);
+                        // Debug log removed
                         continue;
                     }
 
@@ -875,7 +873,7 @@ class AdminManager {
                     });
 
                     successCount++;
-                    console.log(`✅ Asistencia marcada: ${participantId} - ${eventHours}h`);
+                    // Debug log removed
                 } catch (error) {
                     console.error(`❌ Error marcando asistencia para ${participantId}:`, error);
                     errorCount++;
@@ -887,7 +885,7 @@ class AdminManager {
                 attended: firebase.firestore.FieldValue.arrayUnion(...participantIds)
             });
 
-            console.log(`✅ Asistencia en lote completada: ${successCount} exitosos, ${errorCount} errores`);
+            // Debug log removed
             return {
                 success: successCount,
                 errors: errorCount,
@@ -930,7 +928,7 @@ class AdminManager {
 
             await eventDoc.ref.update(updateToSave);
 
-            console.log(`Evento actualizado: ${eventId}`);
+            // Debug log removed
             return true;
         } catch (error) {
             console.error('Error updating event:', error);
@@ -959,7 +957,7 @@ class AdminManager {
             // Eliminar el evento
             await eventDoc.ref.delete();
 
-            console.log(`Evento eliminado: ${eventId}`);
+            // Debug log removed
             return true;
         } catch (error) {
             console.error('Error deleting event:', error);
@@ -970,7 +968,7 @@ class AdminManager {
     // NUEVO: Cerrar eventos pasados automáticamente
     async closePastEvents() {
         try {
-            console.log('🔄 Verificando eventos pasados...');
+            // Debug log removed
             
             const now = new Date();
             const eventsSnapshot = await this.db
@@ -992,7 +990,7 @@ class AdminManager {
             });
 
             if (pastEvents.length > 0) {
-                console.log(`📅 Cerrando ${pastEvents.length} eventos pasados...`);
+                // Debug log removed
                 
                 const batch = this.db.batch();
                 pastEvents.forEach(event => {
@@ -1005,9 +1003,9 @@ class AdminManager {
                 });
                 
                 await batch.commit();
-                console.log(`✅ ${pastEvents.length} eventos cerrados automáticamente`);
+                // Debug log removed
             } else {
-                console.log('✅ No hay eventos pasados para cerrar');
+                // Debug log removed
             }
             
             return pastEvents.length;
@@ -1020,7 +1018,7 @@ class AdminManager {
     // NUEVO: Obtener estadísticas de un voluntariado
     async getVolunteerStatistics(voluntariadoId) {
         try {
-            console.log('🔄 Obteniendo estadísticas del voluntariado:', voluntariadoId);
+            // Debug log removed
             
             // Obtener todos los miembros del voluntariado
             const membersSnapshot = await this.db
@@ -1028,10 +1026,14 @@ class AdminManager {
                 .where(`voluntariados.${voluntariadoId}`, '!=', null)
                 .get();
             
+            // Debug log removed
+            
             const members = membersSnapshot.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data()
             }));
+            
+            // Debug log removed
             
             // Obtener todos los eventos del voluntariado
             const eventsSnapshot = await this.db
@@ -1096,7 +1098,7 @@ class AdminManager {
                 });
             });
             
-            console.log('📊 Estadísticas calculadas:', stats);
+            // Debug log removed
             return stats;
             
         } catch (error) {
@@ -1108,7 +1110,7 @@ class AdminManager {
     // NUEVO: Obtener estadísticas de horas por actividad
     async getHoursByActivity(voluntariadoId) {
         try {
-            console.log('🔄 Obteniendo estadísticas de horas por actividad:', voluntariadoId);
+            // Debug log removed
             
             const members = await this.getVoluntariadoMembers(voluntariadoId);
             const activityStats = {};
@@ -1148,7 +1150,7 @@ class AdminManager {
                 }))
                 .sort((a, b) => b.totalHours - a.totalHours);
             
-            console.log('✅ Estadísticas de actividades obtenidas:', sortedActivities.length);
+            // Debug log removed
             return sortedActivities;
             
         } catch (error) {
@@ -1166,7 +1168,7 @@ class AdminManager {
         }
 
         try {
-            console.log('🔄 Agregando horas al miembro:', memberId, 'en voluntariado:', voluntariadoId);
+            // Debug log removed
             
             // Verificar que es admin del voluntariado
             const isAdmin = await this.isUserAdmin(voluntariadoId);
@@ -1208,7 +1210,7 @@ class AdminManager {
                 [`voluntariados.${voluntariadoId}.hoursHistory`]: updatedHistory
             });
 
-            console.log(`✅ Horas agregadas al miembro ${memberId}: ${hoursData.hours}h por actividad: ${hoursData.event}`);
+            // Debug log removed
             return true;
             
         } catch (error) {
@@ -1220,7 +1222,7 @@ class AdminManager {
     // NUEVO: Obtener historial de horas de un miembro
     async getMemberHoursHistory(memberId, voluntariadoId) {
         try {
-            console.log('🔄 Obteniendo historial de horas del miembro:', memberId, 'en voluntariado:', voluntariadoId);
+            // Debug log removed
             
             const memberDoc = await this.db.collection('users').doc(memberId).get();
             
@@ -1237,8 +1239,8 @@ class AdminManager {
             const volunteerData = memberData.voluntariados[voluntariadoId];
             const hoursHistory = volunteerData.hoursHistory || [];
             
-            console.log('📊 Historial de horas encontrado:', hoursHistory.length, 'entradas');
-            console.log('📊 Datos del voluntariado:', volunteerData);
+            // Debug log removed
+            // Debug log removed
             
             // Ordenar por fecha (más reciente primero) - manejar diferentes formatos de fecha
             const sortedHistory = hoursHistory.sort((a, b) => {
@@ -1272,7 +1274,7 @@ class AdminManager {
                 return dateB - dateA;
             });
             
-            console.log('✅ Historial de horas procesado:', sortedHistory.length, 'entradas');
+            // Debug log removed
             return {
                 totalHours: volunteerData.totalHours || 0,
                 history: sortedHistory,
@@ -1322,12 +1324,12 @@ class AdminManager {
                 assignedBy: []
             };
             
-            console.log('📝 Creando logro con datos:', achievementDoc);
+            // Debug log removed
             
             const achievementRef = await this.db.collection('logros').add(achievementDoc);
 
-            console.log(`✅ Logro creado exitosamente: ${achievementData.name} con ID: ${achievementRef.id}`);
-            console.log('🔗 Voluntariado ID guardado:', voluntariadoId);
+            // Debug log removed
+            // Debug log removed
             
             return achievementRef.id;
             
@@ -1340,18 +1342,18 @@ class AdminManager {
     // NUEVO: Obtener logros de un voluntariado
     async getVolunteerAchievements(voluntariadoId) {
         try {
-            console.log('🔄 Obteniendo logros del voluntariado:', voluntariadoId);
+            // Debug log removed
             
             // Método más simple: obtener todos los logros y filtrar localmente
-            console.log('🔍 Obteniendo todos los logros de Firestore...');
+            // Debug log removed
             const achievementsSnapshot = await this.db
                 .collection('logros')
                 .get();
             
-            console.log('📋 Total de documentos encontrados:', achievementsSnapshot.docs.length);
+            // Debug log removed
             
             if (achievementsSnapshot.empty) {
-                console.log('⚠️ No hay logros en Firestore');
+                // Debug log removed
                 return [];
             }
             
@@ -1364,13 +1366,13 @@ class AdminManager {
                 });
             });
             
-            console.log('📊 Todos los logros obtenidos:', allAchievements.length);
+            // Debug log removed
             
             // Filtrar por voluntariado y estado activo
             const filteredAchievements = allAchievements.filter(achievement => {
                 const matchesVoluntariado = achievement.voluntariadoId === voluntariadoId;
                 const isActive = achievement.isActive !== false;
-                console.log(`🔍 Logro "${achievement.name}": voluntariadoId=${achievement.voluntariadoId}, isActive=${achievement.isActive}, matches=${matchesVoluntariado && isActive}`);
+                // Debug log removed
                 return matchesVoluntariado && isActive;
             });
             
@@ -1381,9 +1383,9 @@ class AdminManager {
                 return dateB - dateA;
             });
             
-            console.log('✅ Logros finales para voluntariado', voluntariadoId, ':', sortedAchievements.length);
+            // Debug log removed
             sortedAchievements.forEach(achievement => {
-                console.log(`🏆 Logro: ${achievement.name} (${achievement.id})`);
+                // Debug log removed
             });
             
             return sortedAchievements;
@@ -1507,7 +1509,7 @@ class AdminManager {
             // Ejecutar todas las operaciones
             await batch.commit();
 
-            console.log(`✅ Logro asignado al miembro ${memberId} con ${achievementHours} horas`);
+            // Debug log removed
             return true;
             
         } catch (error) {
@@ -1519,7 +1521,7 @@ class AdminManager {
     // NUEVO: Eliminar logro
     async deleteAchievement(achievementId) {
         try {
-            console.log('🗑️ Eliminando logro:', achievementId);
+            // Debug log removed
             
             const currentUser = window.firebaseAuth.currentUser;
             if (!currentUser) {
@@ -1542,7 +1544,7 @@ class AdminManager {
 
             // Eliminar el logro
             await this.db.collection('logros').doc(achievementId).delete();
-            console.log('✅ Logro eliminado exitosamente');
+            // Debug log removed
             return true;
             
         } catch (error) {
@@ -1554,7 +1556,7 @@ class AdminManager {
     // NUEVO: Obtener detalles completos de un logro
     async getAchievementDetails(achievementId) {
         try {
-            console.log('🔍 Obteniendo detalles del logro:', achievementId);
+            // Debug log removed
             
             const achievementDoc = await this.db.collection('logros').doc(achievementId).get();
             if (!achievementDoc.exists) {
@@ -1570,7 +1572,7 @@ class AdminManager {
                 .where('achievementId', '==', achievementId)
                 .get();
 
-            console.log('📊 Registros de user_achievements encontrados:', userAchievementsSnapshot.docs.length);
+            // Debug log removed
 
             if (userAchievementsSnapshot.docs.length > 0) {
                 const memberPromises = userAchievementsSnapshot.docs.map(async (doc) => {
@@ -1624,8 +1626,8 @@ class AdminManager {
                 }
             }
 
-            console.log('✅ Detalles del logro obtenidos:', achievementData);
-            console.log('👥 Miembros asignados:', achievementData.assignedMembers.length);
+            // Debug log removed
+            // Debug log removed
             return achievementData;
             
         } catch (error) {
@@ -1637,7 +1639,7 @@ class AdminManager {
     // NUEVO: Obtener logros de un miembro específico
     async getMemberAchievements(memberId, voluntariadoId) {
         try {
-            console.log('🏆 Obteniendo logros del miembro:', memberId);
+            // Debug log removed
             
             const memberDoc = await this.db.collection('users').doc(memberId).get();
             if (!memberDoc.exists) {
@@ -1667,7 +1669,7 @@ class AdminManager {
             });
 
             const achievements = (await Promise.all(achievementPromises)).filter(achievement => achievement !== null);
-            console.log('✅ Logros del miembro obtenidos:', achievements.length);
+            // Debug log removed
             return achievements;
             
         } catch (error) {
@@ -1679,13 +1681,13 @@ class AdminManager {
     // FUNCIÓN DE DEBUGGING: Ver todos los logros en Firestore
     async debugAllAchievements() {
         try {
-            console.log('🔍 DEBUGGING: Obteniendo todos los logros de Firestore...');
+            // Debug log removed
             
             const allAchievementsSnapshot = await this.db
                 .collection('logros')
                 .get();
             
-            console.log('📋 Total de logros en Firestore:', allAchievementsSnapshot.docs.length);
+            // Debug log removed
             
             allAchievementsSnapshot.docs.forEach(doc => {
                 const data = doc.data();
@@ -1720,38 +1722,38 @@ window.debugAchievements = async function() {
 
 // Función para verificar que AdminManager está funcionando
 window.testAdminManager = function() {
-    console.log('🔍 Testing AdminManager...');
-    console.log('AdminManager disponible:', !!window.adminManager);
-    console.log('getHoursByActivity disponible:', typeof window.adminManager?.getHoursByActivity === 'function');
-    console.log('getVolunteerAchievements disponible:', typeof window.adminManager?.getVolunteerAchievements === 'function');
-    console.log('addHoursToMember disponible:', typeof window.adminManager?.addHoursToMember === 'function');
-    console.log('createAchievement disponible:', typeof window.adminManager?.createAchievement === 'function');
-    console.log('assignAchievementToMember disponible:', typeof window.adminManager?.assignAchievementToMember === 'function');
+    // Debug log removed
+    // Debug log removed
+    // Debug log removed
+    // Debug log removed
+    // Debug log removed
+    // Debug log removed
+    // Debug log removed
     return window.adminManager;
 };
 
 // Función específica para debugging del sistema de logros
 window.debugAchievementSystem = async function() {
-    console.log('🔍 === DEBUGGING SISTEMA DE LOGROS ===');
+    // Debug log removed
     
     try {
         // 1. Verificar AdminManager
-        console.log('1. Verificando AdminManager...');
-        console.log('AdminManager disponible:', !!window.adminManager);
-        console.log('createAchievement:', typeof window.adminManager?.createAchievement);
-        console.log('assignAchievementToMember:', typeof window.adminManager?.assignAchievementToMember);
-        console.log('getAchievementDetails:', typeof window.adminManager?.assignAchievementToMember);
+        // Debug log removed
+        // Debug log removed
+        // Debug log removed
+        // Debug log removed
+        // Debug log removed
         
         // 2. Verificar Firebase
-        console.log('2. Verificando Firebase...');
-        console.log('Firebase Auth:', !!window.firebaseAuth);
-        console.log('Firebase Firestore:', !!window.firebaseDb);
-        console.log('Usuario actual:', window.firebaseAuth?.currentUser?.email);
+        // Debug log removed
+        // Debug log removed
+        // Debug log removed
+        // Debug log removed
         
         // 3. Ver todos los logros en Firestore
-        console.log('3. Verificando logros en Firestore...');
+        // Debug log removed
         const allAchievements = await window.debugAchievements();
-        console.log('Total logros en Firestore:', allAchievements.length);
+        // Debug log removed
         allAchievements.forEach(achievement => {
             console.log(`🏆 ${achievement.name} (${achievement.id})`, {
                 voluntariadoId: achievement.voluntariadoId,
@@ -1762,11 +1764,11 @@ window.debugAchievementSystem = async function() {
         });
         
         // 4. Ver user_achievements
-        console.log('4. Verificando user_achievements...');
+        // Debug log removed
         const userAchievementsSnapshot = await window.firebaseDb
             .collection('user_achievements')
             .get();
-        console.log('Total user_achievements:', userAchievementsSnapshot.docs.length);
+        // Debug log removed
         userAchievementsSnapshot.docs.forEach(doc => {
             const data = doc.data();
             console.log(`👤 User Achievement: ${data.userId} -> ${data.achievementId}`, {
@@ -1776,7 +1778,7 @@ window.debugAchievementSystem = async function() {
             });
         });
         
-        console.log('✅ Debugging del sistema de logros completado');
+        // Debug log removed
         
     } catch (error) {
         console.error('❌ Error en debugging del sistema de logros:', error);

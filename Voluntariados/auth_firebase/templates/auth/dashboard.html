@@ -264,6 +264,39 @@
     box-shadow: 0 8px 20px rgba(0,0,0,0.15);
 }
 
+/* Estilos específicos para event-cards */
+.event-card {
+    min-height: 200px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.9) 100%);
+    backdrop-filter: blur(10px);
+}
+
+.event-card .card-content {
+    padding: 2rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.event-card .content {
+    flex-grow: 1;
+}
+
+.event-card .buttons {
+    margin-top: auto;
+    padding-top: 1rem;
+}
+
+/* Mejorar la apariencia cuando el evento ocupa el ancho completo */
+.column.is-12 .event-card {
+    min-height: 250px;
+}
+
+.column.is-12 .event-card .card-content {
+    padding: 2.5rem;
+}
+
 /* Estilos específicos para cards de voluntariados */
 .volunteer-card .card-content {
     padding: 1.5rem;
@@ -692,11 +725,11 @@ function showSection(sectionName) {
 }
 
 async function loadUserData() {
-    console.log('🔄 Cargando datos del usuario...');
+    // Debug log removed
     
     // Esperar a que Firebase esté completamente listo
     if (!window.firebaseAuth || !window.firebaseDb) {
-        console.log('⏳ Firebase no está listo, esperando...');
+        // Debug log removed
         setTimeout(loadUserData, 500);
         return;
     }
@@ -704,14 +737,14 @@ async function loadUserData() {
     // Esperar a que el usuario esté autenticado
     let user = window.firebaseAuth.currentUser;
     if (!user) {
-        console.log('⏳ Usuario no autenticado, esperando...');
+        // Debug log removed
         // Escuchar cambios de autenticación
         window.firebaseAuth.onAuthStateChanged((authUser) => {
             if (authUser) {
-                console.log('✅ Usuario autenticado:', authUser);
+                // Debug log removed
                 loadUserData(); // Recargar datos
             } else {
-                console.log('❌ Usuario no autenticado');
+                // Debug log removed
                 showMessage('No estás autenticado. Redirigiendo al login...', 'warning');
                 setTimeout(() => {
                     window.location.href = "{% url 'auth:login' %}";
@@ -721,7 +754,7 @@ async function loadUserData() {
         return;
     }
     
-    console.log('👤 Usuario actual:', user);
+    // Debug log removed
     
     if (user) {
         // Load basic info
@@ -730,9 +763,9 @@ async function loadUserData() {
         
         // Load detailed profile
         try {
-            console.log('📊 Obteniendo datos del usuario desde Firestore...');
+            // Debug log removed
             const userData = await window.authManager.getUserData(user.uid);
-            console.log('📊 Datos del usuario obtenidos:', userData);
+            // Debug log removed
             
             if (userData) {
                 document.getElementById('profile-first-name').value = userData.firstName || '';
@@ -755,10 +788,10 @@ async function loadUserData() {
                             
                             if (userData && userData.adminVoluntariados && userData.adminVoluntariados.length > 0) {
                                 if (safeDisplayElement('admin-link', 'block')) {
-                                    console.log('✅ Usuario es administrador, mostrando Panel Admin');
+                                    // Debug log removed
                                 }
                             } else {
-                                console.log('❌ Usuario no es administrador');
+                                // Debug log removed
                             }
                         }
                     } catch (error) {
@@ -766,7 +799,7 @@ async function loadUserData() {
                     }
                 }
             } else {
-                console.log('⚠️ No se encontraron datos del usuario en Firestore');
+                // Debug log removed
                 // Mostrar mensaje de que no hay datos
                 document.getElementById('profile-first-name').placeholder = 'No disponible';
                 document.getElementById('profile-last-name').placeholder = 'No disponible';
@@ -778,7 +811,7 @@ async function loadUserData() {
             showMessage('Error al cargar los datos del perfil: ' + error.message, 'danger');
         }
     } else {
-        console.log('❌ No hay usuario autenticado');
+        // Debug log removed
         showMessage('No estás autenticado. Por favor, inicia sesión.', 'warning');
     }
 }
@@ -837,7 +870,7 @@ function toggleEditProfile() {
 
     // Verifica si hay inputs disponibles
     if (inputs.length === 0) {
-        console.log('⚠️ No se encontraron campos de entrada en el formulario.');
+        // Debug log removed
         return;
     }
 
@@ -866,13 +899,13 @@ function toggleEditProfile() {
 
     if (isReadOnly) {
         // Habilitar edición
-        console.log('✏️ Habilitando edición de perfil...');
+        // Debug log removed
         inputs.forEach(input => input.readOnly = false);
         iconSpan.innerHTML = '<i class="fas fa-save"></i>'; // Reemplaza el ícono
         textSpan.textContent = 'Guardar'; // Actualiza el texto
     } else {
         // Guardar cambios
-        console.log('💾 Guardando cambios de perfil...');
+        // Debug log removed
         saveProfileChanges();
         inputs.forEach(input => input.readOnly = true);
         iconSpan.innerHTML = '<i class="fas fa-edit"></i>'; // Reemplaza el ícono
@@ -905,7 +938,7 @@ async function loadSectionData(section) {
 }
 
 async function loadUserVoluntariados() {
-    console.log('🔄 Cargando voluntariados del usuario...');
+    // Debug log removed
     
     const container = document.getElementById('user-voluntariados-container');
     const spinner = document.getElementById('voluntariados-spinner');
@@ -917,15 +950,15 @@ async function loadUserVoluntariados() {
     
     // Esperar a que Firebase esté listo
     if (!window.firebaseAuth || !window.firebaseDb || !window.voluntariadosManager) {
-        console.log('⏳ Firebase o VoluntariadosManager no está listo, esperando...');
+        // Debug log removed
         setTimeout(loadUserVoluntariados, 500);
         return;
     }
     
     try {
-        console.log('📊 Obteniendo voluntariados del usuario...');
+        // Debug log removed
         const userVoluntariados = await window.voluntariadosManager.getUserVoluntariados();
-        console.log('📊 Voluntariados obtenidos:', userVoluntariados);
+        // Debug log removed
         
         safeDisplayElement('voluntariados-spinner', 'none');
         
@@ -1037,23 +1070,23 @@ async function loadUserVoluntariados() {
 
 async function loadUserEvents() {
     // Implementar carga de eventos del usuario
-    console.log('Loading user events...');
+    // Debug log removed
 }
 
 async function loadUserAchievements() {
     try {
-        console.log('🏆 Cargando logros del usuario...');
+        // Debug log removed
         
         // Verificar que Firebase esté disponible
         if (!window.firebaseAuth || !window.firebaseDb) {
-            console.log('⚠️ Firebase no está disponible, esperando...');
+            // Debug log removed
             // Esperar un poco y reintentar
             setTimeout(loadUserAchievements, 1000);
             return;
         }
         
         if (!window.firebaseAuth.currentUser) {
-            console.log('⚠️ Usuario no autenticado');
+            // Debug log removed
             return;
         }
 
@@ -1061,7 +1094,7 @@ async function loadUserAchievements() {
         const userDoc = await window.firebaseDb.collection('users').doc(currentUser.uid).get();
         
         if (!userDoc.exists) {
-            console.log('⚠️ Usuario no encontrado en Firestore');
+            // Debug log removed
             return;
         }
 
@@ -1069,7 +1102,7 @@ async function loadUserAchievements() {
         const achievementsContainer = document.getElementById('user-achievements-grid');
         
         if (!achievementsContainer) {
-            console.log('⚠️ Contenedor de logros no encontrado');
+            // Debug log removed
             return;
         }
 
@@ -1079,7 +1112,7 @@ async function loadUserAchievements() {
             .where('userId', '==', currentUser.uid)
             .get();
 
-        console.log('📊 Logros encontrados:', userAchievementsSnapshot.docs.length);
+        // Debug log removed
 
         if (userAchievementsSnapshot.docs.length === 0) {
             achievementsContainer.innerHTML = `
@@ -1159,7 +1192,7 @@ async function loadUserAchievements() {
             </div>
         `).join('');
 
-        console.log('✅ Logros cargados exitosamente:', validAchievements.length);
+        // Debug log removed
         
     } catch (error) {
         console.error('❌ Error cargando logros del usuario:', error);
@@ -1190,13 +1223,13 @@ function getCategoryColor(category) {
 
 // Funciones para los botones de acción
 function viewVoluntariadoDetails(voluntariadoId) {
-    console.log('Ver detalles del voluntariado:', voluntariadoId);
+    // Debug log removed
     // Navegar a la página de detalles
     window.location.href = `{% url 'auth:volunteer_details' %}?id=${voluntariadoId}`;
 }
 
 function viewEvents(voluntariadoId) {
-    console.log('Ver eventos del voluntariado:', voluntariadoId);
+    // Debug log removed
     // Cambiar a la sección de eventos
     const eventsNav = document.querySelector('[data-section="events"]');
     if (eventsNav) {
@@ -1258,12 +1291,12 @@ function navigateToJoinVoluntariados(event) {
     }
     
     // Si está autenticado, permitir la navegación normal
-    console.log('✅ Usuario autenticado, navegando a Unirse a Voluntariados...');
+    // Debug log removed
     // No hacer preventDefault() para permitir la navegación normal
 }
 
 async function loadUserEvents() {
-    console.log('🔄 Cargando eventos del usuario...');
+    // Debug log removed
     const container = document.getElementById('user-events-container');
     
     if (!container) {
@@ -1273,7 +1306,7 @@ async function loadUserEvents() {
 
     // Verificar que Firebase esté listo
     if (!window.firebaseAuth || !window.firebaseDb) {
-        console.log('⏳ Firebase no está listo, reintentando en 1 segundo...');
+        // Debug log removed
         setTimeout(loadUserEvents, 1000);
         return;
     }
@@ -1308,7 +1341,7 @@ async function loadUserEvents() {
         }
 
         const voluntariadoIds = Object.keys(userData.voluntariados);
-        console.log('📅 Voluntariados del usuario:', voluntariadoIds);
+        // Debug log removed
 
         // Obtener eventos de todos los voluntariados
         const allEvents = [];
@@ -1341,7 +1374,7 @@ async function loadUserEvents() {
             })
             .slice(0, 6); // Mostrar solo los próximos 6 eventos
 
-        console.log('📅 Eventos futuros encontrados:', futureEvents);
+        // Debug log removed
 
         if (futureEvents.length === 0) {
             container.innerHTML = `
@@ -1355,6 +1388,7 @@ async function loadUserEvents() {
         }
 
         // Renderizar eventos
+        const columnClass = futureEvents.length === 1 ? 'is-12' : 'is-6';
         container.innerHTML = `
             <div class="columns is-multiline">
                 ${futureEvents.map(event => {
@@ -1363,7 +1397,7 @@ async function loadUserEvents() {
                     const canEnroll = event.status === 'abierto' && event.currentParticipants < event.maxParticipants && !isEnrolled;
                     
                     return `
-                        <div class="column is-6">
+                        <div class="column ${columnClass}">
                             <div class="card event-card">
                                 <div class="card-content">
                                     <div class="level is-mobile mb-2">

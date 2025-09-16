@@ -109,6 +109,12 @@
                         <span>Logros</span>
                     </a>
                 </li>
+                <li data-tab="users">
+                    <a>
+                        <span class="icon"><i class="fas fa-users-cog"></i></span>
+                        <span>Gestión de Usuarios</span>
+                    </a>
+                </li>
             </ul>
         </div>
 
@@ -233,15 +239,59 @@
                         <span class="icon"><i class="fas fa-plus"></i></span>
                         <span>Crear Logro</span>
                     </button>
-                    <button class="button is-info is-outlined" onclick="window.debugAdminPanel()">
-                        <span class="icon"><i class="fas fa-bug"></i></span>
-                        <span>Debug</span>
-                    </button>
                 </div>
             </div>
             
             <div class="achievements-grid" id="achievements-grid">
                 <!-- Los logros se cargarán aquí -->
+            </div>
+        </div>
+
+        <!-- Pestaña Gestión de Usuarios -->
+        <div id="users-content" class="tab-content" style="display: none;">
+            <div class="users-header">
+                <h2 class="title is-4">
+                    <span class="icon"><i class="fas fa-users-cog"></i></span>
+                    Gestión de Miembros de Mis Voluntariados
+                </h2>
+                <p class="subtitle is-6 has-text-grey">
+                    Gestiona el estado de los miembros en los voluntariados que administras (Activo/Inactivo)
+                </p>
+                <div class="users-actions">
+                    <button class="button is-primary" onclick="loadUsersData()">
+                        <span class="icon"><i class="fas fa-sync-alt"></i></span>
+                        <span>Actualizar Lista</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="users-filters">
+                <div class="field is-grouped">
+                    <div class="control">
+                        <div class="select">
+                            <select id="status-filter">
+                                <option value="">Todos los estados</option>
+                                <option value="activo">Activos</option>
+                                <option value="inactivo">Inactivos</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="control">
+                        <div class="select">
+                            <select id="voluntariado-filter">
+                                <option value="">Todos los voluntariados</option>
+                                <!-- Las opciones se cargarán dinámicamente -->
+                            </select>
+                        </div>
+                    </div>
+                    <div class="control">
+                        <input class="input" type="text" id="search-users" placeholder="Buscar por email o nombre...">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="users-list" id="users-list">
+                <!-- Los usuarios se cargarán aquí -->
             </div>
         </div>
     </div>
@@ -382,12 +432,11 @@
     </div>
 </div>
 
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 let currentVolunteerId = '';
 let membersData = [];
-let eventsData = [];
-let achievementsData = [];
 
 // Inicializar panel
 document.addEventListener('DOMContentLoaded', function() {
@@ -395,18 +444,18 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 async function initializeAdminPanel() {
-    console.log('🔄 Inicializando panel de administración...');
+    // Debug log removed
     
     // Esperar a que Firebase esté listo
     if (!window.firebaseAuth || !window.firebaseDb) {
-        console.log('⏳ Firebase no está listo, reintentando...');
+        // Debug log removed
         setTimeout(initializeAdminPanel, 1000);
         return;
     }
 
     const user = window.firebaseAuth.currentUser;
     if (!user) {
-        console.log('❌ Usuario no autenticado');
+        // Debug log removed
         showMessage('Debes iniciar sesión para acceder al panel de administración', 'danger');
         return;
     }
@@ -417,7 +466,7 @@ async function initializeAdminPanel() {
     // Configurar pestañas
     setupTabs();
     
-    console.log('✅ Panel de administración inicializado');
+    // Debug log removed
 }
 
 async function loadAdminVolunteers() {
@@ -479,6 +528,9 @@ function setupTabs() {
                 case 'achievements':
                     loadAchievementsData();
                     break;
+                case 'users':
+                    loadUsersData();
+                    break;
             }
         });
     });
@@ -493,7 +545,7 @@ async function loadVolunteerData() {
         return;
     }
     
-    console.log('🔄 Cargando datos del voluntariado:', currentVolunteerId);
+    // Debug log removed
     
     try {
         // Mostrar contenido del panel
@@ -501,6 +553,9 @@ async function loadVolunteerData() {
         
         // Cargar datos generales
         await loadGeneralStats();
+        
+        // También cargar contador de miembros directamente como respaldo
+        await updateMembersCountDirectly();
         
         // Cargar datos de miembros por defecto
         await loadMembersData();
@@ -514,21 +569,91 @@ async function loadVolunteerData() {
 
 async function loadGeneralStats() {
     try {
+        // Debug log removed
+        
+        // Verificar que AdminManager esté disponible
+        if (!window.adminManager) {
+            console.error('❌ AdminManager no está disponible');
+            showMessage('Error: AdminManager no está disponible', 'danger');
+            return;
+        }
+        
         // Usar la nueva función de estadísticas del AdminManager
         const stats = await window.adminManager.getVolunteerStatistics(currentVolunteerId);
+        // Debug log removed
         
         // Actualizar estadísticas generales
-        document.getElementById('total-members').textContent = stats.totalMembers;
-        document.getElementById('total-events').textContent = stats.totalEvents;
-        document.getElementById('total-hours').textContent = stats.totalHours;
+        const totalMembersElement = document.getElementById('total-members');
+        const totalEventsElement = document.getElementById('total-events');
+        const totalHoursElement = document.getElementById('total-hours');
+        
+        if (totalMembersElement) {
+            totalMembersElement.textContent = stats.totalMembers;
+            // Debug log removed
+        } else {
+            console.error('❌ Elemento total-members no encontrado');
+        }
+        
+        if (totalEventsElement) {
+            totalEventsElement.textContent = stats.totalEvents;
+            // Debug log removed
+        } else {
+            console.error('❌ Elemento total-events no encontrado');
+        }
+        
+        if (totalHoursElement) {
+            totalHoursElement.textContent = stats.totalHours;
+            // Debug log removed
+        } else {
+            console.error('❌ Elemento total-hours no encontrado');
+        }
         
         // Guardar datos para uso posterior
         membersData = stats.membersByActivity;
-        eventsData = stats.eventParticipation;
+        // Debug log removed
         
     } catch (error) {
-        console.error('Error loading general stats:', error);
-        showMessage('Error al cargar estadísticas', 'danger');
+        console.error('❌ Error loading general stats:', error);
+        showMessage('Error al cargar estadísticas: ' + error.message, 'danger');
+    }
+}
+
+// Función de respaldo para actualizar el contador de miembros directamente
+async function updateMembersCountDirectly() {
+    try {
+        // Debug log removed
+        
+        if (!currentVolunteerId) {
+            // Debug log removed
+            return;
+        }
+        
+        // Obtener miembros directamente desde Firebase
+        const usersSnapshot = await window.firebaseDb.collection('users').get();
+        let memberCount = 0;
+        
+        usersSnapshot.forEach(doc => {
+            const userData = doc.data();
+            const voluntariados = userData.voluntariados || {};
+            
+            if (voluntariados[currentVolunteerId]) {
+                memberCount++;
+            }
+        });
+        
+        // Debug log removed
+        
+        // Actualizar el contador
+        const totalMembersElement = document.getElementById('total-members');
+        if (totalMembersElement) {
+            totalMembersElement.textContent = memberCount;
+            // Debug log removed
+        } else {
+            console.error('❌ Elemento total-members no encontrado');
+        }
+        
+    } catch (error) {
+        console.error('❌ Error actualizando contador de miembros directamente:', error);
     }
 }
 
@@ -536,11 +661,11 @@ async function loadMembersData() {
     if (!currentVolunteerId) return;
     
     try {
-        console.log('🔄 Cargando miembros del voluntariado:', currentVolunteerId);
+        // Debug log removed
         
         // Obtener miembros directamente usando AdminManager
         const members = await window.adminManager.getVoluntariadoMembers(currentVolunteerId);
-        console.log('📊 Miembros obtenidos:', members);
+        // Debug log removed
         
         const membersList = document.getElementById('members-list');
         
@@ -592,6 +717,7 @@ async function loadMembersData() {
         
         // Guardar miembros para uso posterior
         membersData = members;
+        // Debug log removed
         
     } catch (error) {
         console.error('❌ Error loading members data:', error);
@@ -600,36 +726,73 @@ async function loadMembersData() {
 }
 
 async function loadStatisticsData() {
-    if (!currentVolunteerId) return;
+    if (!currentVolunteerId) {
+        // Debug log removed
+        return;
+    }
+    
+    // Debug log removed
     
     try {
+        // Asegurar que los datos de miembros estén disponibles
+        if (!membersData || membersData.length === 0) {
+            // Debug log removed
+            await loadMembersData();
+        }
+        
         // Crear gráficos
+        // Debug log removed
         createEventsChart();
+        
+        // Debug log removed
         await createHoursChart(); // Ahora es async
+        
+        // Debug log removed
         createActiveMembersChart();
+        
+        // Debug log removed
         createDetailedStatsTable();
         
+        // Debug log removed
+        
     } catch (error) {
-        console.error('Error loading statistics data:', error);
+        console.error('❌ Error loading statistics data:', error);
+        showMessage('Error al cargar estadísticas: ' + error.message, 'danger');
     }
 }
 
 function createEventsChart() {
+    // Debug log removed
     const ctx = document.getElementById('eventsChart').getContext('2d');
     
-    // Usar datos reales
-    const eventParticipation = eventsData.slice(0, 10).map(event => ({
-        name: event.title,
-        participants: event.participants || 0
-    }));
+    // Verificar que AdminManager esté disponible
+    if (!window.adminManager) {
+        console.error('❌ AdminManager no está disponible');
+        ctx.canvas.parentElement.innerHTML = `
+            <div class="has-text-centered py-6">
+                <i class="fas fa-exclamation-triangle fa-3x has-text-warning"></i>
+                <p class="has-text-grey mt-3">Error: AdminManager no está disponible</p>
+            </div>
+        `;
+        return;
+    }
     
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: eventParticipation.map(e => e.name),
+    // Debug log removed
+    // Usar datos reales - obtener desde AdminManager
+    window.adminManager.getVolunteerEvents(currentVolunteerId).then(events => {
+        // Debug log removed
+        const topEvents = events.slice(0, 10).map(event => ({
+            name: event.title,
+            participants: event.participants?.length || 0
+        }));
+    
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: topEvents.map(e => e.name),
             datasets: [{
                 label: 'Participantes',
-                data: eventParticipation.map(e => e.participants),
+                data: topEvents.map(e => e.participants),
                 backgroundColor: '#2989d8',
                 borderColor: '#18559b',
                 borderWidth: 2
@@ -649,6 +812,15 @@ function createEventsChart() {
                 }
             }
         }
+    });
+    }).catch(error => {
+        console.error('Error obteniendo datos de eventos:', error);
+        ctx.canvas.parentElement.innerHTML = `
+            <div class="has-text-centered py-6">
+                <i class="fas fa-exclamation-triangle fa-3x has-text-warning"></i>
+                <p class="has-text-grey mt-3">Error al cargar datos de eventos</p>
+            </div>
+        `;
     });
 }
 
@@ -762,10 +934,15 @@ async function createHoursChart() {
 }
 
 function createActiveMembersChart() {
+    // Debug log removed
     const ctx = document.getElementById('activeMembersChart').getContext('2d');
+    
+    // Debug log removed
+    // Debug log removed
     
     // Verificar que membersData existe y tiene datos
     if (!membersData || membersData.length === 0) {
+        // Debug log removed
         ctx.canvas.parentElement.innerHTML = `
             <div class="has-text-centered py-6">
                 <i class="fas fa-users fa-3x has-text-grey-light"></i>
@@ -775,14 +952,32 @@ function createActiveMembersChart() {
         return;
     }
     
-    // Datos de ejemplo - reemplazar con datos reales
+    // Procesar datos de miembros activos
     const activeMembers = membersData.slice(0, 5).map(member => {
+        // Debug log removed
         const volunteerData = member.voluntariadoData || member.voluntariados?.[currentVolunteerId] || {};
+        const memberName = `${member.firstName || ''} ${member.lastName || ''}`.trim() || member.email;
+        const memberHours = volunteerData.totalHours || 0;
+        
+        // Debug log removed
+        
         return {
-            name: `${member.firstName || ''} ${member.lastName || ''}`.trim() || member.email,
-            hours: volunteerData.totalHours || 0
+            name: memberName,
+            hours: memberHours
         };
-    });
+    }).filter(member => member.hours > 0); // Solo mostrar miembros con horas
+    
+    // Debug log removed
+    
+    if (activeMembers.length === 0) {
+        ctx.canvas.parentElement.innerHTML = `
+            <div class="has-text-centered py-6">
+                <i class="fas fa-chart-pie fa-3x has-text-grey-light"></i>
+                <p class="has-text-grey mt-3">No hay miembros con horas registradas</p>
+            </div>
+        `;
+        return;
+    }
     
     new Chart(ctx, {
         type: 'doughnut',
@@ -815,19 +1010,37 @@ function createActiveMembersChart() {
 }
 
 function createDetailedStatsTable() {
+    // Debug log removed
     const tableBody = document.getElementById('detailed-stats-table');
     
+    if (!tableBody) {
+        console.error('❌ Elemento detailed-stats-table no encontrado');
+        return;
+    }
+    
+    if (!membersData || membersData.length === 0) {
+        // Debug log removed
+        tableBody.innerHTML = '<tr><td colspan="5" class="has-text-centered">No hay datos disponibles</td></tr>';
+        return;
+    }
+    
+    // Debug log removed
     tableBody.innerHTML = membersData.map(member => {
-        const volunteerData = member.voluntariados[currentVolunteerId] || {};
+        // Debug log removed
+        const volunteerData = member.voluntariadoData || member.voluntariados?.[currentVolunteerId] || {};
         const eventsCompleted = volunteerData.eventsCompleted || 0;
         const totalHours = volunteerData.totalHours || 0;
         const lastEvent = volunteerData.lastEventDate ? volunteerData.lastEventDate.toDate() : null;
         const status = eventsCompleted > 0 ? 'Activo' : 'Inactivo';
         
+        // Debug log removed
+        
+        const memberName = `${member.firstName || ''} ${member.lastName || ''}`.trim() || member.email;
+        
         return `
             <tr>
                 <td>
-                    <strong>${member.firstName || ''} ${member.lastName || ''}</strong><br>
+                    <strong>${memberName}</strong><br>
                     <small class="has-text-grey">${member.email}</small>
                 </td>
                 <td><span class="tag is-primary">${eventsCompleted}</span></td>
@@ -845,7 +1058,7 @@ async function loadHoursData() {
     if (!currentVolunteerId) return;
     
     try {
-        console.log('🔄 Cargando datos de horas del voluntariado:', currentVolunteerId);
+        // Debug log removed
         
         const hoursList = document.getElementById('hours-list');
         
@@ -907,15 +1120,15 @@ async function loadAchievementsData() {
     if (!currentVolunteerId) return;
     
     try {
-        console.log('🔄 Cargando logros para voluntariado:', currentVolunteerId);
+        // Debug log removed
         const achievementsGrid = document.getElementById('achievements-grid');
         
         // Obtener logros del voluntariado
-        achievementsData = await window.adminManager.getVolunteerAchievements(currentVolunteerId);
-        console.log('📊 Logros obtenidos:', achievementsData);
+        const achievementsData = await window.adminManager.getVolunteerAchievements(currentVolunteerId);
+        // Debug log removed
         
         if (!achievementsData || achievementsData.length === 0) {
-            console.log('⚠️ No se encontraron logros para el voluntariado:', currentVolunteerId);
+            // Debug log removed
             achievementsGrid.innerHTML = `
                 <div class="has-text-centered py-6" style="grid-column: 1 / -1;">
                     <i class="fas fa-trophy fa-3x has-text-grey-light"></i>
@@ -1005,7 +1218,7 @@ async function showAddHoursModal() {
     
     // Si no hay datos de miembros, cargarlos
     if (!membersData || membersData.length === 0) {
-        console.log('🔄 Cargando datos de miembros para el modal...');
+        // Debug log removed
         try {
             await loadMembersData();
         } catch (error) {
@@ -1029,7 +1242,7 @@ function populateMembersSelect() {
     select.innerHTML = '<option value="">Selecciona un miembro...</option>';
     
     if (!membersData || membersData.length === 0) {
-        console.log('⚠️ No hay datos de miembros para poblar el select');
+        // Debug log removed
         return;
     }
     
@@ -1043,7 +1256,7 @@ function populateMembersSelect() {
 
 async function addHours() {
     try {
-        console.log('🔄 Agregando horas...');
+        // Debug log removed
         
         const memberId = document.getElementById('hours-member-select').value;
         const event = document.getElementById('hours-event').value.trim();
@@ -1073,7 +1286,7 @@ async function addHours() {
             comments: comments
         });
         
-        console.log('✅ Horas agregadas:', result);
+        // Debug log removed
         showMessage('Horas agregadas exitosamente', 'success');
         closeModal();
         
@@ -1092,7 +1305,7 @@ async function addHours() {
 
 async function createAchievement() {
     try {
-        console.log('🔄 Creando logro...');
+        // Debug log removed
         
         const name = document.getElementById('achievement-name').value.trim();
         const description = document.getElementById('achievement-description').value.trim();
@@ -1125,7 +1338,7 @@ async function createAchievement() {
             icon: icon
         });
         
-        console.log('✅ Logro creado:', result);
+        // Debug log removed
         showMessage('Logro creado exitosamente', 'success');
         closeModal();
         
@@ -1143,7 +1356,7 @@ async function createAchievement() {
 
 function viewMemberDetails(memberId) {
     // Implementar vista de detalles del miembro
-    console.log('Ver detalles del miembro:', memberId);
+    // Debug log removed
 }
 
 function addHoursToMember(memberId) {
@@ -1164,7 +1377,7 @@ function showAddHoursModalForMember(memberId) {
 
 async function viewHoursHistory(memberId) {
     try {
-        console.log('🔄 Obteniendo historial de horas del miembro:', memberId);
+        // Debug log removed
         
         if (!currentVolunteerId) {
             showMessage('No hay voluntariado seleccionado', 'warning');
@@ -1184,7 +1397,7 @@ async function viewHoursHistory(memberId) {
 
 async function viewAchievementDetails(achievementId) {
     try {
-        console.log('🔍 Ver detalles del logro:', achievementId);
+        // Debug log removed
         
         if (!window.adminManager) {
             showMessage('AdminManager no está disponible', 'danger');
@@ -1202,7 +1415,7 @@ async function viewAchievementDetails(achievementId) {
 
 async function assignAchievement(achievementId) {
     try {
-        console.log('🎯 Asignar logro:', achievementId);
+        // Debug log removed
         
         if (!currentVolunteerId) {
             showMessage('No hay voluntariado seleccionado', 'warning');
@@ -1226,7 +1439,7 @@ async function assignAchievement(achievementId) {
 
 async function deleteAchievement(achievementId) {
     try {
-        console.log('🗑️ Eliminar logro:', achievementId);
+        // Debug log removed
         
         if (!window.adminManager) {
             showMessage('AdminManager no está disponible', 'danger');
@@ -1250,32 +1463,7 @@ async function deleteAchievement(achievementId) {
     }
 }
 
-function exportMembersData() {
-    // Implementar exportación de datos
-    console.log('Exportando datos de miembros...');
-    showMessage('Función de exportación próximamente', 'info');
-}
 
-// FUNCIÓN DE DEBUGGING: Recargar logros manualmente
-async function debugReloadAchievements() {
-    try {
-        console.log('🔍 DEBUGGING: Recargando logros...');
-        console.log('Voluntariado actual:', currentVolunteerId);
-        
-        // Ver todos los logros en Firestore
-        const allAchievements = await window.debugAchievements();
-        console.log('📊 Todos los logros en Firestore:', allAchievements);
-        
-        // Recargar logros del voluntariado actual
-        await loadAchievementsData();
-        
-        showMessage('Logros recargados. Revisa la consola para más detalles.', 'info');
-        
-    } catch (error) {
-        console.error('❌ Error en debug:', error);
-        showMessage('Error en debugging: ' + error.message, 'danger');
-    }
-}
 
 function showHoursHistoryModal(historyData) {
     const modal = document.createElement('div');
@@ -1580,82 +1768,287 @@ async function confirmAssignAchievement(achievementId) {
     }
 }
 
-// Exponer función de debugging globalmente
-window.debugReloadAchievements = debugReloadAchievements;
+// Gestión de usuarios
+let allUsersData = [];
 
-// Función de debugging completa para el panel de administración
-window.debugAdminPanel = async function() {
-    console.log('🔍 === DEBUGGING COMPLETO DEL PANEL ADMIN ===');
-    
-    // 1. Verificar AdminManager
-    console.log('1. Verificando AdminManager...');
-    console.log('AdminManager disponible:', !!window.adminManager);
-    console.log('getHoursByActivity:', typeof window.adminManager?.getHoursByActivity);
-    console.log('getVolunteerAchievements:', typeof window.adminManager?.getVolunteerAchievements);
-    console.log('addHoursToMember:', typeof window.adminManager?.addHoursToMember);
-    
-    // 2. Verificar voluntariado actual
-    console.log('2. Voluntariado actual:', currentVolunteerId);
-    
-    // 3. Verificar todos los logros en Firestore
-    console.log('3. Verificando logros en Firestore...');
+async function loadUsersData() {
     try {
-        const allAchievements = await window.debugAchievements();
-        console.log('Total logros en Firestore:', allAchievements.length);
+        // Debug log removed
         
-        // Filtrar logros del voluntariado actual
-        const currentVolunteerAchievements = allAchievements.filter(a => a.voluntariadoId === currentVolunteerId);
-        console.log('Logros del voluntariado actual:', currentVolunteerAchievements.length);
-        currentVolunteerAchievements.forEach(a => {
-            console.log(`🏆 ${a.name} (${a.id}) - Activo: ${a.isActive}`);
+        // Verificar si el usuario actual es administrador
+        const currentUser = firebase.auth().currentUser;
+        if (!currentUser) {
+            showMessage('Error: Usuario no autenticado', 'danger');
+            return;
+        }
+        
+        // Verificar si el usuario actual es administrador usando el sistema existente
+        if (!window.adminManager) {
+            showMessage('Error: AdminManager no está disponible', 'danger');
+            return;
+        }
+        
+        const isAdmin = await window.adminManager.isUserAdmin();
+        if (!isAdmin) {
+            showMessage('Error: No tienes permisos de administrador', 'danger');
+            return;
+        }
+        
+        // Obtener usuarios directamente desde Firebase
+        if (!window.firebaseDb) {
+            showMessage('Error: Firebase no está disponible', 'danger');
+            return;
+        }
+        
+        // Obtener voluntariados que administra el usuario actual
+        const adminVoluntariados = await getAdminVoluntariados(currentUser.uid);
+        
+        if (adminVoluntariados.length === 0) {
+            showMessage('No administras ningún voluntariado', 'warning');
+            allUsersData = [];
+            displayUsers([]);
+            return;
+        }
+        
+        const usersSnapshot = await window.firebaseDb.collection('users').get();
+        
+        const members = [];
+        
+        // Obtener nombres de voluntariados que administra
+        const voluntariadosNames = {};
+        for (const voluntariadoId of adminVoluntariados) {
+            const voluntariadoDoc = await window.firebaseDb.collection('voluntariados').doc(voluntariadoId).get();
+            if (voluntariadoDoc.exists) {
+                voluntariadosNames[voluntariadoId] = voluntariadoDoc.data().name || voluntariadoId;
+            }
+        }
+        
+        usersSnapshot.forEach(doc => {
+            const userData = doc.data();
+            const voluntariados = userData.voluntariados || {};
+            
+            // Solo incluir usuarios que pertenecen a voluntariados que administra el usuario actual
+            Object.keys(voluntariados).forEach(voluntariadoId => {
+                if (adminVoluntariados.includes(voluntariadoId)) {
+                    const voluntariadoData = voluntariados[voluntariadoId];
+                    
+                    members.push({
+                        id: `${doc.id}_${voluntariadoId}`,
+                        firebase_uid: doc.id,
+                        email: userData.email || '',
+                        nombre: userData.firstName || '',
+                        apellido: userData.lastName || '',
+                        voluntariado_id: voluntariadoId,
+                        voluntariado_name: voluntariadosNames[voluntariadoId] || voluntariadoId,
+                        estado: voluntariadoData.status || 'inactivo',
+                        rol: userData.role || 'usuario',
+                        fecha_registro: voluntariadoData.joinedAt ? voluntariadoData.joinedAt.toDate().toISOString() : new Date().toISOString(),
+                        total_horas: voluntariadoData.totalHours || 0,
+                        eventos_completados: voluntariadoData.eventsCompleted || 0
+                    });
+                }
+            });
         });
+        
+        allUsersData = members;
+        
+        // Actualizar el filtro de voluntariados
+        updateVoluntariadoFilter(adminVoluntariados, voluntariadosNames);
+        
+        displayUsers(allUsersData);
+        
     } catch (error) {
-        console.error('Error obteniendo logros:', error);
+        console.error('❌ Error cargando miembros:', error);
+        showMessage('Error al cargar miembros: ' + error.message, 'danger');
     }
-    
-    // 4. Verificar datos de miembros
-    console.log('4. Datos de miembros:', membersData?.length || 0);
-    
-    // 5. Recargar logros
-    console.log('5. Recargando logros...');
-    await loadAchievementsData();
-    
-    console.log('✅ Debugging completo terminado');
-};
+}
 
-// Función específica para debugging del historial de horas
-window.debugHoursHistory = async function(memberId) {
-    console.log('🔍 === DEBUGGING HISTORIAL DE HORAS ===');
+// Función para obtener los voluntariados que administra el usuario actual
+async function getAdminVoluntariados(userUid) {
+    try {
+        const voluntariadosSnapshot = await window.firebaseDb.collection('voluntariados').get();
+        const adminVoluntariados = [];
+        
+        voluntariadosSnapshot.forEach(doc => {
+            const voluntariadoData = doc.data();
+            const adminUids = voluntariadoData.adminUids || [];
+            
+            if (adminUids.includes(userUid)) {
+                adminVoluntariados.push(doc.id);
+            }
+        });
+        
+        return adminVoluntariados;
+    } catch (error) {
+        console.error('❌ Error obteniendo voluntariados del admin:', error);
+        return [];
+    }
+}
+
+// Función para actualizar el filtro de voluntariados
+function updateVoluntariadoFilter(adminVoluntariados, voluntariadosNames) {
+    const voluntariadoFilter = document.getElementById('voluntariado-filter');
+    if (!voluntariadoFilter) return;
     
-    if (!memberId) {
-        console.error('❌ No se proporcionó memberId');
+    // Limpiar opciones existentes (excepto la primera)
+    voluntariadoFilter.innerHTML = '<option value="">Todos los voluntariados</option>';
+    
+    // Agregar opciones para los voluntariados que administra
+    adminVoluntariados.forEach(voluntariadoId => {
+        const option = document.createElement('option');
+        option.value = voluntariadoId;
+        option.textContent = voluntariadosNames[voluntariadoId] || voluntariadoId;
+        voluntariadoFilter.appendChild(option);
+    });
+    
+}
+
+
+function displayUsers(users) {
+    const usersList = document.getElementById('users-list');
+    
+    if (!users || users.length === 0) {
+        usersList.innerHTML = `
+            <div class="has-text-centered py-6">
+                <i class="fas fa-users fa-3x has-text-grey-light"></i>
+                <p class="has-text-grey mt-3">No hay miembros de voluntariados registrados</p>
+            </div>
+        `;
         return;
     }
     
+    usersList.innerHTML = users.map(user => {
+        const statusClass = user.estado === 'activo' ? 'is-success' : 
+                           user.estado === 'inactivo' ? 'is-warning' : 'is-danger';
+        const roleClass = user.rol === 'admin' ? 'is-primary' : 'is-light';
+        
+        return `
+            <div class="user-card">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-details">
+                        <h4 class="title is-5">${user.nombre || ''} ${user.apellido || ''}</h4>
+                        <p class="subtitle is-6">${user.email}</p>
+                        <div class="user-meta">
+                            <span class="tag is-info">${user.voluntariado_name}</span>
+                            <span class="tag ${statusClass}">${user.estado}</span>
+                            <span class="tag ${roleClass}">${user.rol}</span>
+                            <span class="has-text-grey">
+                                Se unió: ${new Date(user.fecha_registro).toLocaleDateString()}
+                            </span>
+                            <span class="has-text-grey">
+                                Horas: ${user.total_horas} | Eventos: ${user.eventos_completados}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="user-actions">
+                    <div class="field">
+                        <div class="control">
+                            <div class="select is-small">
+                                <select onchange="changeMemberStatus('${user.firebase_uid}', '${user.voluntariado_id}', this.value)">
+                                    <option value="activo" ${user.estado === 'activo' ? 'selected' : ''}>Activo</option>
+                                    <option value="inactivo" ${user.estado === 'inactivo' ? 'selected' : ''}>Inactivo</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+async function changeMemberStatus(userUid, voluntariadoId, newStatus) {
     try {
-        console.log('1. Verificando AdminManager...');
-        console.log('AdminManager disponible:', !!window.adminManager);
-        console.log('getMemberHoursHistory:', typeof window.adminManager?.getMemberHoursHistory);
         
-        console.log('2. Voluntariado actual:', currentVolunteerId);
+        // Verificar si el usuario actual es administrador usando el sistema existente
+        if (!window.adminManager) {
+            showMessage('Error: AdminManager no está disponible', 'danger');
+            return;
+        }
         
-        console.log('3. Obteniendo historial de horas...');
-        const historyData = await window.adminManager.getMemberHoursHistory(memberId, currentVolunteerId);
+        const isAdmin = await window.adminManager.isUserAdmin();
+        if (!isAdmin) {
+            showMessage('Error: No tienes permisos de administrador', 'danger');
+            return;
+        }
         
-        console.log('✅ Historial obtenido exitosamente:');
-        console.log('Total horas:', historyData.totalHours);
-        console.log('Número de entradas:', historyData.history.length);
-        console.log('Información del miembro:', historyData.memberInfo);
-        console.log('Historial completo:', historyData.history);
+        // Actualizar el estado del miembro en el voluntariado específico
+        if (!window.firebaseDb) {
+            showMessage('Error: Firebase no está disponible', 'danger');
+            return;
+        }
         
-        // Mostrar modal con el historial
-        showHoursHistoryModal(historyData);
+        // Actualizar el estado del miembro en el voluntariado específico
+        const userRef = window.firebaseDb.collection('users').doc(userUid);
+        await userRef.update({
+            [`voluntariados.${voluntariadoId}.status`]: newStatus,
+            [`voluntariados.${voluntariadoId}.updatedAt`]: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        showMessage(`Estado del miembro actualizado a ${newStatus}`, 'success');
+        
+        // Recargar la lista de usuarios
+        await loadUsersData();
         
     } catch (error) {
-        console.error('❌ Error en debugging de historial:', error);
-        console.error('Stack trace:', error.stack);
+        console.error('❌ Error cambiando estado del miembro:', error);
+        showMessage('Error al cambiar estado del miembro: ' + error.message, 'danger');
     }
-};
+}
+
+
+
+
+// Configurar filtros
+document.addEventListener('DOMContentLoaded', function() {
+    const statusFilter = document.getElementById('status-filter');
+    const voluntariadoFilter = document.getElementById('voluntariado-filter');
+    const searchInput = document.getElementById('search-users');
+    
+    if (statusFilter) {
+        statusFilter.addEventListener('change', filterUsers);
+    }
+    
+    if (voluntariadoFilter) {
+        voluntariadoFilter.addEventListener('change', filterUsers);
+    }
+    
+    if (searchInput) {
+        searchInput.addEventListener('input', filterUsers);
+    }
+});
+
+function filterUsers() {
+    const statusFilter = document.getElementById('status-filter')?.value || '';
+    const voluntariadoFilter = document.getElementById('voluntariado-filter')?.value || '';
+    const searchTerm = document.getElementById('search-users')?.value.toLowerCase() || '';
+    
+    let filteredUsers = allUsersData;
+    
+    if (statusFilter) {
+        filteredUsers = filteredUsers.filter(user => user.estado === statusFilter);
+    }
+    
+    if (voluntariadoFilter) {
+        filteredUsers = filteredUsers.filter(user => user.voluntariado_id === voluntariadoFilter);
+    }
+    
+    if (searchTerm) {
+        filteredUsers = filteredUsers.filter(user => 
+            user.email.toLowerCase().includes(searchTerm) ||
+            (user.nombre && user.nombre.toLowerCase().includes(searchTerm)) ||
+            (user.apellido && user.apellido.toLowerCase().includes(searchTerm))
+        );
+    }
+    
+    displayUsers(filteredUsers);
+}
+
+
 </script>
 
 <style>
@@ -2092,6 +2485,89 @@ window.debugHoursHistory = async function(memberId) {
     font-size: 0.875rem;
 }
 
+/* Estilos para gestión de usuarios */
+.users-header, .users-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.users-filters {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.user-card {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 4px solid #2989d8;
+    transition: transform 0.2s ease;
+}
+
+.user-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.user-avatar {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #2989d8, #18559b);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.user-details h4 {
+    margin-bottom: 0.25rem;
+    color: #2c3e50;
+}
+
+.user-details .subtitle {
+    color: #7f8c8d;
+    margin-bottom: 0.5rem;
+}
+
+.user-meta {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.user-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.user-actions .field {
+    margin-bottom: 0;
+}
+
+.user-actions .select {
+    min-width: 120px;
+}
+
 /* Responsive para funcionalidades de logros */
 @media (max-width: 768px) {
     .achievement-actions {
@@ -2110,6 +2586,28 @@ window.debugHoursHistory = async function(memberId) {
     .back-button {
         font-size: 0.8rem;
         padding: 0.5rem 1rem;
+    }
+    
+    /* Responsive para gestión de usuarios */
+    .users-header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .user-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .user-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+    
+    .user-meta {
+        justify-content: center;
     }
 }
 </style>

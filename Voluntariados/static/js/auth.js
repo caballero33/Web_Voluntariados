@@ -25,7 +25,7 @@ class AuthManager {
                 this.currentUser = user;
                 this.updateUI(user);
                 this.isReady = true;
-                console.log('🔐 Auth state changed:', user ? `User: ${user.email}` : 'No user');
+                // Auth state changed
             });
         }
     }
@@ -38,7 +38,10 @@ class AuthManager {
             // Save additional user data to Firestore
             await this.saveUserData(user.uid, userData);
             
-            this.showMessage('¡Registro exitoso! Bienvenido a Voluntariados.', 'success');
+            // Register user in Django system with inactive status
+            await this.registerUserInDjango(user.uid, email, userData);
+            
+            this.showMessage('¡Registro exitoso! Tu cuenta está pendiente de activación.', 'success');
             return user;
         } catch (error) {
             this.showMessage(this.getErrorMessage(error.code), 'error');
@@ -50,6 +53,9 @@ class AuthManager {
         try {
             const userCredential = await window.firebaseAuth.signInWithEmailAndPassword(email, password);
             const user = userCredential.user;
+            
+            // Check user status in Django system
+            await this.checkUserStatus(user.uid);
             
             this.showMessage('¡Bienvenido de nuevo!', 'success');
             return user;
@@ -142,6 +148,152 @@ class AuthManager {
         notification.querySelector('.delete').onclick = () => {
             notification.remove();
         };
+    }
+
+    async registerUserInDjango(uid, email, userData) {
+        try {
+            // Debug log removed
+            
+            // Guardar usuario en Firebase con estado inactivo por defecto
+            await window.firebaseDb.collection('users').doc(uid).set({
+                email: email,
+                nombre: userData.nombre || '',
+                apellido: userData.apellido || '',
+                estado: 'inactivo',  // Estado inicial inactivo
+                rol: 'usuario',      // Rol por defecto
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            
+            // Debug log removed
+            return { success: true, message: 'Usuario registrado exitosamente' };
+            
+        } catch (error) {
+            console.error('❌ Error al registrar usuario en Firebase:', error);
+            return { success: false, message: error.message };
+        }
+    }
+
+    async checkUserStatus(uid) {
+        try {
+            // Debug log removed
+            
+            // Obtener datos del usuario desde Firebase
+            const userDoc = await window.firebaseDb.collection('users').doc(uid).get();
+            
+            if (userDoc.exists) {
+                const userData = userDoc.data();
+                const user = {
+                    id: userDoc.id,
+                    firebase_uid: userDoc.id,
+                    email: userData.email || '',
+                    nombre: userData.nombre || '',
+                    apellido: userData.apellido || '',
+                    estado: userData.estado || 'inactivo',
+                    rol: userData.rol || 'usuario',
+                    can_access: (userData.estado || 'inactivo') === 'activo'
+                };
+                
+                // Debug log removed
+                
+                // Si el usuario no está activo, redirigir a página de estado inactivo
+                if (!user.can_access) {
+                    window.location.href = '/auth/inactive-user/';
+                    return false;
+                }
+                
+                // Si es admin, permitir acceso al panel de administración
+                if (user.rol === 'admin') {
+                    // Debug log removed
+                }
+                
+                return user;
+            } else {
+                console.warn('⚠️ Usuario no encontrado en Firebase');
+                // Si el usuario no está en Firebase, redirigir a registro
+                return null;
+            }
+        } catch (error) {
+            console.error('❌ Error al verificar estado del usuario en Firebase:', error);
+            return null;
+        }
+    }
+
+    async updateUserStatus(targetUid, newStatus, newRole = null) {
+        try {
+            const user = firebase.auth().currentUser;
+            if (!user) {
+                throw new Error('No hay usuario autenticado');
+            }
+            
+            // Debug log removed
+            
+            // Verificar que el usuario actual es administrador
+            const currentUserDoc = await window.firebaseDb.collection('users').doc(user.uid).get();
+            if (!currentUserDoc.exists || currentUserDoc.data().rol !== 'admin') {
+                throw new Error('No tienes permisos de administrador');
+            }
+            
+            // Actualizar el usuario en Firebase
+            const updateData = {};
+            if (newStatus) {
+                updateData.estado = newStatus;
+            }
+            if (newRole) {
+                updateData.rol = newRole;
+            }
+            updateData.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+            
+            await window.firebaseDb.collection('users').doc(targetUid).update(updateData);
+            
+            // Debug log removed
+            this.showMessage('Estado actualizado exitosamente', 'success');
+            return { success: true };
+            
+        } catch (error) {
+            console.error('❌ Error al actualizar estado en Firebase:', error);
+            this.showMessage('Error al actualizar estado del usuario: ' + error.message, 'error');
+            return { success: false, message: error.message };
+        }
+    }
+
+    async getAllUsers() {
+        try {
+            const user = firebase.auth().currentUser;
+            if (!user) {
+                throw new Error('No hay usuario autenticado');
+            }
+            
+            // Debug log removed
+            
+            // Obtener usuarios desde la colección 'users' en Firestore
+            const usersSnapshot = await window.firebaseDb.collection('users').get();
+            
+            const users = [];
+            usersSnapshot.forEach(doc => {
+                const userData = doc.data();
+                users.push({
+                    id: doc.id,
+                    firebase_uid: doc.id,
+                    email: userData.email || '',
+                    nombre: userData.nombre || '',
+                    apellido: userData.apellido || '',
+                    estado: userData.estado || 'inactivo',
+                    rol: userData.rol || 'usuario',
+                    fecha_registro: userData.createdAt ? userData.createdAt.toDate().toISOString() : new Date().toISOString(),
+                    fecha_ultima_actividad: userData.lastLogin ? userData.lastLogin.toDate().toISOString() : new Date().toISOString(),
+                    voluntariados: userData.voluntariados || []
+                });
+            });
+            
+            // Debug log removed
+            return users;
+            
+        } catch (error) {
+            console.error('❌ Error al obtener usuarios desde Firebase:', error);
+            this.showMessage('Error al obtener lista de usuarios desde Firebase', 'error');
+            return [];
+        }
     }
 
     getErrorMessage(errorCode) {

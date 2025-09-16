@@ -22,22 +22,28 @@ class VoluntariadosManager {
     setupFirestore() {
         this.db = window.firebaseDb;
         this.currentUser = window.firebaseAuth.currentUser;
-        console.log('🎯 VoluntariadosManager inicializado');
+        // VoluntariadosManager inicializado
     }
 
     // Obtener todos los voluntariados
     async getAllVoluntariados() {
-        if (!this.db) return [];
+        if (!this.db) {
+            return [];
+        }
 
         try {
             const snapshot = await this.db.collection('voluntariados').get();
-            this.voluntariados = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
+            
+            this.voluntariados = snapshot.docs.map(doc => {
+                const data = doc.data();
+                return {
+                    id: doc.id,
+                    ...data
+                };
+            });
+            
             return this.voluntariados;
         } catch (error) {
-            console.error('❌ Error obteniendo voluntariados:', error);
             return [];
         }
     }
@@ -94,7 +100,7 @@ class VoluntariadosManager {
                     ...userVoluntariados,
                     [voluntariado.id]: {
                         joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                        status: 'activo',
+                        status: 'inactivo',
                         totalHours: 0,
                         eventsCompleted: 0
                     }
@@ -113,7 +119,7 @@ class VoluntariadosManager {
 
             return {
                 success: true,
-                message: `¡Bienvenido a ${voluntariado.name}!`,
+                message: `¡Te has unido a ${voluntariado.name}! Tu cuenta está pendiente de activación por un administrador.`,
                 voluntariado: voluntariado
             };
 
@@ -241,7 +247,7 @@ class VoluntariadosManager {
                     }
                 }, { merge: true });
 
-                console.log(`🏆 Logro otorgado: ${achievement.name}`);
+                // Debug log removed
                 
                 // Mostrar notificación
                 this.showAchievementNotification(achievement);
@@ -332,10 +338,10 @@ window.voluntariadosManager = new VoluntariadosManager();
 
 // Función de debug para verificar el estado
 window.debugAuth = function() {
-    console.log('=== DEBUG AUTH ===');
-    console.log('Firebase Auth:', window.firebaseAuth);
-    console.log('Usuario actual:', window.firebaseAuth?.currentUser);
-    console.log('Firebase DB:', window.firebaseDb);
-    console.log('VoluntariadosManager:', window.voluntariadosManager);
-    console.log('==================');
+    // Debug log removed
+    // Debug log removed
+    // Debug log removed
+    // Debug log removed
+    // Debug log removed
+    // Debug log removed
 };

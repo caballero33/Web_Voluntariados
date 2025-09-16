@@ -27,9 +27,7 @@ function initializeFirebase() {
         window.firebaseAuth = auth;
         window.firebaseDb = db;
 
-        console.log('✅ Firebase initialized successfully');
-        console.log('🔐 Firebase Auth ready:', auth);
-        console.log('📊 Firestore DB ready:', db);
+        // Firebase initialized successfully
         
         // Trigger custom event to notify other scripts Firebase is ready
         window.dispatchEvent(new CustomEvent('firebaseReady'));

@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Usuario Inactivo - Voluntariados UNAH{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="columns is-centered">
+        <div class="column is-8">
+            <div class="box-content has-text-centered">
+                <div class="notification is-warning">
+                    <h1 class="title is-3 has-text-dark">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Cuenta Inactiva
+                    </h1>
+                </div>
+                
+                <div class="content">
+                    <p class="subtitle is-5">
+                        Tu cuenta está actualmente <strong>inactiva</strong> y no puedes acceder a la información de los voluntariados.
+                    </p>
+                    
+                    <div class="notification is-info">
+                        <h2 class="subtitle is-4">¿Qué significa esto?</h2>
+                        <ul class="has-text-left">
+                            <li>• Tu registro fue exitoso, pero tu cuenta necesita ser activada</li>
+                            <li>• Solo los administradores pueden activar tu cuenta</li>
+                            <li>• Una vez activada, podrás acceder a todos los voluntariados</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="notification is-light">
+                        <h2 class="subtitle is-4">¿Qué puedes hacer?</h2>
+                        <ul class="has-text-left">
+                            <li>• Contacta a un administrador para activar tu cuenta</li>
+                            <li>• Espera a que tu cuenta sea revisada y activada</li>
+                            <li>• Una vez activada, recibirás acceso completo al sistema</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="buttons is-centered">
+                        <button class="button is-primary" onclick="checkUserStatus()">
+                            <span class="icon">
+                                <i class="fas fa-sync-alt"></i>
+                            </span>
+                            <span>Verificar Estado</span>
+                        </button>
+                        
+                        <a href="{% url 'auth:login' %}" class="button is-light">
+                            <span class="icon">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </span>
+                            <span>Volver al Login</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Función para verificar el estado del usuario
+async function checkUserStatus() {
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        alert('No hay usuario autenticado');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/auth/api/get-user-status/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                uid: user.uid
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            if (data.user.estado === 'activo') {
+                alert('¡Tu cuenta ha sido activada! Redirigiendo al dashboard...');
+                window.location.href = '/auth/dashboard/';
+            } else {
+                alert(`Tu cuenta sigue ${data.user.estado}. Contacta a un administrador.`);
+            }
+        } else {
+            alert('Error al verificar el estado: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al verificar el estado del usuario');
+    }
+}
+
+// Verificar estado automáticamente cada 30 segundos
+setInterval(checkUserStatus, 30000);
+</script>
+{% endblock %}
