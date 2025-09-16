@@ -17,4 +17,12 @@ def voluntariados(request):
     return render(request, 'voluntariados.html')
 
 def errores(request):
-    return render(request, 'errores.html')
+    context = {
+        "enlace_inicio": reverse('home'),
+        "enlace_soporte": "mailto:l.ivanhdz23@gmail.com"
+    }
+    return render(request, 'errores.html', context)
+
+def unirse(request):
+    
+    return render(request, 'unirse.html')
