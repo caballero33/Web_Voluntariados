@@ -121,12 +121,80 @@ document.addEventListener('DOMContentLoaded', function() {
     loadUserVoluntariados();
 });
 
+// Función de diagnóstico para verificar voluntariados
+window.debugVoluntariados = async function() {
+    // Debug log removed
+    
+    try {
+        // 1. Verificar VoluntariadosManager
+        if (!window.voluntariadosManager) {
+            // Debug log removed
+            return;
+        }
+        // Debug log removed
+        
+        // 2. Verificar Firestore
+        if (!window.firebaseDb) {
+            // Debug log removed
+            return;
+        }
+        // Debug log removed
+        
+        // 3. Consultar voluntariados directamente
+        // Debug log removed
+        const snapshot = await window.firebaseDb.collection('voluntariados').get();
+        // Debug log removed
+        
+        if (snapshot.empty) {
+            // Debug log removed
+            return;
+        }
+        
+        // 4. Mostrar voluntariados encontrados
+        snapshot.docs.forEach((doc, index) => {
+            const data = doc.data();
+            // Debug log removed
+        });
+        
+        // 5. Probar función getAllVoluntariados
+        // Debug log removed
+        const voluntariados = await window.voluntariadosManager.getAllVoluntariados();
+        // Debug log removed
+        
+    } catch (error) {
+        console.error('❌ Error en diagnóstico:', error);
+    }
+    
+    // Debug log removed
+};
+
 async function loadAvailableVoluntariados() {
     try {
+        // Debug log removed
+        
+        // Verificar que VoluntariadosManager esté disponible
+        if (!window.voluntariadosManager) {
+            console.error('❌ VoluntariadosManager no está disponible');
+            const container = document.getElementById('voluntariados-list');
+            if (container) {
+                container.innerHTML = '<p class="has-text-danger">Error: VoluntariadosManager no está disponible</p>';
+            }
+            return;
+        }
+        
+        // Debug log removed
         const voluntariados = await window.voluntariadosManager.getAllVoluntariados();
+        // Debug log removed
+        
         const container = document.getElementById('voluntariados-list');
         
+        if (!container) {
+            console.error('❌ Container voluntariados-list no encontrado');
+            return;
+        }
+        
         if (voluntariados.length === 0) {
+            // Debug log removed
             container.innerHTML = '<p class="has-text-grey">No hay voluntariados disponibles.</p>';
             return;
         }
@@ -176,8 +244,20 @@ async function loadAvailableVoluntariados() {
             </div>
         `).join('');
         
+        // Debug log removed
+        
     } catch (error) {
-        console.error('Error cargando voluntariados:', error);
+        console.error('❌ Error cargando voluntariados:', error);
+        const container = document.getElementById('voluntariados-list');
+        if (container) {
+            container.innerHTML = `
+                <div class="column is-12">
+                    <div class="notification is-danger">
+                        <p class="has-text-white">Error al cargar voluntariados: ${error.message}</p>
+                    </div>
+                </div>
+            `;
+        }
     }
 }
 
