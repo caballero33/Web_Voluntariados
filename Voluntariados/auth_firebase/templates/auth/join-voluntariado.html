@@ -7,6 +7,14 @@
     <div class="column is-half">
         <div class="box-content">
             <div class="has-text-centered mb-6">
+                <div class="mb-4">
+                    <a href="{% url 'auth:dashboard' %}" class="button is-light is-small back-button">
+                        <span class="icon">
+                            <i class="fas fa-arrow-left"></i>
+                        </span>
+                        <span>Regresar</span>
+                    </a>
+                </div>
                 <h1 class="title is-2 has-text-primary">
                     <i class="fas fa-users mr-3"></i>Unirse a Voluntariados
                 </h1>
@@ -350,12 +358,38 @@ function viewVoluntariadoDetails(voluntariadoId) {
     margin: 0 0.25rem;
 }
 
+/* Estilos para el botón de navegación */
+.back-button {
+    background-color: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    transition: all 0.3s ease;
+    border-radius: 20px;
+    font-weight: 500;
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+}
+
+.back-button:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.4);
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.back-button .icon {
+    margin-right: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.back-button span:not(.icon) {
+    font-size: 0.875rem;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
-    .level.is-mobile .level-item {
-        margin: 0.5rem 0;
-    }
-    
     .buttons.is-centered {
         flex-direction: column;
     }
@@ -363,6 +397,11 @@ function viewVoluntariadoDetails(voluntariadoId) {
     .buttons .button {
         margin: 0.25rem 0;
         width: 100%;
+    }
+    
+    .back-button {
+        font-size: 0.8rem;
+        padding: 0.5rem 1rem;
     }
 }
 </style>

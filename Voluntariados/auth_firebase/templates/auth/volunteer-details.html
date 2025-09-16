@@ -162,7 +162,21 @@
                                     <label class="label">Fecha del Evento</label>
                                     <input class="input" type="datetime-local" id="event-date" required>
                                 </div>
-                                <div class="control is-expanded">
+                                <div class="control">
+                                    <label class="label">Duración (horas)</label>
+                                    <div class="select">
+                                        <select id="event-duration" required>
+                                            <option value="1">1 hora</option>
+                                            <option value="2" selected>2 horas</option>
+                                            <option value="3">3 horas</option>
+                                            <option value="4">4 horas</option>
+                                            <option value="5">5 horas</option>
+                                            <option value="6">6 horas</option>
+                                            <option value="8">8 horas</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="control">
                                     <label class="label">Límite de Participantes</label>
                                     <input class="input" type="number" id="event-limit" min="1" placeholder="Ej: 20" required>
                                 </div>
@@ -357,20 +371,63 @@ async function loadVolunteerDetails() {
         // Load user status
         const user = window.firebaseAuth.currentUser;
         if (user) {
-            const userVolunteerDoc = await window.firebaseDb.collection('users')
-                .doc(user.uid)
-                .collection('voluntariados')
-                .doc(currentVolunteerId)
-                .get();
+            console.log('🔍 Cargando datos del usuario para voluntariado:', currentVolunteerId);
             
-            if (userVolunteerDoc.exists) {
-                const userData = userVolunteerDoc.data();
-                document.getElementById('user-status').textContent = userData.status;
-                document.getElementById('user-status').className = `tag is-${userData.status === 'activo' ? 'success' : 'danger'}`;
-                document.getElementById('user-events').textContent = userData.eventsCompleted || 0;
-                document.getElementById('user-hours').textContent = userData.totalHours || 0;
-                document.getElementById('join-date').textContent = userData.joinedAt ? 
-                    new Date(userData.joinedAt.toDate()).toLocaleDateString() : '-';
+            const userDoc = await window.firebaseDb.collection('users').doc(user.uid).get();
+            
+            if (userDoc.exists) {
+                const userData = userDoc.data();
+                console.log('👤 Datos del usuario:', userData);
+                
+                // Verificar si el usuario está en este voluntariado
+                if (userData.voluntariados && userData.voluntariados[currentVolunteerId]) {
+                    const volunteerData = userData.voluntariados[currentVolunteerId];
+                    console.log('📊 Datos del voluntariado:', volunteerData);
+                    
+                    // Actualizar estado
+                    const statusElement = document.getElementById('user-status');
+                    if (statusElement) {
+                        statusElement.textContent = volunteerData.status || 'activo';
+                        statusElement.className = `tag is-${(volunteerData.status || 'activo') === 'activo' ? 'success' : 'danger'}`;
+                    }
+                    
+                    // Actualizar eventos completados
+                    const eventsElement = document.getElementById('user-events');
+                    if (eventsElement) {
+                        eventsElement.textContent = volunteerData.eventsCompleted || 0;
+                    }
+                    
+                    // Actualizar horas totales
+                    const hoursElement = document.getElementById('user-hours');
+                    if (hoursElement) {
+                        hoursElement.textContent = volunteerData.totalHours || 0;
+                    }
+                    
+                    // Actualizar fecha de ingreso
+                    const joinDateElement = document.getElementById('join-date');
+                    if (joinDateElement) {
+                        if (volunteerData.joinedAt) {
+                            const joinDate = volunteerData.joinedAt.toDate ? 
+                                volunteerData.joinedAt.toDate() : 
+                                new Date(volunteerData.joinedAt);
+                            joinDateElement.textContent = joinDate.toLocaleDateString();
+                        } else {
+                            joinDateElement.textContent = '-';
+                        }
+                    }
+                    
+                                console.log('✅ Datos del usuario actualizados correctamente');
+                } else {
+                    console.log('❌ Usuario no encontrado en este voluntariado');
+                    // Si no está en el voluntariado, mostrar datos por defecto
+                    document.getElementById('user-status').textContent = 'No miembro';
+                    document.getElementById('user-status').className = 'tag is-warning';
+                    document.getElementById('user-events').textContent = '0';
+                    document.getElementById('user-hours').textContent = '0';
+                    document.getElementById('join-date').textContent = '-';
+                }
+            } else {
+                console.log('❌ Documento de usuario no encontrado');
             }
         }
         
@@ -379,47 +436,171 @@ async function loadVolunteerDetails() {
         await loadEvents();
         await loadMembers();
         
+        // Configurar listener en tiempo real para cambios en los datos del usuario
+        setupUserDataListener();
+        
     } catch (error) {
         console.error('Error loading volunteer details:', error);
         showMessage('Error al cargar los detalles del voluntariado', 'danger');
     }
 }
 
+// Función para configurar listener en tiempo real de los datos del usuario
+function setupUserDataListener() {
+    const user = window.firebaseAuth.currentUser;
+    if (!user || !currentVolunteerId) {
+        console.log('❌ No se puede configurar listener: usuario o voluntariado no válido');
+        return;
+    }
+    
+    console.log('👂 Configurando listener en tiempo real para usuario:', user.uid);
+    
+    // Escuchar cambios en tiempo real en el documento del usuario
+    window.firebaseDb.collection('users').doc(user.uid)
+        .onSnapshot((doc) => {
+            if (doc.exists) {
+                const userData = doc.data();
+                console.log('🔄 Datos del usuario actualizados en tiempo real:', userData);
+                
+                // Verificar si el usuario está en este voluntariado
+                if (userData.voluntariados && userData.voluntariados[currentVolunteerId]) {
+                    const volunteerData = userData.voluntariados[currentVolunteerId];
+                    
+                    // Actualizar solo los elementos que existen
+                    const statusElement = document.getElementById('user-status');
+                    if (statusElement) {
+                        statusElement.textContent = volunteerData.status || 'activo';
+                        statusElement.className = `tag is-${(volunteerData.status || 'activo') === 'activo' ? 'success' : 'danger'}`;
+                    }
+                    
+                    const eventsElement = document.getElementById('user-events');
+                    if (eventsElement) {
+                        eventsElement.textContent = volunteerData.eventsCompleted || 0;
+                    }
+                    
+                    const hoursElement = document.getElementById('user-hours');
+                    if (hoursElement) {
+                        hoursElement.textContent = volunteerData.totalHours || 0;
+                    }
+                    
+                    console.log('✅ Datos actualizados en tiempo real');
+                }
+            }
+        }, (error) => {
+            console.error('❌ Error en listener de datos del usuario:', error);
+        });
+}
+
+// Función para actualizar manualmente los datos del usuario
+async function refreshUserData() {
+    console.log('🔄 Actualizando datos del usuario manualmente...');
+    
+    const user = window.firebaseAuth.currentUser;
+    if (!user || !currentVolunteerId) {
+        console.log('❌ No se puede actualizar: usuario o voluntariado no válido');
+        return;
+    }
+    
+    try {
+        const userDoc = await window.firebaseDb.collection('users').doc(user.uid).get();
+        
+        if (userDoc.exists) {
+            const userData = userDoc.data();
+            
+            if (userData.voluntariados && userData.voluntariados[currentVolunteerId]) {
+                const volunteerData = userData.voluntariados[currentVolunteerId];
+                
+                // Actualizar elementos
+                const statusElement = document.getElementById('user-status');
+                if (statusElement) {
+                    statusElement.textContent = volunteerData.status || 'activo';
+                    statusElement.className = `tag is-${(volunteerData.status || 'activo') === 'activo' ? 'success' : 'danger'}`;
+                }
+                
+                const eventsElement = document.getElementById('user-events');
+                if (eventsElement) {
+                    eventsElement.textContent = volunteerData.eventsCompleted || 0;
+                }
+                
+                const hoursElement = document.getElementById('user-hours');
+                if (hoursElement) {
+                    hoursElement.textContent = volunteerData.totalHours || 0;
+                }
+                
+                console.log('✅ Datos del usuario actualizados manualmente');
+            }
+        }
+    } catch (error) {
+        console.error('❌ Error actualizando datos del usuario:', error);
+    }
+}
+
+// Hacer la función disponible globalmente
+window.refreshUserData = refreshUserData;
+
 async function checkUserRole() {
     try {
         const user = window.firebaseAuth.currentUser;
         if (!user) {
             console.log('❌ Usuario no autenticado');
-            return;
+            window.isAdmin = false;
+            return false;
+        }
+
+        if (!currentVolunteerId) {
+            console.log('❌ No hay voluntariado seleccionado');
+            window.isAdmin = false;
+            return false;
         }
 
         // Verificar directamente en Firestore
         const volunteerDoc = await window.firebaseDb.collection('voluntariados').doc(currentVolunteerId).get();
         if (volunteerDoc.exists) {
             const adminUids = volunteerDoc.data().adminUids || [];
-            isAdmin = adminUids.includes(user.uid);
+            window.isAdmin = adminUids.includes(user.uid);
             
-            console.log('👑 Verificando admin:', {
+            console.log('👑 Verificando permisos de admin:', {
                 userUid: user.uid,
+                userEmail: user.email,
+                voluntariadoId: currentVolunteerId,
                 adminUids: adminUids,
-                isAdmin: isAdmin
+                isAdmin: window.isAdmin
             });
             
-            if (isAdmin) {
-                const adminForm = document.getElementById('admin-post-form');
-                const adminEventForm = document.getElementById('admin-event-form');
+            // Mostrar/ocultar elementos de admin según el resultado
+            const adminForm = document.getElementById('admin-post-form');
+            const adminEventForm = document.getElementById('admin-event-form');
+            
+            if (window.isAdmin) {
                 if (adminForm) {
                     adminForm.style.display = 'block';
-                    console.log('✅ Formulario de admin mostrado');
+                    console.log('✅ Formulario de posts de admin mostrado');
                 }
                 if (adminEventForm) {
                     adminEventForm.style.display = 'block';
-                    console.log('✅ Formulario de eventos mostrado');
+                    console.log('✅ Formulario de eventos de admin mostrado');
+                }
+            } else {
+                if (adminForm) {
+                    adminForm.style.display = 'none';
+                    console.log('❌ Formulario de posts de admin ocultado');
+                }
+                if (adminEventForm) {
+                    adminEventForm.style.display = 'none';
+                    console.log('❌ Formulario de eventos de admin ocultado');
                 }
             }
+            
+            return window.isAdmin;
+        } else {
+            console.log('❌ Voluntariado no encontrado:', currentVolunteerId);
+            window.isAdmin = false;
+            return false;
         }
     } catch (error) {
         console.error('❌ Error checking user role:', error);
+        window.isAdmin = false;
+        return false;
     }
 }
 
@@ -527,6 +708,9 @@ async function loadEvents() {
     console.log('🏢 Cargando eventos para voluntariado:', currentVolunteerId);
     
     try {
+        // Verificar permisos de admin cada vez que se cargan eventos
+        await checkUserRole();
+        
         // Cerrar eventos pasados automáticamente
         await window.adminManager.closePastEvents();
         
@@ -538,7 +722,7 @@ async function loadEvents() {
                 <div class="has-text-centered py-6">
                     <i class="fas fa-calendar fa-3x has-text-grey-light"></i>
                     <p class="mt-3 has-text-grey">No hay eventos programados</p>
-                    ${isAdmin ? '<p class="has-text-info">Como administrador, puedes crear eventos aquí</p>' : ''}
+                    ${window.isAdmin ? '<p class="has-text-info">Como administrador, puedes crear eventos aquí</p>' : ''}
                 </div>
             `;
             return;
@@ -610,7 +794,7 @@ async function loadEvents() {
                         </div>
                         
                         <div class="event-actions">
-                            ${!isAdmin ? `
+                            ${!window.isAdmin ? `
                                 ${canEnroll && !isEnrolled ? `
                                     <button class="button is-success is-small" onclick="enrollInEvent('${event.id}')">
                                         <span class="icon"><i class="fas fa-user-plus"></i></span>
@@ -806,7 +990,7 @@ function setupTabs() {
     const contents = document.querySelectorAll('.tab-content');
     
     tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
+        tab.addEventListener('click', async () => {
             // Remove active class from all tabs
             tabs.forEach(t => t.classList.remove('is-active'));
             contents.forEach(c => c.style.display = 'none');
@@ -817,6 +1001,17 @@ function setupTabs() {
             // Show corresponding content
             const tabName = tab.dataset.tab;
             document.getElementById(`${tabName}-content`).style.display = 'block';
+            
+            // Si se cambia a la pestaña de eventos, verificar permisos de admin
+            if (tabName === 'events') {
+                console.log('🔄 Cambiando a pestaña de eventos, verificando permisos...');
+                await checkUserRole();
+                await loadEvents();
+            } else if (tabName === 'wall') {
+                console.log('🔄 Cambiando a pestaña del muro, verificando permisos...');
+                await checkUserRole();
+                await loadPosts();
+            }
         });
     });
 }
@@ -871,10 +1066,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const title = document.getElementById('event-title').value;
             const description = document.getElementById('event-description').value;
             const eventDate = document.getElementById('event-date').value;
+            const duration = parseInt(document.getElementById('event-duration').value);
             const maxParticipants = parseInt(document.getElementById('event-limit').value);
             const status = document.getElementById('event-status').value;
             
-            if (!title || !description || !eventDate || !maxParticipants) {
+            if (!title || !description || !eventDate || !duration || !maxParticipants) {
                 alert('Por favor completa todos los campos');
                 return;
             }
@@ -884,6 +1080,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     title,
                     description,
                     eventDate: new Date(eventDate),
+                    duration,
                     maxParticipants,
                     status
                 });
@@ -930,19 +1127,28 @@ async function unenrollFromEvent(eventId) {
 // Función para copiar lista de participantes
 async function copyParticipantsList(eventId) {
     try {
-        const participants = await window.adminManager.getEventParticipants(eventId);
+        const participants = await window.adminManager.getEventParticipantsDetailed(eventId);
         const event = await window.adminManager.getEvent(eventId);
         
         let listText = `LISTA DE PARTICIPANTES - ${event.title}\n`;
         listText += `Fecha: ${event.eventDate.toDate().toLocaleDateString()}\n`;
-        listText += `Total: ${participants.length}/${event.maxParticipants}\n\n`;
+        listText += `Horas del evento: ${event.duration || 2}h\n`;
+        listText += `Total inscritos: ${participants.length}/${event.maxParticipants}\n`;
+        listText += `Asistencia confirmada: ${participants.filter(p => p.attended).length}\n\n`;
+        
+        listText += `DETALLE DE PARTICIPANTES:\n`;
+        listText += `========================\n\n`;
         
         participants.forEach((participant, index) => {
-            listText += `${index + 1}. ${participant.firstName} ${participant.lastName} - ${participant.email}\n`;
+            listText += `${index + 1}. ${participant.fullName}\n`;
+            listText += `   📧 Email: ${participant.email}\n`;
+            listText += `   📱 Teléfono: ${participant.phone || 'No registrado'}\n`;
+            listText += `   ✅ Asistencia: ${participant.attendanceStatus}\n`;
+            listText += `\n`;
         });
         
         await navigator.clipboard.writeText(listText);
-        showMessage('Lista de participantes copiada al portapapeles', 'success');
+        showMessage('Lista detallada de participantes copiada al portapapeles', 'success');
     } catch (error) {
         console.error('Error copying participants list:', error);
         showMessage('Error al copiar lista: ' + error.message, 'danger');
@@ -972,41 +1178,71 @@ async function viewEventDetails(eventId) {
     try {
         const event = await window.adminManager.getEvent(eventId);
         const participants = await window.adminManager.getEventParticipants(eventId);
+        const attendedCount = participants.filter(p => p.attended).length;
         
         let detailsHtml = `
             <div class="modal is-active">
                 <div class="modal-background" onclick="closeModal()"></div>
-                <div class="modal-card">
+                <div class="modal-card" style="width: 90%; max-width: 800px;">
                     <header class="modal-card-head">
                         <p class="modal-card-title">${event.title}</p>
                         <button class="delete" onclick="closeModal()"></button>
                     </header>
                     <section class="modal-card-body">
-                        <p><strong>Descripción:</strong> ${event.description}</p>
-                        <p><strong>Fecha:</strong> ${event.eventDate.toDate().toLocaleDateString()} - ${event.eventDate.toDate().toLocaleTimeString()}</p>
-                        <p><strong>Participantes:</strong> ${participants.length}/${event.maxParticipants}</p>
-                        <p><strong>Estado:</strong> ${event.status === 'abierto' ? '🟢 Abierto' : '🔴 Cerrado'}</p>
+                        <div class="columns">
+                            <div class="column is-8">
+                                <p><strong>Descripción:</strong> ${event.description}</p>
+                                <p><strong>Fecha:</strong> ${event.eventDate.toDate().toLocaleDateString()} - ${event.eventDate.toDate().toLocaleTimeString()}</p>
+                                <p><strong>Duración:</strong> ${event.duration || 2} horas</p>
+                                <p><strong>Participantes:</strong> ${participants.length}/${event.maxParticipants}</p>
+                                <p><strong>Asistencia confirmada:</strong> ${attendedCount}/${participants.length}</p>
+                                <p><strong>Estado:</strong> ${event.status === 'abierto' ? '🟢 Abierto' : '🔴 Cerrado'}</p>
+                            </div>
+                            <div class="column is-4">
+                                <div class="box has-background-info-light">
+                                    <h5 class="title is-6">Estadísticas</h5>
+                                    <p><strong>Inscritos:</strong> ${participants.length}</p>
+                                    <p><strong>Asistieron:</strong> ${attendedCount}</p>
+                                    <p><strong>Por confirmar:</strong> ${participants.length - attendedCount}</p>
+                                    <p><strong>Tasa asistencia:</strong> ${participants.length > 0 ? Math.round((attendedCount / participants.length) * 100) : 0}%</p>
+                                </div>
+                            </div>
+                        </div>
                         
                         <h4 class="title is-6 mt-4">Participantes Inscritos:</h4>
-                        <div class="participants-list">
+                        <div class="participants-list" style="max-height: 300px; overflow-y: auto;">
         `;
         
         if (participants.length === 0) {
             detailsHtml += '<p class="has-text-grey">No hay participantes inscritos</p>';
         } else {
             participants.forEach((participant, index) => {
+                const statusIcon = participant.attended ? '✅' : '⏳';
+                const statusClass = participant.attended ? 'has-text-success' : 'has-text-warning';
+                const buttonClass = participant.attended ? 'is-success is-static' : 'is-primary';
+                const buttonText = participant.attended ? 'Asistió' : 'Marcar Asistencia';
+                
                 detailsHtml += `
-                    <div class="participant-item">
-                        <span class="icon-text">
-                            <span class="icon">
-                                <i class="fas fa-user"></i>
-                            </span>
-                            <span>${participant.firstName} ${participant.lastName} - ${participant.email}</span>
-                        </span>
-                        <button class="button is-small is-success" onclick="markAttendance('${eventId}', '${participant.uid}')">
-                            <span class="icon"><i class="fas fa-check"></i></span>
-                            <span>Marcar Asistencia</span>
-                        </button>
+                    <div class="participant-item box" style="margin-bottom: 0.5rem;">
+                        <div class="columns is-vcentered">
+                            <div class="column is-8">
+                                <span class="icon-text">
+                                    <span class="icon">
+                                        <i class="fas fa-user"></i>
+                                    </span>
+                                    <span><strong>${participant.fullName}</strong></span>
+                                    <span class="tag is-light ml-2">${participant.email}</span>
+                                </span>
+                                <br>
+                                <small class="${statusClass}">${statusIcon} ${participant.attended ? 'Asistencia confirmada' : 'Pendiente de confirmar'}</small>
+                            </div>
+                            <div class="column is-4 has-text-right">
+                                <button class="button is-small ${buttonClass}" onclick="markAttendance('${eventId}', '${participant.uid}')" ${participant.attended ? 'disabled' : ''}>
+                                    <span class="icon"><i class="fas fa-${participant.attended ? 'check' : 'check'}"></i></span>
+                                    <span>${buttonText}</span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 `;
             });
@@ -1016,6 +1252,10 @@ async function viewEventDetails(eventId) {
                         </div>
                     </section>
                     <footer class="modal-card-foot">
+                        <button class="button is-warning" onclick="showAttendanceChecklist('${eventId}')">
+                            <span class="icon"><i class="fas fa-list-check"></i></span>
+                            <span>Checklist de Asistencia</span>
+                        </button>
                         <button class="button is-primary" onclick="copyParticipantsList('${eventId}')">
                             <span class="icon"><i class="fas fa-copy"></i></span>
                             <span>Copiar Lista</span>
@@ -1045,6 +1285,172 @@ async function markAttendance(eventId, participantId) {
     }
 }
 
+// Función para mostrar checklist de asistencia
+async function showAttendanceChecklist(eventId) {
+    try {
+        const event = await window.adminManager.getEvent(eventId);
+        const participants = await window.adminManager.getEventParticipantsDetailed(eventId);
+        
+        if (participants.length === 0) {
+            showMessage('No hay participantes inscritos en este evento', 'warning');
+            return;
+        }
+        
+        // Cerrar modal anterior si existe
+        closeModal();
+        
+        let checklistHtml = `
+            <div class="modal is-active">
+                <div class="modal-background" onclick="closeModal()"></div>
+                <div class="modal-card" style="width: 95%; max-width: 900px;">
+                    <header class="modal-card-head">
+                        <p class="modal-card-title">
+                            <span class="icon"><i class="fas fa-list-check"></i></span>
+                            Checklist de Asistencia - ${event.title}
+                        </p>
+                        <button class="delete" onclick="closeModal()"></button>
+                    </header>
+                    <section class="modal-card-body">
+                        <div class="notification is-info">
+                            <strong>Instrucciones:</strong> Marca con ✅ a los participantes que asistieron al evento. 
+                            Solo los marcados recibirán las ${event.duration || 2} horas del evento.
+                        </div>
+                        
+                        <div class="field is-grouped mb-4">
+                            <div class="control">
+                                <button class="button is-success" onclick="selectAllParticipants()">
+                                    <span class="icon"><i class="fas fa-check-double"></i></span>
+                                    <span>Marcar Todos</span>
+                                </button>
+                            </div>
+                            <div class="control">
+                                <button class="button is-light" onclick="unselectAllParticipants()">
+                                    <span class="icon"><i class="fas fa-times"></i></span>
+                                    <span>Desmarcar Todos</span>
+                                </button>
+                            </div>
+                            <div class="control">
+                                <span class="tag is-info" id="selected-count">0 seleccionados</span>
+                            </div>
+                        </div>
+                        
+                        <div class="participants-checklist" style="max-height: 400px; overflow-y: auto;">
+        `;
+        
+        participants.forEach((participant, index) => {
+            const isChecked = participant.attended ? 'checked' : '';
+            checklistHtml += `
+                <div class="participant-checkbox-item box" style="margin-bottom: 0.5rem;">
+                    <label class="checkbox is-flex is-align-items-center">
+                        <input type="checkbox" class="participant-checkbox" 
+                               value="${participant.uid}" ${isChecked}
+                               onchange="updateSelectedCount()">
+                        <div class="ml-3">
+                            <div class="is-flex is-align-items-center">
+                                <span class="icon has-text-primary mr-2">
+                                    <i class="fas fa-user"></i>
+                                </span>
+                                <strong>${participant.fullName}</strong>
+                                <span class="tag is-light ml-2">${participant.email}</span>
+                                ${participant.attended ? '<span class="tag is-success ml-2">Ya confirmado</span>' : ''}
+                            </div>
+                            <small class="has-text-grey">
+                                📱 ${participant.phone || 'Teléfono no registrado'}
+                            </small>
+                        </div>
+                    </label>
+                </div>
+            `;
+        });
+        
+        checklistHtml += `
+                        </div>
+                    </section>
+                    <footer class="modal-card-foot">
+                        <button class="button is-success" onclick="confirmAttendanceBatch('${eventId}')" id="confirm-btn" disabled>
+                            <span class="icon"><i class="fas fa-check"></i></span>
+                            <span>Confirmar Asistencia Seleccionada</span>
+                        </button>
+                        <button class="button is-primary" onclick="copyParticipantsList('${eventId}')">
+                            <span class="icon"><i class="fas fa-copy"></i></span>
+                            <span>Copiar Lista</span>
+                        </button>
+                        <button class="button" onclick="closeModal()">Cancelar</button>
+                    </footer>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', checklistHtml);
+        updateSelectedCount(); // Actualizar contador inicial
+    } catch (error) {
+        console.error('Error showing attendance checklist:', error);
+        showMessage('Error al cargar checklist: ' + error.message, 'danger');
+    }
+}
+
+// Función para actualizar contador de seleccionados
+function updateSelectedCount() {
+    const checkboxes = document.querySelectorAll('.participant-checkbox');
+    const selectedCount = document.querySelectorAll('.participant-checkbox:checked').length;
+    const countElement = document.getElementById('selected-count');
+    const confirmBtn = document.getElementById('confirm-btn');
+    
+    if (countElement) {
+        countElement.textContent = `${selectedCount} seleccionados`;
+    }
+    
+    if (confirmBtn) {
+        confirmBtn.disabled = selectedCount === 0;
+    }
+}
+
+// Función para seleccionar todos los participantes
+function selectAllParticipants() {
+    const checkboxes = document.querySelectorAll('.participant-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = true;
+    });
+    updateSelectedCount();
+}
+
+// Función para deseleccionar todos los participantes
+function unselectAllParticipants() {
+    const checkboxes = document.querySelectorAll('.participant-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    updateSelectedCount();
+}
+
+// Función para confirmar asistencia en lote
+async function confirmAttendanceBatch(eventId) {
+    const checkboxes = document.querySelectorAll('.participant-checkbox:checked');
+    const selectedIds = Array.from(checkboxes).map(checkbox => checkbox.value);
+    
+    if (selectedIds.length === 0) {
+        showMessage('Selecciona al menos un participante', 'warning');
+        return;
+    }
+    
+    if (!confirm(`¿Confirmar asistencia para ${selectedIds.length} participantes?\n\nEsto asignará ${selectedIds.length} × ${(await window.adminManager.getEvent(eventId)).duration || 2} horas a los participantes seleccionados.`)) {
+        return;
+    }
+    
+    try {
+        const result = await window.adminManager.markAttendanceBatch(eventId, selectedIds);
+        
+        showMessage(`✅ Asistencia confirmada para ${result.success} participantes\n❌ Errores: ${result.errors}`, 'success');
+        
+        // Cerrar modal y recargar eventos
+        closeModal();
+        await loadEvents();
+    } catch (error) {
+        console.error('Error confirming batch attendance:', error);
+        showMessage('Error al confirmar asistencia: ' + error.message, 'danger');
+    }
+}
+
 // Función para cerrar modal
 function closeModal() {
     const modal = document.querySelector('.modal.is-active');
@@ -1052,6 +1458,38 @@ function closeModal() {
         modal.remove();
     }
 }
+
+// Función de debug para verificar permisos de admin
+window.debugAdminPermissions = async function() {
+    console.log('🔍 DEBUG: Verificando permisos de admin...');
+    console.log('📊 Estado actual:', {
+        currentVolunteerId: currentVolunteerId,
+        windowIsAdmin: window.isAdmin,
+        user: window.firebaseAuth.currentUser?.uid,
+        userEmail: window.firebaseAuth.currentUser?.email
+    });
+    
+    const result = await checkUserRole();
+    console.log('✅ Resultado de verificación:', result);
+    
+    // Verificar elementos DOM
+    const adminForm = document.getElementById('admin-post-form');
+    const adminEventForm = document.getElementById('admin-event-form');
+    console.log('🎛️ Elementos DOM:', {
+        adminPostForm: adminForm ? adminForm.style.display : 'No encontrado',
+        adminEventForm: adminEventForm ? adminEventForm.style.display : 'No encontrado'
+    });
+    
+    return result;
+};
+
+// Función para forzar verificación de permisos
+window.forceCheckAdmin = async function() {
+    console.log('🔄 Forzando verificación de permisos...');
+    await checkUserRole();
+    await loadEvents();
+    console.log('✅ Verificación completada');
+};
 
 // Función para eliminar evento
 async function deleteEvent(eventId, eventTitle) {
@@ -1102,7 +1540,21 @@ async function editEvent(eventId) {
                                     <label class="label">Fecha del Evento</label>
                                     <input class="input" type="datetime-local" id="edit-event-date" value="${event.eventDate.toDate().toISOString().slice(0, 16)}" required>
                                 </div>
-                                <div class="control is-expanded">
+                                <div class="control">
+                                    <label class="label">Duración (horas)</label>
+                                    <div class="select">
+                                        <select id="edit-event-duration" required>
+                                            <option value="1" ${event.duration === 1 ? 'selected' : ''}>1 hora</option>
+                                            <option value="2" ${event.duration === 2 ? 'selected' : ''}>2 horas</option>
+                                            <option value="3" ${event.duration === 3 ? 'selected' : ''}>3 horas</option>
+                                            <option value="4" ${event.duration === 4 ? 'selected' : ''}>4 horas</option>
+                                            <option value="5" ${event.duration === 5 ? 'selected' : ''}>5 horas</option>
+                                            <option value="6" ${event.duration === 6 ? 'selected' : ''}>6 horas</option>
+                                            <option value="8" ${event.duration === 8 ? 'selected' : ''}>8 horas</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="control">
                                     <label class="label">Límite de Participantes</label>
                                     <input class="input" type="number" id="edit-event-limit" min="1" value="${event.maxParticipants}" required>
                                 </div>
@@ -1142,10 +1594,11 @@ async function saveEventChanges(eventId) {
         const title = document.getElementById('edit-event-title').value;
         const description = document.getElementById('edit-event-description').value;
         const eventDate = document.getElementById('edit-event-date').value;
+        const duration = parseInt(document.getElementById('edit-event-duration').value);
         const maxParticipants = parseInt(document.getElementById('edit-event-limit').value);
         const status = document.getElementById('edit-event-status').value;
         
-        if (!title || !description || !eventDate || !maxParticipants) {
+        if (!title || !description || !eventDate || !duration || !maxParticipants) {
             alert('Por favor completa todos los campos');
             return;
         }
@@ -1154,6 +1607,7 @@ async function saveEventChanges(eventId) {
             title,
             description,
             eventDate: new Date(eventDate),
+            duration,
             maxParticipants,
             status
         });
