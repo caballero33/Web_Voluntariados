@@ -329,28 +329,147 @@ window.forceShowAdminPanel = async () => {
 window.assignAdminByUID = async (uid, voluntariadoId) => {
     try {
         console.log('🔄 Asignando administrador...');
+        console.log('👤 UID:', uid);
+        console.log('🏢 Voluntariado:', voluntariadoId);
+        
+        // Verificar que el usuario existe
+        const userDoc = await window.firebaseDb.collection('users').doc(uid).get();
+        if (!userDoc.exists) {
+            console.error('❌ Usuario no encontrado en Firestore');
+            return;
+        }
+        
+        const userData = userDoc.data();
+        console.log('👤 Usuario encontrado:', userData.fullName || userData.email);
         
         // Actualizar usuario
         await window.firebaseDb.collection('users').doc(uid).update({
             isAdmin: true,
-            adminVoluntariados: firebase.firestore.FieldValue.arrayUnion(voluntariadoId)
+            adminVoluntariados: window.firebase.firestore.FieldValue.arrayUnion(voluntariadoId)
         });
+        console.log('✅ Usuario actualizado como admin');
         
         // Actualizar voluntariado
         const voluntariadoDoc = await window.firebaseDb.collection('voluntariados').doc(voluntariadoId).get();
         if (voluntariadoDoc.exists) {
             const currentAdmins = voluntariadoDoc.data().adminUids || [];
+            console.log('👑 Admins actuales:', currentAdmins);
+            
             if (!currentAdmins.includes(uid)) {
                 await voluntariadoDoc.ref.update({
-                    adminUids: firebase.firestore.FieldValue.arrayUnion(uid)
+                    adminUids: window.firebase.firestore.FieldValue.arrayUnion(uid)
                 });
+                console.log('✅ UID agregado a adminUids del voluntariado');
+            } else {
+                console.log('⚠️ UID ya estaba en adminUids');
             }
+        } else {
+            console.error('❌ Voluntariado no encontrado');
+            return;
         }
         
-        console.log('✅ Administrador asignado exitosamente');
+        console.log('🎉 ¡Administrador asignado exitosamente!');
         console.log('🔄 Recarga la página para ver los cambios');
         
     } catch (error) {
         console.error('❌ Error asignando administrador:', error);
+    }
+};
+
+// Función específica para hacer admin en Patitas UNAH
+window.makeAdminPatitasUNAH = async (uid) => {
+    console.log('🐾 === ASIGNANDO ADMIN EN PATITAS UNAH ===');
+    return await window.assignAdminByUID(uid, 'patitas_unah');
+};
+
+// Función para buscar usuario por email y hacerlo admin
+window.makeAdminByEmail = async (email, voluntariadoId) => {
+    try {
+        console.log('🔍 Buscando usuario por email:', email);
+        
+        // Buscar usuario por email
+        const usersSnapshot = await window.firebaseDb.collection('users')
+            .where('email', '==', email)
+            .get();
+        
+        if (usersSnapshot.empty) {
+            console.error('❌ Usuario no encontrado con email:', email);
+            return;
+        }
+        
+        const userDoc = usersSnapshot.docs[0];
+        const uid = userDoc.id;
+        const userData = userDoc.data();
+        
+        console.log('👤 Usuario encontrado:', userData.fullName || userData.email);
+        console.log('🆔 UID:', uid);
+        
+        // Asignar como admin
+        await window.assignAdminByUID(uid, voluntariadoId);
+        
+    } catch (error) {
+        console.error('❌ Error buscando usuario por email:', error);
+    }
+};
+
+// Función específica para hacer admin en Patitas UNAH por email
+window.makeAdminPatitasByEmail = async (email) => {
+    console.log('🐾 === ASIGNANDO ADMIN EN PATITAS UNAH POR EMAIL ===');
+    return await window.makeAdminByEmail(email, 'patitas_unah');
+};
+
+// Función para listar todos los usuarios y sus UIDs
+window.listAllUsers = async () => {
+    try {
+        console.log('👥 === LISTANDO TODOS LOS USUARIOS ===');
+        
+        const usersSnapshot = await window.firebaseDb.collection('users').get();
+        console.log('📊 Total de usuarios:', usersSnapshot.size);
+        
+        usersSnapshot.docs.forEach(doc => {
+            const userData = doc.data();
+            console.log(`👤 ${userData.fullName || userData.email}`, {
+                uid: doc.id,
+                email: userData.email,
+                isAdmin: userData.isAdmin || false,
+                adminVoluntariados: userData.adminVoluntariados || []
+            });
+        });
+        
+    } catch (error) {
+        console.error('❌ Error listando usuarios:', error);
+    }
+};
+
+// Función para verificar admins de un voluntariado específico
+window.checkVolunteerAdmins = async (voluntariadoId) => {
+    try {
+        console.log(`👑 === ADMINS DE ${voluntariadoId.toUpperCase()} ===`);
+        
+        const voluntariadoDoc = await window.firebaseDb.collection('voluntariados').doc(voluntariadoId).get();
+        if (!voluntariadoDoc.exists) {
+            console.error('❌ Voluntariado no encontrado');
+            return;
+        }
+        
+        const voluntariadoData = voluntariadoDoc.data();
+        const adminUids = voluntariadoData.adminUids || [];
+        
+        console.log('🏢 Voluntariado:', voluntariadoData.name);
+        console.log('👑 Admin UIDs:', adminUids);
+        
+        // Obtener detalles de cada admin
+        for (const uid of adminUids) {
+            const userDoc = await window.firebaseDb.collection('users').doc(uid).get();
+            if (userDoc.exists) {
+                const userData = userDoc.data();
+                console.log(`👤 Admin: ${userData.fullName || userData.email} (${uid})`);
+            } else {
+                console.log(`❌ Admin no encontrado: ${uid}`);
+            }
+        }
+        
+    } catch (error) {
+        console.error('❌ Error verificando admins:', error);
     }
 };

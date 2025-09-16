@@ -245,13 +245,15 @@ class AdminManager {
                 title: eventData.title,
                 description: eventData.description,
                 eventDate: firebase.firestore.Timestamp.fromDate(eventData.eventDate),
+                duration: eventData.duration || 2, // Duración del evento en horas
                 maxParticipants: eventData.maxParticipants,
                 status: eventData.status || 'abierto',
                 voluntariadoId: voluntariadoId,
                 createdBy: currentUser.uid,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                participants: [],
-                currentParticipants: 0
+                participants: [currentUser.uid], // Inscribir automáticamente al admin que crea el evento
+                currentParticipants: 1,
+                attended: [] // Lista de asistencias (inicialmente vacía)
             };
 
             console.log('📝 Datos del evento a guardar:', eventToSave);
@@ -260,10 +262,11 @@ class AdminManager {
             const eventRef = await this.db.collection('eventos').add(eventToSave);
 
             console.log('✅ Evento creado exitosamente:', eventRef.id);
+            console.log('👤 Admin inscrito automáticamente:', currentUser.uid);
 
             return {
                 success: true,
-                message: 'Evento creado exitosamente',
+                message: 'Evento creado exitosamente. Has sido inscrito automáticamente.',
                 eventId: eventRef.id
             };
 
@@ -481,18 +484,26 @@ class AdminManager {
                     throw new Error('No puedes inscribirte a un evento que ya pasó');
                 }
 
+                // Verificar si ya está inscrito
+                if (eventData.participants && eventData.participants.includes(targetUserId)) {
+                    throw new Error('Ya estás inscrito en este evento');
+                }
+
                 await eventDoc.ref.update({
                     participants: firebase.firestore.FieldValue.arrayUnion(targetUserId),
                     currentParticipants: firebase.firestore.FieldValue.increment(1)
                 });
+
+                console.log(`✅ Usuario inscrito en evento: ${eventData.title}`);
             } else if (action === 'remove') {
                 await eventDoc.ref.update({
                     participants: firebase.firestore.FieldValue.arrayRemove(targetUserId),
                     currentParticipants: firebase.firestore.FieldValue.increment(-1)
                 });
+
+                console.log(`✅ Usuario desinscrito del evento: ${eventData.title}`);
             }
 
-            console.log(`Participante ${action} exitosamente`);
             return true;
         } catch (error) {
             console.error('Error managing participants:', error);
@@ -600,6 +611,7 @@ class AdminManager {
             const eventDoc = await this.db.collection('eventos').doc(eventId).get();
             const eventData = eventDoc.data();
             const participantIds = eventData.participants || [];
+            const attendedIds = eventData.attended || [];
             
             if (participantIds.length === 0) {
                 return [];
@@ -609,16 +621,62 @@ class AdminManager {
             for (const participantId of participantIds) {
                 const userDoc = await this.db.collection('users').doc(participantId).get();
                 if (userDoc.exists) {
+                    const userData = userDoc.data();
                     participants.push({
                         uid: participantId,
-                        ...userDoc.data()
+                        ...userData,
+                        attended: attendedIds.includes(participantId), // Marcar si asistió
+                        fullName: `${userData.firstName || ''} ${userData.lastName || ''}`.trim()
                     });
                 }
             }
             
+            // Ordenar por nombre
+            participants.sort((a, b) => a.fullName.localeCompare(b.fullName));
+            
             return participants;
         } catch (error) {
             console.error('Error getting participants:', error);
+            throw error;
+        }
+    }
+
+    // NUEVO: Obtener participantes con datos completos para exportar
+    async getEventParticipantsDetailed(eventId) {
+        try {
+            const eventDoc = await this.db.collection('eventos').doc(eventId).get();
+            const eventData = eventDoc.data();
+            const participantIds = eventData.participants || [];
+            const attendedIds = eventData.attended || [];
+            
+            if (participantIds.length === 0) {
+                return [];
+            }
+            
+            const participants = [];
+            for (const participantId of participantIds) {
+                const userDoc = await this.db.collection('users').doc(participantId).get();
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    participants.push({
+                        uid: participantId,
+                        firstName: userData.firstName || '',
+                        lastName: userData.lastName || '',
+                        fullName: `${userData.firstName || ''} ${userData.lastName || ''}`.trim(),
+                        email: userData.email || '',
+                        phone: userData.phone || '',
+                        attended: attendedIds.includes(participantId),
+                        attendanceStatus: attendedIds.includes(participantId) ? 'Asistió' : 'No confirmado'
+                    });
+                }
+            }
+            
+            // Ordenar por nombre
+            participants.sort((a, b) => a.fullName.localeCompare(b.fullName));
+            
+            return participants;
+        } catch (error) {
+            console.error('Error getting detailed participants:', error);
             throw error;
         }
     }
@@ -653,7 +711,7 @@ class AdminManager {
         }
     }
 
-    // NUEVO: Marcar asistencia
+    // NUEVO: Marcar asistencia individual
     async markAttendance(eventId, participantId) {
         const currentUser = window.firebaseAuth.currentUser;
         
@@ -706,9 +764,9 @@ class AdminManager {
                 event: eventData.title,
                 date: firebase.firestore.Timestamp.fromDate(new Date()),
                 addedBy: currentUser.uid,
-                addedAt: firebase.firestore.Timestamp.fromDate(new Date()), // Usar timestamp manual
-                comments: `Asistencia automática al evento: ${eventData.title}`,
-                type: 'event_attendance' // Tipo para identificar que viene de asistencia a evento
+                addedAt: firebase.firestore.Timestamp.fromDate(new Date()),
+                comments: `Asistencia confirmada al evento: ${eventData.title}`,
+                type: 'event_attendance'
             };
             
             // Actualizar evento con asistencia
@@ -734,6 +792,109 @@ class AdminManager {
             return true;
         } catch (error) {
             console.error('Error marking attendance:', error);
+            throw error;
+        }
+    }
+
+    // NUEVO: Marcar asistencia en lote (checklist)
+    async markAttendanceBatch(eventId, participantIds) {
+        const currentUser = window.firebaseAuth.currentUser;
+        
+        if (!this.db || !currentUser) {
+            throw new Error('Usuario no autenticado');
+        }
+
+        try {
+            const eventDoc = await this.db.collection('eventos').doc(eventId).get();
+            const eventData = eventDoc.data();
+            
+            // Verificar que es admin del voluntariado
+            const isAdmin = await this.isUserAdmin(eventData.voluntariadoId);
+            if (!isAdmin) {
+                throw new Error('Solo los administradores pueden marcar asistencia');
+            }
+
+            const eventHours = eventData.duration || 2;
+            const attendedList = eventData.attended || [];
+            let successCount = 0;
+            let errorCount = 0;
+
+            // Procesar cada participante
+            for (const participantId of participantIds) {
+                try {
+                    // Verificar que el participante está inscrito
+                    if (!eventData.participants || !eventData.participants.includes(participantId)) {
+                        console.warn(`⚠️ Usuario ${participantId} no está inscrito en el evento`);
+                        errorCount++;
+                        continue;
+                    }
+
+                    // Verificar si ya se marcó asistencia
+                    if (attendedList.includes(participantId)) {
+                        console.log(`⚠️ Usuario ${participantId} ya tiene asistencia marcada`);
+                        continue;
+                    }
+
+                    // Actualizar estadísticas del usuario
+                    const userDoc = await this.db.collection('users').doc(participantId).get();
+                    const userData = userDoc.data();
+                    
+                    if (!userData || !userData.voluntariados || !userData.voluntariados[eventData.voluntariadoId]) {
+                        console.warn(`⚠️ Usuario ${participantId} no está inscrito en el voluntariado`);
+                        errorCount++;
+                        continue;
+                    }
+                    
+                    const volunteerData = userData.voluntariados[eventData.voluntariadoId];
+                    
+                    // Actualizar datos del voluntariado
+                    const newEventsCompleted = (volunteerData.eventsCompleted || 0) + 1;
+                    const newTotalHours = (volunteerData.totalHours || 0) + eventHours;
+                    
+                    // Crear entrada de historial de horas
+                    const hoursEntry = {
+                        hours: eventHours,
+                        event: eventData.title,
+                        date: firebase.firestore.Timestamp.fromDate(new Date()),
+                        addedBy: currentUser.uid,
+                        addedAt: firebase.firestore.Timestamp.fromDate(new Date()),
+                        comments: `Asistencia confirmada al evento: ${eventData.title}`,
+                        type: 'event_attendance'
+                    };
+                    
+                    // Obtener historial actual del usuario
+                    const currentHistory = volunteerData.hoursHistory || [];
+                    const updatedHistory = [...currentHistory, hoursEntry];
+                    
+                    // Actualizar usuario con horas y estadísticas
+                    await userDoc.ref.update({
+                        [`voluntariados.${eventData.voluntariadoId}.eventsCompleted`]: newEventsCompleted,
+                        [`voluntariados.${eventData.voluntariadoId}.totalHours`]: newTotalHours,
+                        [`voluntariados.${eventData.voluntariadoId}.lastEventDate`]: firebase.firestore.FieldValue.serverTimestamp(),
+                        [`voluntariados.${eventData.voluntariadoId}.hoursHistory`]: updatedHistory
+                    });
+
+                    successCount++;
+                    console.log(`✅ Asistencia marcada: ${participantId} - ${eventHours}h`);
+                } catch (error) {
+                    console.error(`❌ Error marcando asistencia para ${participantId}:`, error);
+                    errorCount++;
+                }
+            }
+
+            // Actualizar evento con todas las asistencias
+            await eventDoc.ref.update({
+                attended: firebase.firestore.FieldValue.arrayUnion(...participantIds)
+            });
+
+            console.log(`✅ Asistencia en lote completada: ${successCount} exitosos, ${errorCount} errores`);
+            return {
+                success: successCount,
+                errors: errorCount,
+                total: participantIds.length
+            };
+        } catch (error) {
+            console.error('Error marking batch attendance:', error);
             throw error;
         }
     }
