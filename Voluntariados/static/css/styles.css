@@ -230,7 +230,7 @@ body.light-mode .card, body.light-mode .volunteer-card, body.light-mode .event-c
   object-fit: cover;
   transition: transform var(--transition);
 }
-.event-image:hover img { transform: scale(1.05); }
+.event-image:hover img { transform: scale(1.05); transform: rotate(7deg);}
 
 /* Box content */
 .box-content {
@@ -386,10 +386,12 @@ body.light-mode .theme-toggle:hover { background: rgba(0,0,0,0.15); }
 
 .event-image:hover {
     transform: scale(1.03);
+    transform: rotate(-5deg);
     box-shadow: 0 10px 25px rgba(0,0,0,0.15);
 }
 
 .event-image:hover img {
+    transform: rotate(5deg);
     transform: scale(1.05);
 }
 
