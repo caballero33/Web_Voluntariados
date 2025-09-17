@@ -1,0 +1,42 @@
+<div class="column is-6">
+    <div class="event-card card">
+        <div class="card-content">
+            <div class="columns is-vcentered">
+                <div class="column is-2 has-text-centered">
+                    <span class="icon is-large has-text-primary">
+                        <i class="fa-solid {{ icono }} fa-2x"></i>
+                    </span>
+                </div>
+                <div class="column is-7">
+                    <h3 class="title is-4 has-text-white">{{ nombre }}</h3>
+                </div>
+                <div class="column is-3">
+                    <div class="event-image">
+                        <img src="{{ imagen_url }}" 
+                            alt="{{ nombre }} Logo">
+                    </div>
+                </div>
+            </div>
+            <div class="event-details has-text-white">
+                <p>
+                    <strong class="has-text-white">Contacto:</strong>
+                </p>
+                <p><i class="fas fa-globe mr-2"></i><a class="has-text-white" href="{{ sitio }}">{{ sitio }}</a></p>
+                <a class="has-text-white"  href="tel:{{ telefono }}"><i class="fas fa-phone mr-2"></i>{{ telefono }}</a>
+                <br>
+                <a class="has-text-white"  href="mailto:{{ correo }}"><i class="fas fa-envelope mr-2"></i>{{ correo }}</a>
+            </div>
+            <div class="content mt-4">
+                <p class="has-text-white">
+                    {{ descripcion }}
+                </p>
+                <a class="button is-primary mt-3" href="{{ url }}">
+                    <span>Más información sobre cómo unirse</span>
+                    <span class="icon">
+                        <i class="fas fa-arrow-right"></i>
+                    </span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

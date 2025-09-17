@@ -24,5 +24,8 @@ def errores(request):
     return render(request, 'errores.html', context)
 
 def unirse(request):
-    
-    return render(request, 'unirse.html')
+    context = {
+        "enlace_inicio": reverse('home'),
+        "voluntariados": reverse('nuestros_voluntariados:home')
+    }
+    return render(request, 'unirse.html', context)
