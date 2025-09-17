@@ -40,11 +40,12 @@
     <div id="navbarMenu" class="navbar-menu has-background-dark">
       <div class="navbar-start">
         <a href="{% url "home" %}" class="navbar-item has-text-white"><i class="fas fa-home mr-2"></i>Inicio</a>
-        <a href="{% url "reglamento" %}" class="navbar-item has-text-white"><i class="fas fa-book mr-2"></i>Reglamento</a>
+        <a class="navbar-item has-text-white" href="{% url 'unirse' %}"><i class="fas fa-circle-question mr-2"></i>¿Cómo unirse?</a>
         <div class="navbar-item has-dropdown is-hoverable">
           <a class="navbar-item has-text-white"><i class="fas fa-ellipsis-h mr-2"></i>Más</a>
           <div class="navbar-dropdown has-background-dark">
-            <a class="navbar-item has-text-white"><i class="fas fa-users mr-2"></i>Sobre nosotros</a>
+            <a href="{% url "reglamento" %}" class="navbar-item has-text-white"><i class="fas fa-book mr-2"></i>Reglamento</a>
+            <a href="{% url "eventos" %}" class="navbar-item has-text-white"><i class="fas fa-calendar-day mr-2"></i>Eventos Recientes</a>
             <a class="navbar-item has-text-white" href="{% url 'nuestros_voluntariados:home' %}"><i class="fas fa-hand-holding-heart mr-2"></i>Voluntariados</a>
             <hr class="navbar-divider">
             <a class="navbar-item has-text-white" href="{% url 'errores' %}"><i class="fas fa-bug mr-2"></i>Reportar un problema</a>
@@ -132,8 +133,9 @@
               <li><a href="{% url "home" %}"><i class="fas fa-chevron-right mr-2 has-text-primary"></i>Inicio</a></li>
               <li><a href="{% url "reglamento" %}"><i class="fas fa-chevron-right mr-2 has-text-primary"></i>Reglamento</a></li>
               <li><a href="{% url 'nuestros_voluntariados:home' %}"><i class="fas fa-chevron-right mr-2 has-text-primary"></i>Voluntariados</a></li>
-              <li><a href="#"><i class="fas fa-chevron-right mr-2 has-text-primary"></i>Eventos</a></li>
-              <li><a href="#"><i class="fas fa-chevron-right mr-2 has-text-primary"></i>Galeria</a></li>
+              <li><a href="{% url 'unirse' %}"><i class="fas fa-chevron-right mr-2 has-text-primary"></i>¿Cómo unirse?</a></li>
+              <li><a href="{% url 'eventos' %}"><i class="fas fa-chevron-right mr-2 has-text-primary"></i>Eventos Recientes</a></li>
+              <li><a href="{% url 'errores' %}"><i class="fas fa-chevron-right mr-2 has-text-primary"></i>Reportar un error</a></li>
             </ul>
           </div>
         </div>

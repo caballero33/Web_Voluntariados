@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}¿Cómo unirse?{% endblock %}
+
+{% block content %}
+
+{% include "partial/portada_template.html" with icon="fa-users" nombre="¿Cómo unirse?" boton1="Ir al Inicio" boton2="¡Conoce los voluntariados!" eslogan="¡Únete a nuestra causa!" logo_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741579925/ckeskhupgmw0tlfyvgmj.png" icon_boton2="fa-hands-helping" enlace1=enlace_inicio enlace2=voluntariados %}
+
+{% include "partial/space.html" with icon="fa-info-circle" title="¿Cómo unirse?" description="A muchas personas les gustaría unirse a un voluntariado para poder ayudar a los demás y hacer una diferencia en sus comunidades y así aportar para una causa noble. Sin embargo, muchos no saben por dónde empezar o cómo hacerlo.<br><br>Nosotros queremos ayudarle con eso: aquí podrá tener información detallada sobre los distintos voluntariados, junto a la forma de unirse a cada uno." %}
+
+<div class="box-content mt-5">
+    <div class="columns">
+        <div class="column is-12">
+            <h2 class="title is-2 has-text-primary">
+                <i class="fas fa-info-circle mr-2"></i>Voluntariados
+            </h2>
+        </div>
+    </div>
+    
+    <div class="columns is-multiline mt-4">
+
+        <!-- VTIC -->
+        {% include "partial/tarjeta_unirse.html" with icono="fa-microscope" nombre="Voluntariado de Tutorías e Investigación Científica" imagen_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1757627650/Agregar_un_subt%C3%ADtulo_10_irdlej.png" telefono="+504 9777-3865" correo="contacto@ejemplo.com" sitio="https://nvlearn-53156.web.app/" descripcion="Un tutor dentro de nuestra comunidad corre con la responsabilidad de no ser solo un estudiante más, si no comportarse como un agente de cambio, innovación y creatividad académica.<br>Nuestros tutores serán investigadores de su campo comprometidos con cambiar el salón." url="https://nvlearn-53156.web.app/como-ser-tutor" %}
+
+    </div>
+    
+    <div class="has-text-centered mt-5">
+        <a class="button is-primary is-medium" href="{% url 'nuestros_voluntariados:home' %}">
+            <span>Ver todos los voluntariados</span>
+            <span class="icon">
+                <i class="fas fa-arrow-right"></i>
+            </span>
+        </a>
+    </div>
+</div>
+
+{% endblock %}

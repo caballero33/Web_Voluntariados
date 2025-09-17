@@ -8,11 +8,49 @@
       <p class="subtitle is-3 mt-4">Transforma vidas, transforma comunidades, transforma el mundo</p>
       <div class="mt-5">
         <div class="buttons is-centered">
-          <a href="#voluntariados" class="button is-light is-large"><strong>Ver Voluntariados</strong></a>
-          <a href="#beneficios" class="button is-link is-large has-text-white"><i class="fas fa-gift mr-2"></i>Beneficios</a>
+          <a href="{% url 'unirse' %}" class="button is-light is-large"><strong>¿Quieres saber cómo unirte?</strong></a>
+          <a href="#donaciones" class="button is-link is-large has-text-white"><i class="fas fa-gift mr-2"></i>Donaciones</a>
         </div>
       </div>
     </div>
+  </div>
+</section>
+<br>
+<section class="section has-background-primary-light" id="voluntariados">
+  <div class="container">
+    <div class="has-text-centered mb-6">
+      <h2 class="title is-2 has-text-primary"><i class="fas fa-hands-helping mr-2"></i>Nuestros Voluntariados</h2>
+      <p class="subtitle">Descubre cómo puedes contribuir según tus intereses</p>
+      <div class="tabs is-centered is-boxed mt-5" id="filtros-voluntariados">
+        <ul>
+          <li class="is-active" data-categoria="todos"><a>Todos</a></li>
+          <li data-categoria="ambiental"><a>Medio Ambiente</a></li>
+          <li data-categoria="social"><a>Social</a></li>
+          <li data-categoria="educacion"><a>Educación</a></li>
+          <li data-categoria="animal"><a>Animales</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="columns is-multiline is-variable is-4" id="contenedor-voluntariados">
+        <!-- Voluntariado de Educación e Investigación Científica -->
+        {% include "partial/voluntariados.html" with color_class="is-link" categorias="social educacion" logo_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1757627650/Agregar_un_subt%C3%ADtulo_10_irdlej.png" tags=tags_vtic nombre="VTIC" descripcion="Voluntariado de educación e investigación científica de la UNAH, comprometido con la excelencia académica y el desarrollo de nuestros estudiantes a través de tutorías especializadas y grupos de investigación." voluntarios=95 proyectos=10 url="https://nvlearn-53156.web.app/" %}
+        
+        <!-- Pumas Verdes -->
+        {% include "partial/voluntariados.html" with color_class="is-success" categorias="ambiental social" logo_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741580608/Logo_PV_UNAH_VS-removebg-preview_jadsip.png" tags=tags_pumas_verdes nombre="Pumas Verdes" descripcion="Comprometidos con la sostenibilidad ambiental y la educación ecológica en nuestro campus y comunidades." voluntarios=85 proyectos=12 url=url_pumas_verdes %}
+
+        <!-- Sonriendo Juntos -->
+        {% include "partial/voluntariados.html" with color_class="is-warning" categorias="social" logo_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741580995/c31eebe3-8666-4c25-ba58-c81ae0da5ab6-removebg-preview_b1an3v.png" tags=tags_sonriendo_juntos nombre="Sonriendo Juntos" descripcion="Transformando vidas a través de la salud y bienestar, colaborando con Operación Sonrisa Honduras." voluntarios=120 proyectos=8 url=url_sonriendo_juntos %}
+
+        <!-- Patitas UNAH -->
+        {% include "partial/voluntariados.html" with color_class="is-danger" categorias="animal social" logo_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741580981/273c01b6-b5ce-4abb-af34-c5046222a2d6-removebg-preview_ycw82u.png" tags=tags_patitas_unah nombre="Patitas UNAH" descripcion="Protectores de la vida animal: Rescate, rehabilitación y concienciación sobre tenencia responsable." voluntarios=65 proyectos=15 url=url_patitas_unah %}
+
+        <!-- Pumas Unidos -->
+        {% include "partial/voluntariados.html" with color_class="is-warning" categorias="social" logo_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741581160/27022b04-71eb-4808-95e2-fbc2c4e43738-removebg-preview_hewtfm.png" tags=tags_pumas_unidos nombre="Pumas Unidos" descripcion="Acciones solidarias que fortalecen comunidades vulnerables mediante ayuda humanitaria y educación." voluntarios=110 proyectos=20 url=url_pumas_unidos %}
+
+        <!-- Pumas en Acción -->
+        {% include "partial/voluntariados.html" with color_class="is-info" categorias="social educacion" logo_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1743287190/f24b026d-f1f9-4f7d-8ada-2bd7f071bb9e_nehray.jpg" tags=tags_pumas_en_accion nombre="Pumas en Acción" descripcion="Programas de alfabetización y refuerzo educativo en comunidades con bajos recursos educativos." voluntarios=95 proyectos=10 url=url_pumas_en_accion %}
+
+      </div>
   </div>
 </section>
 <section class="section" id="beneficios">
@@ -63,43 +101,7 @@
     </div>
   </div>
 </section>
-<section class="section has-background-primary-light" id="voluntariados">
-  <div class="container">
-    <div class="has-text-centered mb-6">
-      <h2 class="title is-2 has-text-primary"><i class="fas fa-hands-helping mr-2"></i>Nuestros Voluntariados</h2>
-      <p class="subtitle">Descubre cómo puedes contribuir según tus intereses</p>
-      <div class="tabs is-centered is-boxed mt-5" id="filtros-voluntariados">
-        <ul>
-          <li class="is-active" data-categoria="todos"><a>Todos</a></li>
-          <li data-categoria="ambiental"><a>Medio Ambiente</a></li>
-          <li data-categoria="social"><a>Social</a></li>
-          <li data-categoria="educacion"><a>Educación</a></li>
-          <li data-categoria="animal"><a>Animales</a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="columns is-multiline is-variable is-4" id="contenedor-voluntariados">
-        <!-- Voluntariado de Educación e Investigación Científica -->
-        {% include "partial/voluntariados.html" with color_class="is-link" categorias="social educacion" logo_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1757627650/Agregar_un_subt%C3%ADtulo_10_irdlej.png" tags=tags_vtic nombre="VTIC" descripcion="Voluntariado de educación e investigación científica de la UNAH, comprometido con la excelencia académica y el desarrollo de nuestros estudiantes a través de tutorías especializadas y grupos de investigación." voluntarios=95 proyectos=10 url="https://nvlearn-53156.web.app/" %}
-        
-        <!-- Pumas Verdes -->
-        {% include "partial/voluntariados.html" with color_class="is-success" categorias="ambiental social" logo_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741580608/Logo_PV_UNAH_VS-removebg-preview_jadsip.png" tags=tags_pumas_verdes nombre="Pumas Verdes" descripcion="Comprometidos con la sostenibilidad ambiental y la educación ecológica en nuestro campus y comunidades." voluntarios=85 proyectos=12 url=url_pumas_verdes %}
 
-        <!-- Sonriendo Juntos -->
-        {% include "partial/voluntariados.html" with color_class="is-warning" categorias="social" logo_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741580995/c31eebe3-8666-4c25-ba58-c81ae0da5ab6-removebg-preview_b1an3v.png" tags=tags_sonriendo_juntos nombre="Sonriendo Juntos" descripcion="Transformando vidas a través de la salud y bienestar, colaborando con Operación Sonrisa Honduras." voluntarios=120 proyectos=8 url=url_sonriendo_juntos %}
-
-        <!-- Patitas UNAH -->
-        {% include "partial/voluntariados.html" with color_class="is-danger" categorias="animal social" logo_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741580981/273c01b6-b5ce-4abb-af34-c5046222a2d6-removebg-preview_ycw82u.png" tags=tags_patitas_unah nombre="Patitas UNAH" descripcion="Protectores de la vida animal: Rescate, rehabilitación y concienciación sobre tenencia responsable." voluntarios=65 proyectos=15 url=url_patitas_unah %}
-
-        <!-- Pumas Unidos -->
-        {% include "partial/voluntariados.html" with color_class="is-warning" categorias="social" logo_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741581160/27022b04-71eb-4808-95e2-fbc2c4e43738-removebg-preview_hewtfm.png" tags=tags_pumas_unidos nombre="Pumas Unidos" descripcion="Acciones solidarias que fortalecen comunidades vulnerables mediante ayuda humanitaria y educación." voluntarios=110 proyectos=20 url=url_pumas_unidos %}
-
-        <!-- Pumas en Acción -->
-        {% include "partial/voluntariados.html" with color_class="is-info" categorias="social educacion" logo_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1743287190/f24b026d-f1f9-4f7d-8ada-2bd7f071bb9e_nehray.jpg" tags=tags_pumas_en_accion nombre="Pumas en Acción" descripcion="Programas de alfabetización y refuerzo educativo en comunidades con bajos recursos educativos." voluntarios=95 proyectos=10 url=url_pumas_en_accion %}
-
-      </div>
-  </div>
-</section>
 <section class="section">
   <div class="container">
     <div class="box-content">
@@ -154,12 +156,6 @@
             <p>Sí, puedes participar en múltiples voluntariados siempre que puedas comprometerte adecuadamente con cada uno. Recomendamos comenzar con uno y luego expandir tu participación.</p>
           </div>
         </div>
-      </div>
-      <br>
-      <div class="has-text-centered mt-6">
-        <a href="#" class="button is-primary is-large">
-          <i class="fas fa-comments mr-2"></i>¿Preguntas?
-        </a>
       </div>
     </div>
   </div>
