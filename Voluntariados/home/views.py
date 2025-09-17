@@ -29,3 +29,10 @@ def unirse(request):
         "voluntariados": reverse('nuestros_voluntariados:home')
     }
     return render(request, 'unirse.html', context)
+
+def eventos(request):
+    context = {
+        "enlace_inicio": reverse('home'),
+        "voluntariados": reverse('nuestros_voluntariados:home')
+    }
+    return render(request, 'eventos.html', context)

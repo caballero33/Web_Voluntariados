@@ -1,0 +1,25 @@
+<div class="columns is-vcentered">
+    <div class="column is-2 has-text-centered icon is-large has-text-primary">
+            <i class="fa-solid {{ icon }} fa-4x"></i>
+    </div>
+    <div class="column is-7">
+        <div>
+            <h2 class="title is-2 has-text-primary">
+                {{ title }}
+            </h2>
+            <div class="event-details has-text-white">
+                <p class="mb-2"><i class="fas fa-calendar-day mr-2"></i>{{ date }}</p>
+                <p><i class="fas fa-map-marker-alt mr-2"></i>{{ location }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="column is-3">
+        <div class="event-images">
+            <img src="{{ image_url }}" 
+                alt="{{ title }}">
+        </div>
+    </div>
+</div>
+<p>
+    {{ description }}
+</p>
