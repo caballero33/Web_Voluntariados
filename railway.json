@@ -3,8 +3,8 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "gunicorn Voluntariados.wsgi --bind 0.0.0.0:$PORT",
+    "startCommand": "python manage.py collectstatic --noinput && gunicorn Voluntariados.wsgi --bind 0.0.0.0:$PORT",
     "healthcheckPath": "/",
-    "healthcheckTimeout": 100
+    "healthcheckTimeout": 300
   }
 }
