@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Inicio{% endblock %}
+
+{% block content %}
+
+<!-- Esta es la parte de bienvenida -->
+<div class="box-content">
+    <section class="hero is-medium is-primary transicion">
+        <div class="hero-body">
+            <div class="container has-text-centered">
+                <h1 class="title is-1">
+                    <i class="fas fa-hands-helping mr-3"></i>Juntos Transformando Comunidades
+                </h1>
+                <p class="subtitle is-3 mt-4">
+                    Una red universitaria comprometida con el desarrollo social y ambiental a través de la acción voluntaria organizada.
+                </p>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- Aquí están los eventos -->
+<div class="box-content mt-5">
+    <div class="columns">
+        <div class="column is-12">
+            <h2 class="title is-2 has-text-primary">
+                <i class="fas fa-history mr-2"></i>Eventos Recientes
+            </h2>
+        </div>
+    </div>
+    
+    <div class="columns is-multiline mt-4">
+
+        <!-- Evento 1 -->
+        {% include "partial/eventos_home.html" with evento_icono="fa-warehouse" evento_titulo="Inauguración del Nuevo Espacio de Voluntariado" evento_imagen_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741583384/b7cffaf1-0995-42fb-b8e8-c306a6fee7d2_nfsdyo.jpg" evento_fecha="15 de Marzo, 2025" evento_ubicacion="UNAH - Cortés" evento_descripcion="Únete a nosotros en este hito histórico para nuestra organización universitaria." evento_url="#" %}
+
+    </div>
+    
+    <div class="has-text-centered mt-5">
+        <a class="button is-primary is-medium" href="{% url 'eventos' %}">
+            <span>Ver todos los eventos</span>
+            <span class="icon">
+                <i class="fas fa-arrow-right"></i>
+            </span>
+        </a>
+    </div>
+</div>
+    
+<!-- Voluntariados -->
+    <div class="box-content mt-5">
+        <h2 class="title is-2 has-text-centered has-text-primary">Nuestros Voluntariados</h2>
+        <p class="subtitle has-text-centered has-text-white">Descubre cómo puedes contribuir según tus intereses</p>
+        
+        <div class="columns mt-5 is-variable is-4">
+            <!-- Pumas Verdes -->
+            {% include "partial/voluntariado_home.html" with nombre="Pumas Verdes" eslogan="Comprometidos con la sostenibilidad ambiental y la educación ecológica en nuestro campus y comunidades." logo_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741580608/Logo_PV_UNAH_VS-removebg-preview_jadsip.png" url=url_pumas_verdes %}
+            
+            <!-- Sonriendo Juntos -->
+            {% include "partial/voluntariado_home.html" with nombre="Sonriendo Juntos" eslogan="Transformando vidas a través de la salud y bienestar, colaborando con Operación Sonrisa Honduras." logo_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741580995/c31eebe3-8666-4c25-ba58-c81ae0da5ab6-removebg-preview_b1an3v.png" url=url_sonriendo_juntos %}
+            
+            <!-- Patitas UNAH -->
+            {% include "partial/voluntariado_home.html" with nombre="Patitas UNAH" eslogan="Protectores de la vida animal: Rescate, rehabilitación y concienciación sobre tenencia responsable." logo_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741580981/273c01b6-b5ce-4abb-af34-c5046222a2d6-removebg-preview_ycw82u.png" url=url_patitas_unah %}
+            
+            <!-- Voluntariado de Tutorías e Investigación Científica -->
+            {% include "partial/voluntariado_home.html" with nombre="Voluntariado de Tutorías e Investigación Científica" eslogan="Comprometido con la excelencia académica y el desarrollo de nuestros estudiantes a través de tutorías especializadas y grupos de investigación." logo_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1757627650/Agregar_un_subt%C3%ADtulo_10_irdlej.png" url="https://nvlearn-53156.web.app/" %}
+        </div>
+        <div class="has-text-centered mt-6">
+            <a href="{% url 'nuestros_voluntariados:home' %}" class="button is-primary is-large">
+                <i class="fa-solid fa-table mr-2"></i></i>Ver todos
+            </a>
+        </div>
+    </div>
+    
+{% endblock %}

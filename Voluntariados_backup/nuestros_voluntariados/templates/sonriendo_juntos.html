@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Voluntariados{% endblock %}
+{% block content %}
+<script src="{% static 'js/sonriendo_juntos.js' %}"></script>
+{% include "partial/portada.html" with nombre="Sonriendo Juntos" icon="fa-face-smile-wink" eslogan="Transformando vidas a través de la solidaridad." logo_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741580995/c31eebe3-8666-4c25-ba58-c81ae0da5ab6-removebg-preview_b1an3v.png" %}
+
+<!-- Nuestra Misión -->
+{% include "partial/mision.html" with title="Nuestra Labor" description="Como aliados oficiales de Operación Sonrisa Honduras, trabajamos para brindar atención médica especializada y mejorar la calidad de vida en comunidades vulnerables, promoviendo el acceso a salud y bienestar integral." %}
+
+<!-- Aquí están los eventos -->
+<div class="box-content mt-5">
+    <div class="columns">
+        <div class="column is-12">
+            <h2 class="title is-2 has-text-primary">
+                <i class="fa-solid fa-check mr-2"></i>Nuestras Acciones
+            </h2>
+        </div>
+    </div>
+    
+    <div class="columns is-multiline mt-4">
+
+        {% include "partial/eventos.html" with icon="fa-hand-holding-medical" title="Apoyo en cirugías reconstructivas" image_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741581327/903e32da-1f53-4d27-a306-443721b6fff8_for9su.jpg" alt="Inauguración espacio voluntariado" description="Brindar asistencia especializada en procedimientos quirúrgicos reconstructivos, contribuyendo a la recuperación funcional y estética de los pacientes, y mejorando su calidad de vida."%}
+
+        {% include "partial/eventos.html" with icon="fa-hands-helping" title="Equipo multidisciplinario trabajando" image_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741581326/a1a1ed2e-af7d-4824-9226-4245920e4092_nmdb2t.jpg" alt="Talleres de educación ambiental" description="Coordinar profesionales de distintas especialidades para ofrecer atención integral y colaborativa, asegurando que cada paciente reciba un enfoque completo y eficiente en su tratamiento."%}
+
+        {% include "partial/eventos.html" with icon="fa-bullhorn" title="Campañas de concienciación comunitaria" image_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741581334/4f83131d-ed1a-474d-b56b-23c03b2ecf0b_lewyqm.jpg" alt="Reciclaje comunitario" description="Difundir información y educar a la comunidad sobre temas relevantes, promoviendo actitudes responsables y participativas que mejoren el bienestar social y colectivo."%}
+
+    </div>
+</div>
+
+<!-- Contact Information Section -->
+{% include "partial/contacto.html" with contacto_mensaje="¿Quieres Ayudar a Sonreír?" contacto_email="sonriendojuntossps@gmail.com" contacto_slogan="Creando sonrisas, transformando vidas" %}
+
+{% endblock %}

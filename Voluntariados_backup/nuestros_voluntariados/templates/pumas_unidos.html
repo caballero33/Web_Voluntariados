@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Voluntariados{% endblock %}
+{% block content %}
+<script src="{% static 'js/pumas_unidos.js' %}"></script>
+{% include "partial/portada.html" with nombre="Pumas Unidos" icon="fa-people-group" eslogan="Solidaridad que transforma comunidades." logo_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741581160/27022b04-71eb-4808-95e2-fbc2c4e43738-removebg-preview_hewtfm.png" %}
+
+<!-- Nuestra Misión -->
+{% include "partial/mision.html" with title="Nuestra Esencia" description=" Como voluntariado social de la UNAH-CORTÉS, unimos esfuerzos para crear iniciativas solidarias que impacten positivamente en comunidades vulnerables, promoviendo la justicia social y el desarrollo comunitario." %}
+
+<!-- Aquí están los eventos -->
+<div class="box-content mt-5">
+    <div class="columns">
+        <div class="column is-12">
+            <h2 class="title is-2 has-text-primary">
+                <i class="fa-solid fa-check mr-2"></i>Nuestras Acciones
+            </h2>
+        </div>
+    </div>
+    
+    <div class="columns is-multiline mt-4">
+
+        {% include "partial/eventos.html" with icon="fa-utensils" title="Programas de ayuda alimentaria" image_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741581813/77097b02-7e75-46ca-bdc2-eb948a0ff50b_wvidlo.jpg" alt="Inauguración espacio voluntariado" description="Proveer alimentos y recursos nutricionales a personas o comunidades en situación de vulnerabilidad, contribuyendo a la seguridad alimentaria y al bienestar general."%}
+
+        {% include "partial/eventos.html" with icon="fa-chalkboard-teacher" title="Talleres de desarrollo comunitario" image_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741581817/238de5f8-fa9d-4bfe-a490-a013e2b6dada_uqs7cn.jpg" alt="Talleres de educación ambiental" description="Organizar espacios educativos y prácticos donde la comunidad pueda adquirir habilidades, conocimientos y herramientas para fortalecer su autonomía, participación y desarrollo integral."%}
+
+        {% include "partial/eventos.html" with icon="fa-book-reader" title="Programas de refuerzo educativo" image_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741581820/779eb62b-a945-4753-91ef-aa525b148083_aufaa7.jpg" alt="Reciclaje comunitario" description="Ofrecer apoyo académico adicional a estudiantes para mejorar su comprensión, desempeño y aprendizaje, fortaleciendo sus competencias y fomentando el éxito escolar."%}
+        
+        {% include "partial/eventos.html" with icon="fa-hand-holding-heart" title="Campañas de donaciones" image_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741581824/71f9b4e3-176e-42c5-9d90-2f5a1ce4ab73_pgkw4e.jpg" alt="Reciclaje comunitario" description="Promover la recolección de recursos, bienes o fondos destinados a apoyar causas sociales, humanitarias o comunitarias, fomentando la solidaridad y el bienestar de quienes más lo necesitan."%}
+    
+    </div>
+</div>
+
+<!-- Contact Information Section -->
+{% include "partial/contacto.html" with contacto_mensaje="¿Quieres Ayudar a la causa?" contacto_email="pumasunidos824@gmail.com" contacto_slogan="Construyendo puentes de solidaridad universitaria." %}
+
+{% endblock %}

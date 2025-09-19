@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Voluntariados{% endblock %}
+{% block content %}
+<script src="{% static 'js/pumas_verdes.js' %}"></script>
+{% include "partial/portada.html" with nombre="Pumas Verdes" icon="fa-leaf" eslogan="Protectores del medio ambiente universitario." logo_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741580608/Logo_PV_UNAH_VS-removebg-preview_jadsip.png" galeria="#galeria" unirse="#unirse" %}
+
+<!-- Nuestra Misión -->
+{% include "partial/mision.html" with title="Nuestra Misión" description="Como brazo ecológico de la Asociación de Voluntariado Universitario UNAH-CORTÉS, nos dedicamos a promover la sostenibilidad ambiental a través de acciones concretas, educación ecológica y la creación de espacios verdes en nuestro campus y comunidades aledañas." %}
+
+<!-- Aquí están los eventos -->
+<div class="box-content mt-5">
+    <div class="columns">
+        <div class="column is-12">
+            <h2 class="title is-2 has-text-primary">
+                <i class="fa-solid fa-check mr-2"></i>Nuestras Acciones
+            </h2>
+        </div>
+    </div>
+    
+    <div class="columns is-multiline mt-4">
+
+        {% include "partial/eventos.html" with icon="fa-seedling" title="Reforestación en áreas comunes" image_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741580386/991050f6-89ab-4b54-b468-2284c26d4af2_mzhfyb.jpg" alt="Inauguración espacio voluntariado" description="Promover la plantación y cuidado de árboles y vegetación en espacios compartidos, contribuyendo a mejorar el entorno, la biodiversidad y la calidad del aire."%}
+
+        {% include "partial/eventos.html" with icon="fa-book-atlas" title="Talleres de educación ambiental" image_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741580383/502709ed-9582-4c3c-8691-62b5e10e71f0_f0ns6g.jpg" alt="Talleres de educación ambiental" description="Actividades formativas diseñadas para sensibilizar y capacitar a las personas sobre la importancia del cuidado del medio ambiente, fomentando hábitos sostenibles y respeto por la naturaleza."%}
+
+        {% include "partial/eventos.html" with icon="fa-recycle" title="Reciclaje comunitario" image_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741580373/30b4eeb2-133d-4d44-8e98-0062bfa9de34_xkttiw.jpg" alt="Reciclaje comunitario" description="Jornadas organizadas para que la comunidad participe activamente en la recolección, separación y correcto manejo de residuos, promoviendo la sostenibilidad y reduciendo el impacto ambiental local."%}
+
+        {% include "partial/eventos.html" with icon="fa-people-carry-box" title="Equipo de voluntarios en acción" image_url="https://res.cloudinary.com/dcm2dsjov/image/upload/v1741580380/624dd7e1-0f06-41af-8bfd-3a96e3aef70c_cdy2yc.jpg" alt="Equipo de voluntarios en acción" description="Grupo de personas comprometidas que colaboran activamente en proyectos y actividades comunitarias, uniendo esfuerzos para generar un impacto positivo en el entorno social y ambiental."%}
+
+    </div>
+</div>
+
+<!-- Contact Information Section -->
+{% include "partial/contacto.html" with contacto_mensaje="¿Quieres Ayudar a Pumas Verdes?" contacto_email="pumasverdesunahvs10@gmail.com" contacto_slogan="Comprometidos con un futuro sostenible." %}
+
+{% endblock %}

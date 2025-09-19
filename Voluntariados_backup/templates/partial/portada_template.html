@@ -1,0 +1,26 @@
+<section class="hero is-medium is-primary">
+    <div class="hero-body">
+        <div class="container">
+            <div class="columns is-vcentered is-variable is-6">
+                <div class="column is-7-desktop is-12-mobile">
+                    <div class="has-text-centered hero-header-content">
+                        <h1 class="title is-1 mb-2"><i class="fa-solid {{ icon }} mr-3"></i>{{ nombre }}</h1>
+                        <div class="mt-5 mb-4">
+                            <div class="buttons is-centered">
+                                <a href="{{ enlace1 }}" class="button is-light is-large"><strong>{{ boton1 }}</strong></a>
+                                <a href="{{ enlace2 }}" class="button is-primary is-large subtitle"><i class="fa-solid {{ icon_boton2 }} mr-3"></i>{{ boton2 }}</a>
+                            </div>
+                        </div>
+                        <p class="subtitle is-3 mt-4">{{ eslogan }}</p>
+                    </div>
+                </div>
+                <div class="column is-5-desktop is-12-mobile">
+                    <div class="hero-logo-container hero-logo-responsive">
+                        <img src="{{ logo_url }}"
+                            alt="Logo {{ nombre }}">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,488 @@
+{% extends "base.html" %}
+
+{% block title %}Unirse a Voluntariado{% endblock %}
+
+{% block content %}
+<div class="columns is-centered">
+    <div class="column is-half">
+        <div class="box-content">
+            <div class="has-text-centered mb-6">
+                <div class="mb-4">
+                    <a href="{% url 'auth:dashboard' %}" class="button is-light is-small back-button">
+                        <span class="icon">
+                            <i class="fas fa-arrow-left"></i>
+                        </span>
+                        <span>Regresar</span>
+                    </a>
+                </div>
+                <h1 class="title is-2 has-text-primary">
+                    <i class="fas fa-users mr-3"></i>Unirse a Voluntariados
+                </h1>
+                <p class="subtitle has-text-white">Puedes unirte a múltiples voluntariados. Ingresa el código único del voluntariado al que deseas unirte</p>
+            </div>
+
+            <form id="join-voluntariado-form" class="box">
+                <div class="field">
+                    <label class="label">Código del Voluntariado</label>
+                    <div class="control has-icons-left">
+                        <input class="input" type="text" id="voluntariado-code" 
+                               placeholder="Ej: PV2025" required maxlength="10" style="text-transform: uppercase;">
+                        <span class="icon is-small is-left">
+                            <i class="fas fa-key"></i>
+                        </span>
+                    </div>
+                    <p class="help">Pide el código al coordinador del voluntariado</p>
+                </div>
+
+                <div class="field">
+                    <div class="control">
+                        <button class="button is-primary is-fullwidth" type="submit">
+                            <span class="icon">
+                                <i class="fas fa-user-plus"></i>
+                            </span>
+                            <span>Unirse al Voluntariado</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Información de voluntariados disponibles -->
+            <div class="box mt-5">
+                <h3 class="title is-4 has-text-primary mb-4">
+                    <i class="fas fa-info-circle mr-2"></i>Voluntariados Disponibles
+                </h3>
+                <p class="subtitle is-6 has-text-grey mb-4">Puedes unirte a cualquiera de estos voluntariados usando su código único</p>
+                
+                <div class="columns is-multiline" id="voluntariados-list">
+                    <!-- Se cargarán dinámicamente -->
+                </div>
+            </div>
+
+            <!-- Mis voluntariados actuales -->
+            <div class="box mt-5" id="my-voluntariados" style="display: none;">
+                <h3 class="title is-4 has-text-primary mb-4">
+                    <i class="fas fa-heart mr-2"></i>Mis Voluntariados
+                </h3>
+                
+                <div class="columns is-multiline" id="user-voluntariados-list">
+                    <!-- Se cargarán dinámicamente -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const joinForm = document.getElementById('join-voluntariado-form');
+    
+    // Auto-uppercase del código
+    document.getElementById('voluntariado-code').addEventListener('input', function() {
+        this.value = this.value.toUpperCase();
+    });
+    
+    joinForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const code = document.getElementById('voluntariado-code').value.trim();
+        const submitButton = joinForm.querySelector('button[type="submit"]');
+        
+        if (!code) {
+            window.authManager.showMessage('Por favor ingresa un código válido.', 'error');
+            return;
+        }
+        
+        // Deshabilitar botón durante la operación
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<span class="icon"><i class="fas fa-spinner fa-spin"></i></span><span>Procesando...</span>';
+        
+        try {
+            const result = await window.voluntariadosManager.joinVoluntariadoByCode(code);
+            
+            if (result.success) {
+                window.authManager.showMessage(result.message, 'success');
+                document.getElementById('voluntariado-code').value = '';
+                
+                // Recargar la lista de voluntariados del usuario
+                loadUserVoluntariados();
+            }
+            
+        } catch (error) {
+            window.authManager.showMessage(error.message, 'error');
+        } finally {
+            // Rehabilitar botón
+            submitButton.disabled = false;
+            submitButton.innerHTML = '<span class="icon"><i class="fas fa-user-plus"></i></span><span>Unirse al Voluntariado</span>';
+        }
+    });
+    
+    // Cargar voluntariados disponibles
+    loadAvailableVoluntariados();
+    loadUserVoluntariados();
+});
+
+// Función de diagnóstico para verificar voluntariados
+window.debugVoluntariados = async function() {
+    // Debug log removed
+    
+    try {
+        // 1. Verificar VoluntariadosManager
+        if (!window.voluntariadosManager) {
+            // Debug log removed
+            return;
+        }
+        // Debug log removed
+        
+        // 2. Verificar Firestore
+        if (!window.firebaseDb) {
+            // Debug log removed
+            return;
+        }
+        // Debug log removed
+        
+        // 3. Consultar voluntariados directamente
+        // Debug log removed
+        const snapshot = await window.firebaseDb.collection('voluntariados').get();
+        // Debug log removed
+        
+        if (snapshot.empty) {
+            // Debug log removed
+            return;
+        }
+        
+        // 4. Mostrar voluntariados encontrados
+        snapshot.docs.forEach((doc, index) => {
+            const data = doc.data();
+            // Debug log removed
+        });
+        
+        // 5. Probar función getAllVoluntariados
+        // Debug log removed
+        const voluntariados = await window.voluntariadosManager.getAllVoluntariados();
+        // Debug log removed
+        
+    } catch (error) {
+        console.error('❌ Error en diagnóstico:', error);
+    }
+    
+    // Debug log removed
+};
+
+async function loadAvailableVoluntariados() {
+    try {
+        // Debug log removed
+        
+        // Verificar que VoluntariadosManager esté disponible
+        if (!window.voluntariadosManager) {
+            console.error('❌ VoluntariadosManager no está disponible');
+            const container = document.getElementById('voluntariados-list');
+            if (container) {
+                container.innerHTML = '<p class="has-text-danger">Error: VoluntariadosManager no está disponible</p>';
+            }
+            return;
+        }
+        
+        // Debug log removed
+        const voluntariados = await window.voluntariadosManager.getAllVoluntariados();
+        // Debug log removed
+        
+        const container = document.getElementById('voluntariados-list');
+        
+        if (!container) {
+            console.error('❌ Container voluntariados-list no encontrado');
+            return;
+        }
+        
+        if (voluntariados.length === 0) {
+            // Debug log removed
+            container.innerHTML = '<p class="has-text-grey">No hay voluntariados disponibles.</p>';
+            return;
+        }
+        
+        container.innerHTML = voluntariados.map(vol => `
+            <div class="column is-6">
+                <div class="card available-volunteer-card">
+                    <div class="card-content">
+                        <div class="media">
+                            <div class="media-left">
+                                <figure class="image is-48x48">
+                                    <img src="${vol.logo}" alt="${vol.name}" style="border-radius: 8px;">
+                                </figure>
+                            </div>
+                            <div class="media-content">
+                                <p class="title is-6 has-text-primary">${vol.name}</p>
+                                <p class="subtitle is-7 has-text-info">
+                                    <i class="fas fa-key mr-1"></i>Código: <strong>${vol.code}</strong>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="content">
+                            <p class="is-small has-text-grey">${vol.description}</p>
+                            <div class="level is-mobile mt-3">
+                                <div class="level-item has-text-centered">
+                                    <div>
+                                        <p class="heading">Categoría</p>
+                                        <span class="tag is-${getCategoryColor(vol.category)}">${vol.category}</span>
+                                    </div>
+                                </div>
+                                <div class="level-item has-text-centered">
+                                    <div>
+                                        <p class="heading">Miembros</p>
+                                        <p class="title is-6">${vol.memberCount}/${vol.maxMembers}</p>
+                                    </div>
+                                </div>
+                                <div class="level-item has-text-centered">
+                                    <div>
+                                        <p class="heading">Estado</p>
+                                        <span class="tag is-${vol.active ? 'success' : 'danger'}">${vol.active ? 'Activo' : 'Inactivo'}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+        
+        // Debug log removed
+        
+    } catch (error) {
+        console.error('❌ Error cargando voluntariados:', error);
+        const container = document.getElementById('voluntariados-list');
+        if (container) {
+            container.innerHTML = `
+                <div class="column is-12">
+                    <div class="notification is-danger">
+                        <p class="has-text-white">Error al cargar voluntariados: ${error.message}</p>
+                    </div>
+                </div>
+            `;
+        }
+    }
+}
+
+async function loadUserVoluntariados() {
+    try {
+        const userVoluntariados = await window.voluntariadosManager.getUserVoluntariados();
+        const container = document.getElementById('user-voluntariados-list');
+        const section = document.getElementById('my-voluntariados');
+        
+        if (userVoluntariados.length === 0) {
+            section.style.display = 'none';
+            return;
+        }
+        
+        section.style.display = 'block';
+        container.innerHTML = userVoluntariados.map(vol => `
+            <div class="column is-6">
+                <div class="card my-volunteer-card">
+                    <div class="card-content">
+                        <div class="media">
+                            <div class="media-left">
+                                <figure class="image is-48x48">
+                                    <img src="${vol.logo}" alt="${vol.name}" style="border-radius: 8px;">
+                                </figure>
+                            </div>
+                            <div class="media-content">
+                                <p class="title is-6 has-text-success">${vol.name}</p>
+                                <p class="subtitle is-7 has-text-success">
+                                    <i class="fas fa-check-circle mr-1"></i>Miembro Activo
+                                </p>
+                                <p class="is-size-7 has-text-info">Código: ${vol.code}</p>
+                            </div>
+                        </div>
+                        <div class="content">
+                            <div class="level is-mobile">
+                                <div class="level-item has-text-centered">
+                                    <div>
+                                        <p class="heading">Eventos</p>
+                                        <p class="title is-6">${vol.userData.eventsCompleted || 0}</p>
+                                    </div>
+                                </div>
+                                <div class="level-item has-text-centered">
+                                    <div>
+                                        <p class="heading">Horas</p>
+                                        <p class="title is-6">${vol.userData.totalHours || 0}</p>
+                                    </div>
+                                </div>
+                                <div class="level-item has-text-centered">
+                                    <div>
+                                        <p class="heading">Estado</p>
+                                        <span class="tag is-success">${vol.userData.status}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="has-text-centered mt-3">
+                                <span class="tag is-${getCategoryColor(vol.category)}">${vol.category}</span>
+                            </div>
+                            <div class="buttons is-centered mt-3">
+                                <button class="button is-small is-info" onclick="viewVoluntariadoDetails('${vol.id}')">
+                                    <span class="icon"><i class="fas fa-eye"></i></span>
+                                    <span>Ver Detalles</span>
+                                </button>
+                                <button class="button is-small is-danger is-outlined" onclick="leaveVoluntariado('${vol.id}')">
+                                    <span class="icon"><i class="fas fa-sign-out-alt"></i></span>
+                                    <span>Abandonar</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+        
+    } catch (error) {
+        console.error('Error cargando voluntariados del usuario:', error);
+    }
+}
+
+function getCategoryColor(category) {
+    const colors = {
+        'medio-ambiente': 'success',
+        'social': 'info',
+        'animales': 'warning',
+        'educacion': 'danger',
+        'salud': 'primary'
+    };
+    return colors[category] || 'light';
+}
+
+async function leaveVoluntariado(voluntariadoId) {
+    if (!confirm('¿Estás seguro de que quieres abandonar este voluntariado?')) {
+        return;
+    }
+    
+    try {
+        const result = await window.voluntariadosManager.leaveVoluntariado(voluntariadoId);
+        if (result.success) {
+            window.authManager.showMessage(result.message, 'info');
+            loadUserVoluntariados();
+        }
+    } catch (error) {
+        window.authManager.showMessage(error.message, 'error');
+    }
+}
+
+function viewVoluntariadoDetails(voluntariadoId) {
+    // Redirigir al dashboard del voluntariado
+    window.location.href = `/auth/dashboard/?voluntariado=${voluntariadoId}`;
+}
+</script>
+
+<style>
+.available-volunteer-card, .my-volunteer-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.available-volunteer-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    border-color: var(--color-primary);
+}
+
+.my-volunteer-card {
+    border-color: #00d1b2;
+    background: linear-gradient(135deg, rgba(0, 209, 178, 0.05), rgba(0, 209, 178, 0.02));
+}
+
+.my-volunteer-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 209, 178, 0.2);
+}
+
+.level-item {
+    margin: 0 0.5rem;
+}
+
+.heading {
+    font-size: 0.75rem;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* Mejoras para las tarjetas */
+.card-content .media {
+    margin-bottom: 1rem;
+}
+
+.card-content .content {
+    padding-top: 0;
+}
+
+/* Estilos para los botones */
+.buttons .button {
+    margin: 0 0.25rem;
+}
+
+/* Estilos para el botón de navegación */
+.back-button {
+    background-color: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    transition: all 0.3s ease;
+    border-radius: 20px;
+    font-weight: 500;
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+}
+
+.back-button:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.4);
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.back-button .icon {
+    margin-right: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.back-button span:not(.icon) {
+    font-size: 0.875rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .buttons.is-centered {
+        flex-direction: column;
+    }
+    
+    .buttons .button {
+        margin: 0.25rem 0;
+        width: 100%;
+    }
+    
+    .back-button {
+        font-size: 0.8rem;
+        padding: 0.5rem 1rem;
+    }
+}
+</style>
+{% endblock %}
