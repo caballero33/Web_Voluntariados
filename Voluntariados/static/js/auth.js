@@ -78,7 +78,13 @@ class AuthManager {
     async saveUserData(uid, userData) {
         try {
             await window.firebaseDb.collection('users').doc(uid).set({
-                ...userData,
+                email: userData.email || '',
+                firstName: userData.nombre || userData.firstName || '',
+                lastName: userData.apellido || userData.lastName || '',
+                fullName: `${userData.nombre || userData.firstName || ''} ${userData.apellido || userData.lastName || ''}`.trim(),
+                phone: userData.phone || userData.telefono || '',
+                estado: userData.estado || 'inactivo',
+                rol: userData.rol || 'usuario',
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 lastLogin: firebase.firestore.FieldValue.serverTimestamp()
             });
@@ -152,20 +158,19 @@ class AuthManager {
 
     async registerUserInDjango(uid, email, userData) {
         try {
-            // Debug log removed
-            
             // Guardar usuario en Firebase con estado inactivo por defecto
             await window.firebaseDb.collection('users').doc(uid).set({
                 email: email,
-                nombre: userData.nombre || '',
-                apellido: userData.apellido || '',
+                firstName: userData.nombre || userData.firstName || '',
+                lastName: userData.apellido || userData.lastName || '',
+                fullName: `${userData.nombre || userData.firstName || ''} ${userData.apellido || userData.lastName || ''}`.trim(),
+                phone: userData.phone || userData.telefono || '',
                 estado: 'inactivo',  // Estado inicial inactivo
                 rol: 'usuario',      // Rol por defecto
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 lastLogin: firebase.firestore.FieldValue.serverTimestamp()
             });
             
-            // Debug log removed
             return { success: true, message: 'Usuario registrado exitosamente' };
             
         } catch (error) {

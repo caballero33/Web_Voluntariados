@@ -758,7 +758,6 @@ async function loadUserData() {
     
     if (user) {
         // Load basic info
-        document.getElementById('user-name-display').textContent = user.displayName || user.email;
         document.getElementById('user-email-display').textContent = user.email;
         
         // Load detailed profile
@@ -773,6 +772,10 @@ async function loadUserData() {
                 document.getElementById('profile-email').value = user.email;
                 document.getElementById('profile-phone').value = userData.phone || '';
                 document.getElementById('profile-interest').value = userData.volunteerInterest || '';
+                
+                // Update user name in sidebar
+                const fullName = userData.fullName || `${userData.firstName || ''} ${userData.lastName || ''}`.trim();
+                document.getElementById('user-name-display').textContent = fullName || 'Usuario';
                 
                 // Update statistics
                 updateUserStats(userData);
